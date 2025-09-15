@@ -45,6 +45,9 @@ importers:
       '@typescript-eslint/parser':
         specifier: ^8.43.0
         version: 8.43.0(eslint@8.57.1)(typescript@5.9.2)
+      '@typescript-eslint/rule-tester':
+        specifier: ^8.43.0
+        version: 8.43.0(eslint@8.57.1)(typescript@5.9.2)
       eslint:
         specifier: ^8.56.0
         version: 8.57.1
@@ -4694,6 +4697,20 @@ snapshots:
       typescript: 5.9.2
     transitivePeerDependencies:
       - supports-color
+
+  '@typescript-eslint/rule-tester@8.43.0(eslint@8.57.1)(typescript@5.9.2)':
+    dependencies:
+      '@typescript-eslint/parser': 8.43.0(eslint@8.57.1)(typescript@5.9.2)
+      '@typescript-eslint/typescript-estree': 8.43.0(typescript@5.9.2)
+      '@typescript-eslint/utils': 8.43.0(eslint@8.57.1)(typescript@5.9.2)
+      ajv: 6.12.6
+      eslint: 8.57.1
+      json-stable-stringify-without-jsonify: 1.0.1
+      lodash.merge: 4.6.2
+      semver: 7.7.2
+    transitivePeerDependencies:
+      - supports-color
+      - typescript
 
   '@typescript-eslint/rule-tester@8.43.0(eslint@9.35.0)(typescript@5.9.2)':
     dependencies:
