@@ -15,27 +15,13 @@ import {
   isVariableDeclarator,
   type Node,
 } from './nodes';
-import {
-  type DeprecatedToken,
-  getPandaContext,
-  matchFile,
-  matchImports,
-  resolveLongHand,
-  type run,
-  runAsync,
-} from './worker';
+import { type DeprecatedToken, getPandaContext } from './worker';
+import { resolveTsPathPattern } from '@pandacss/config/ts-path';
+import { type PandaContext } from '@pandacss/node';
 import { analyze } from '@typescript-eslint/scope-manager';
 import { type TSESTree } from '@typescript-eslint/utils';
 import { type RuleContext } from '@typescript-eslint/utils/ts-eslint';
-
-const syncAction = ((...args: Parameters<typeof run>) => {
-  try {
-    return runAsync(...args);
-  } catch (error) {
-    console.error('syncAction error:', error);
-    return undefined;
-  }
-}) as typeof run;
+import path from 'path';
 
 export const getAncestor = <N extends Node>(
   ofType: (node: Node) => node is N,
@@ -136,6 +122,36 @@ const isValidStyledProperty = <T extends Node>(
   return isJSXIdentifier(node) && isValidProperty(node.name, context);
 };
 
+const matchFile = (
+  pandaContext: PandaContext,
+  name: string,
+  imports: ImportResult[],
+) => {
+  const file = pandaContext.imports.file(imports);
+
+  return file.match(name);
+};
+
+type MatchImportResult = {
+  alias: string;
+  mod: string;
+  name: string;
+};
+
+const matchImports = (
+  pandaContext: PandaContext,
+  result: MatchImportResult,
+) => {
+  return pandaContext.imports.match(result, (module_) => {
+    const { tsOptions } = pandaContext.parserOptions;
+    if (!tsOptions?.pathMappings) {
+      return;
+    }
+
+    return resolveTsPathPattern(tsOptions.pathMappings, module_);
+  });
+};
+
 const isPandaIsh = (name: string, context: RuleContext<any, any>) => {
   const imports = getImports(context);
   if (imports.length === 0) {
@@ -207,21 +223,44 @@ const isLocalStyledFactory = (
   return true;
 };
 
+const arePathsEqual = (path1: string, path2: string) => {
+  const normalizedPath1 = path.resolve(path1);
+  const normalizedPath2 = path.resolve(path2);
+
+  return normalizedPath1 === normalizedPath2;
+};
+
 export const isValidFile = (context: RuleContext<any, any>) => {
-  return syncAction('isValidFile', getSyncOptions(context));
+  const pandaContext = getPandaContext(getSyncOptions(context));
+
+  return pandaContext
+    .getFiles()
+    .some((file) => arePathsEqual(file, context.filename));
 };
 
 export const isValidProperty = (
   name: string,
   context: RuleContext<any, any>,
-  calleName?: string,
+  calleeName?: string,
 ) => {
-  return syncAction(
-    'isValidProperty',
-    getSyncOptions(context),
-    name,
-    calleName,
-  );
+  const pandaContext = getPandaContext(getSyncOptions(context));
+
+  if (pandaContext.isValidProperty(name)) {
+    return true;
+  }
+
+  if (!calleeName) {
+    return;
+  }
+
+  const pattern = pandaContext.patterns.details.find(
+    (p) => p.baseName === calleeName || p.jsx.includes(calleeName),
+  )?.config.properties;
+  if (!pattern) {
+    return;
+  }
+
+  return Object.keys(pattern).includes(name);
 };
 
 export const isPandaImport = (
@@ -460,21 +499,33 @@ export const resolveLonghand = (
   name: string,
   context: RuleContext<any, any>,
 ) => {
-  return resolveLongHand(getPandaContext(getSyncOptions(context)), name);
+  const pandaContext = getPandaContext(getSyncOptions(context));
+
+  const reverseShorthandsMap = new Map();
+
+  for (const [key, values] of pandaContext.utility.getPropShorthandsMap()) {
+    for (const value of values) {
+      reverseShorthandsMap.set(value, key);
+    }
+  }
+
+  return reverseShorthandsMap.get(name);
 };
 
 export const resolveShorthands = (
   name: string,
   context: RuleContext<any, any>,
 ) => {
-  return syncAction('resolveShorthands', getSyncOptions(context), name);
+  const pandaContext = getPandaContext(getSyncOptions(context));
+
+  return pandaContext.utility.getPropShorthandsMap().get(name);
 };
 
 export const isColorAttribute = (
   attribute: string,
   context: RuleContext<any, any>,
 ) => {
-  return syncAction('isColorAttribute', getSyncOptions(context), attribute);
+  return getPropertyCategory(context, attribute) === 'colors';
 };
 
 export const isColorToken = (
@@ -485,7 +536,11 @@ export const isColorToken = (
     return;
   }
 
-  return syncAction('isColorToken', getSyncOptions(context), value);
+  const pandaContext = getPandaContext(getSyncOptions(context));
+
+  return Boolean(
+    pandaContext.utility.tokens.view.categoryMap.get('colors')?.get(value),
+  );
 };
 
 export const extractTokens = (value: string) => {
@@ -513,6 +568,13 @@ export const extractTokens = (value: string) => {
 // Caching invalid tokens to avoid redundant computations
 const invalidTokensCache = new Map<string, string[]>();
 
+const filterInvalidTokens = (
+  pandaContext: PandaContext,
+  paths: string[],
+): string[] => {
+  return paths.filter((path) => !pandaContext.utility.tokens.view.get(path));
+};
+
 export const getInvalidTokens = (
   value: string,
   context: RuleContext<any, any>,
@@ -526,11 +588,10 @@ export const getInvalidTokens = (
     return [];
   }
 
-  const invalidTokens = syncAction(
-    'filterInvalidTokens',
-    getSyncOptions(context),
-    tokens,
-  );
+  const pandaContext = getPandaContext(getSyncOptions(context));
+
+  const invalidTokens = filterInvalidTokens(pandaContext, tokens);
+
   invalidTokensCache.set(value, invalidTokens);
   return invalidTokens;
 };
@@ -538,16 +599,39 @@ export const getInvalidTokens = (
 // Caching deprecated tokens to avoid redundant computations
 const deprecatedTokensCache = new Map<string, DeprecatedToken[]>();
 
+const filterDeprecatedTokens = (
+  pandaContext: PandaContext,
+  tokens: DeprecatedToken[],
+): DeprecatedToken[] => {
+  return tokens.filter((token) => {
+    const value =
+      typeof token === 'string' ? token : token.category + '.' + token.value;
+    return pandaContext.utility.tokens.isDeprecated(value);
+  });
+};
+
+const getPropertyCategory = (
+  context: RuleContext<any, any>,
+  _attribute: string,
+) => {
+  const pandaContext = getPandaContext(getSyncOptions(context));
+
+  const longhand = resolveLonghand(_attribute, context);
+  const attribute = longhand || _attribute;
+  const attributeConfig = pandaContext.utility.config[attribute];
+  return typeof attributeConfig?.values === 'string'
+    ? attributeConfig.values
+    : undefined;
+};
+
 export const getDeprecatedTokens = (
   property: string,
   value: string,
   context: RuleContext<any, any>,
 ) => {
-  const propertyCategory = syncAction(
-    'getPropCategory',
-    getSyncOptions(context),
-    property,
-  );
+  const pandaContext = getPandaContext(getSyncOptions(context));
+
+  const propertyCategory = getPropertyCategory(context, property);
 
   const tokens = extractTokens(value);
 
@@ -563,11 +647,9 @@ export const getDeprecatedTokens = (
     return deprecatedTokensCache.get(value)!;
   }
 
-  const deprecatedTokens = syncAction(
-    'filterDeprecatedTokens',
-    getSyncOptions(context),
-    values,
-  );
+  // @ts-expect-error TODO
+  const deprecatedTokens = filterDeprecatedTokens(pandaContext, values);
+
   deprecatedTokensCache.set(value, deprecatedTokens);
 
   return deprecatedTokens;
