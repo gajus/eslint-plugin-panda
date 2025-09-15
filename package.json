@@ -10,6 +10,7 @@
     "lint:eslint": "eslint . --ext .ts",
     "lint:prettier": "prettier --check .",
     "lint:tsc": "pnpm -r --parallel lint:tsc",
+    "lint:knip": "knip",
     "prepare": "husky",
     "release": "changeset publish",
     "test:vitest": "vitest run"
