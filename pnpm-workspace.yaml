@@ -1,7 +1,8 @@
 onlyBuiltDependencies:
+  - deasync
   - esbuild
   - multiline-ts
   - oxc-resolver
 packages:
-  - 'sandbox'
-  - 'plugin'
+  - sandbox
+  - plugin

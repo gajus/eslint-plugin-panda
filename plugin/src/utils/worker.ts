@@ -1,17 +1,17 @@
 import { type ImportResult } from '.';
 import { createContext } from '../../tests/fixtures/create-context';
+import { loadConfigAndCreateContextSync } from './loadConfigAndCreateContextSync';
 import { findConfig } from '@pandacss/config';
 import { resolveTsPathPattern } from '@pandacss/config/ts-path';
-import { loadConfigAndCreateContext, type PandaContext } from '@pandacss/node';
+import { type PandaContext } from '@pandacss/node';
 import path from 'path';
-import { runAsWorker } from 'synckit';
 
 type Options = {
   configPath?: string;
   currentFile: string;
 };
 
-const contextCache: { [configPath: string]: Promise<PandaContext> } = {};
+const contextCache: { [configPath: string]: PandaContext } = {};
 
 export type DeprecatedToken =
   | string
@@ -20,7 +20,7 @@ export type DeprecatedToken =
       value: string;
     };
 
-export async function getContext(options: Options) {
+const getContext = (options: Options) => {
   if (process.env.NODE_ENV === 'test') {
     const context = createContext() as unknown as PandaContext;
     context.getFiles = () => ['App.tsx'];
@@ -35,20 +35,20 @@ export async function getContext(options: Options) {
       contextCache[configPath] = _getContext(configPath);
     }
 
-    return await contextCache[configPath];
+    return contextCache[configPath];
   }
-}
+};
 
-async function _getContext(configPath: string | undefined) {
+const _getContext = (configPath: string | undefined) => {
   if (!configPath) {
     throw new Error('Invalid config path');
   }
 
   const cwd = path.dirname(configPath);
 
-  const context = await loadConfigAndCreateContext({ configPath, cwd });
+  const context = loadConfigAndCreateContextSync({ configPath, cwd });
   return context;
-}
+};
 
 // Refactored to arrow function, removed async
 const filterDeprecatedTokens = (
@@ -182,61 +182,57 @@ export function runAsync(
   action: 'isColorToken',
   options: Options,
   value: string,
-): Promise<boolean>;
+): boolean;
 export function runAsync(
   action: 'isColorAttribute',
   options: Options,
   attribute: string,
-): Promise<boolean>;
+): boolean;
 export function runAsync(
   action: 'isValidFile',
   options: Options,
   fileName: string,
-): Promise<string>;
+): string;
 export function runAsync(
   action: 'resolveShorthands',
   options: Options,
   name: string,
-): Promise<string[] | undefined>;
+): string[] | undefined;
 export function runAsync(
   action: 'resolveLongHand',
   options: Options,
   name: string,
-): Promise<string | undefined>;
+): string | undefined;
 
 export function runAsync(
   action: 'isValidProperty',
   options: Options,
   name: string,
   patternName?: string,
-): Promise<boolean>;
+): boolean;
 export function runAsync(
   action: 'matchFile',
   options: Options,
   name: string,
   imports: ImportResult[],
-): Promise<boolean>;
+): boolean;
 export function runAsync(
   action: 'matchImports',
   options: Options,
   result: MatchImportResult,
-): Promise<boolean>;
+): boolean;
 export function runAsync(
   action: 'getPropCategory',
   options: Options,
   property: string,
-): Promise<string>;
+): string;
 export function runAsync(
   action: 'filterDeprecatedTokens',
   options: Options,
   tokens: DeprecatedToken[],
-): Promise<DeprecatedToken[]>;
-export async function runAsync(
-  action: string,
-  options: Options,
-  ...args: any
-): Promise<any> {
-  const context = await getContext(options);
+): DeprecatedToken[];
+export function runAsync(action: string, options: Options, ...args: any): any {
+  const context = getContext(options);
 
   switch (action) {
     case 'filterDeprecatedTokens':
@@ -348,5 +344,3 @@ const resolveShorthands = (
 ): string[] | undefined => {
   return context.utility.getPropShorthandsMap().get(name);
 };
-
-runAsWorker(run as any);

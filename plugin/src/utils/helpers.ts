@@ -1,4 +1,4 @@
-import { type ImportResult, syncAction } from '.';
+import { type ImportResult } from '.';
 import {
   isCallExpression,
   isIdentifier,
@@ -15,10 +15,19 @@ import {
   isVariableDeclarator,
   type Node,
 } from './nodes';
-import { type DeprecatedToken } from './worker';
+import { type DeprecatedToken, type run, runAsync } from './worker';
 import { analyze } from '@typescript-eslint/scope-manager';
 import { type TSESTree } from '@typescript-eslint/utils';
 import { type RuleContext } from '@typescript-eslint/utils/ts-eslint';
+
+const syncAction = ((...args: Parameters<typeof run>) => {
+  try {
+    return runAsync(...args);
+  } catch (error) {
+    console.error('syncAction error:', error);
+    return undefined;
+  }
+}) as typeof run;
 
 export const getAncestor = <N extends Node>(
   ofType: (node: Node) => node is N,
