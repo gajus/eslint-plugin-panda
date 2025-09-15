@@ -1,48 +1,69 @@
-import { createRule } from '../utils'
-import { isPandaAttribute, isPandaProp as isPandaProperty, isRecipeVariant } from '../utils/helpers'
-import { isIdentifier, isJSXExpressionContainer, isMemberExpression } from '../utils/nodes'
-import { type TSESTree } from '@typescript-eslint/utils'
+import { createRule } from '../utils';
+import {
+  isPandaAttribute,
+  isPandaProp as isPandaProperty,
+  isRecipeVariant,
+} from '../utils/helpers';
+import {
+  isIdentifier,
+  isJSXExpressionContainer,
+  isMemberExpression,
+} from '../utils/nodes';
+import { type TSESTree } from '@typescript-eslint/utils';
 
-export const RULE_NAME = 'no-property-renaming'
+export const RULE_NAME = 'no-property-renaming';
 
 const rule = createRule({
   create(context) {
     // Caches for helper functions
-    const pandaPropertyCache = new WeakMap<TSESTree.JSXAttribute, boolean | undefined>()
-    const pandaAttributeCache = new WeakMap<TSESTree.Property, boolean | undefined>()
-    const recipeVariantCache = new WeakMap<TSESTree.Property, boolean | undefined>()
+    const pandaPropertyCache = new WeakMap<
+      TSESTree.JSXAttribute,
+      boolean | undefined
+    >();
+    const pandaAttributeCache = new WeakMap<
+      TSESTree.Property,
+      boolean | undefined
+    >();
+    const recipeVariantCache = new WeakMap<
+      TSESTree.Property,
+      boolean | undefined
+    >();
 
     const isCachedPandaProperty = (node: TSESTree.JSXAttribute): boolean => {
       if (pandaPropertyCache.has(node)) {
-        return pandaPropertyCache.get(node)!
+        return pandaPropertyCache.get(node)!;
       }
 
-      const result = isPandaProperty(node, context)
-      pandaPropertyCache.set(node, result)
-      return Boolean(result)
-    }
+      const result = isPandaProperty(node, context);
+      pandaPropertyCache.set(node, result);
+      return Boolean(result);
+    };
 
     const isCachedPandaAttribute = (node: TSESTree.Property): boolean => {
       if (pandaAttributeCache.has(node)) {
-        return pandaAttributeCache.get(node)!
+        return pandaAttributeCache.get(node)!;
       }
 
-      const result = isPandaAttribute(node, context)
-      pandaAttributeCache.set(node, result)
-      return Boolean(result)
-    }
+      const result = isPandaAttribute(node, context);
+      pandaAttributeCache.set(node, result);
+      return Boolean(result);
+    };
 
     const isCachedRecipeVariant = (node: TSESTree.Property): boolean => {
       if (recipeVariantCache.has(node)) {
-        return recipeVariantCache.get(node)!
+        return recipeVariantCache.get(node)!;
       }
 
-      const result = isRecipeVariant(node, context)
-      recipeVariantCache.set(node, result)
-      return Boolean(result)
-    }
+      const result = isRecipeVariant(node, context);
+      recipeVariantCache.set(node, result);
+      return Boolean(result);
+    };
 
-    const sendReport = (node: TSESTree.Node, expected: string, property: string) => {
+    const sendReport = (
+      node: TSESTree.Node,
+      expected: string,
+      property: string,
+    ) => {
       context.report({
         data: {
           expected,
@@ -50,60 +71,68 @@ const rule = createRule({
         },
         messageId: 'noRenaming',
         node,
-      })
-    }
+      });
+    };
 
-    const handleReport = (node: TSESTree.Node, value: TSESTree.Node, attribute: string) => {
+    const handleReport = (
+      node: TSESTree.Node,
+      value: TSESTree.Node,
+      attribute: string,
+    ) => {
       if (isIdentifier(value) && attribute !== value.name) {
-        sendReport(node, attribute, value.name)
-      } else if (isMemberExpression(value) && isIdentifier(value.property) && attribute !== value.property.name) {
-        sendReport(node, attribute, value.property.name)
+        sendReport(node, attribute, value.name);
+      } else if (
+        isMemberExpression(value) &&
+        isIdentifier(value.property) &&
+        attribute !== value.property.name
+      ) {
+        sendReport(node, attribute, value.property.name);
       }
-    }
+    };
 
     return {
       JSXAttribute(node: TSESTree.JSXAttribute) {
         if (!node.value) {
-          return
+          return;
         }
 
         if (!isJSXExpressionContainer(node.value)) {
-          return
+          return;
         }
 
         if (!isCachedPandaProperty(node)) {
-          return
+          return;
         }
 
-        const attribute = node.name.name.toString()
-        const expression = node.value.expression
+        const attribute = node.name.name.toString();
+        const expression = node.value.expression;
 
-        handleReport(node.value, expression, attribute)
+        handleReport(node.value, expression, attribute);
       },
 
       Property(node: TSESTree.Property) {
         if (!isIdentifier(node.key)) {
-          return
+          return;
         }
 
         if (!isIdentifier(node.value) && !isMemberExpression(node.value)) {
-          return
+          return;
         }
 
         if (!isCachedPandaAttribute(node)) {
-          return
+          return;
         }
 
         if (isCachedRecipeVariant(node)) {
-          return
+          return;
         }
 
-        const attribute = node.key.name
-        const value = node.value
+        const attribute = node.key.name;
+        const value = node.value;
 
-        handleReport(node.value, value, attribute)
+        handleReport(node.value, value, attribute);
       },
-    }
+    };
   },
   defaultOptions: [],
   meta: {
@@ -119,6 +148,6 @@ const rule = createRule({
     type: 'problem',
   },
   name: RULE_NAME,
-})
+});
 
-export default rule
+export default rule;

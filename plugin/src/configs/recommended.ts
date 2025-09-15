@@ -14,4 +14,4 @@ export default {
     'panda/no-property-renaming': 'warn',
     'panda/no-unsafe-token-fn-usage': 'warn',
   },
-}
+};

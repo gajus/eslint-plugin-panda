@@ -1,5 +1,5 @@
-import auto from 'eslint-config-canonical/auto'
-import { defineConfig } from 'eslint/config'
+import auto from 'eslint-config-canonical/auto';
+import { defineConfig } from 'eslint/config';
 
 export default defineConfig(
   // @ts-expect-error - TODO properly type eslint-config-canonical
@@ -37,4 +37,4 @@ export default defineConfig(
   {
     ignores: ['**/dist/', '**/.*/', '**/styled-system/'],
   },
-)
+);

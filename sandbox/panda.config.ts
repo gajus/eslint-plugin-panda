@@ -1,4 +1,4 @@
-import { defineConfig } from '@pandacss/dev'
+import { defineConfig } from '@pandacss/dev';
 
 export default defineConfig({
   exclude: [],
@@ -113,4 +113,4 @@ export default defineConfig({
       },
     },
   },
-})
+});

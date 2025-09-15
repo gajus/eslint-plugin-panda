@@ -1,4 +1,4 @@
-import { type ImportResult, syncAction } from '.'
+import { type ImportResult, syncAction } from '.';
 import {
   isCallExpression,
   isIdentifier,
@@ -14,253 +14,310 @@ import {
   isTemplateLiteral,
   isVariableDeclarator,
   type Node,
-} from './nodes'
-import { type DeprecatedToken } from './worker'
-import { analyze } from '@typescript-eslint/scope-manager'
-import { type TSESTree } from '@typescript-eslint/utils'
-import { type RuleContext } from '@typescript-eslint/utils/ts-eslint'
+} from './nodes';
+import { type DeprecatedToken } from './worker';
+import { analyze } from '@typescript-eslint/scope-manager';
+import { type TSESTree } from '@typescript-eslint/utils';
+import { type RuleContext } from '@typescript-eslint/utils/ts-eslint';
 
-export const getAncestor = <N extends Node>(ofType: (node: Node) => node is N, for_: Node): N | undefined => {
-  let current: Node | undefined = for_.parent
+export const getAncestor = <N extends Node>(
+  ofType: (node: Node) => node is N,
+  for_: Node,
+): N | undefined => {
+  let current: Node | undefined = for_.parent;
   while (current) {
     if (ofType(current)) {
-      return current
+      return current;
     }
 
-    current = current.parent
+    current = current.parent;
   }
-}
+};
 
 const getSyncOptions = (context: RuleContext<any, any>) => {
   return {
     configPath: context.settings['@pandacss/configPath'] as string | undefined,
     currentFile: context.filename,
-  }
-}
+  };
+};
 
 export const getImportSpecifiers = (context: RuleContext<any, any>) => {
   const specifiers: Array<{
-    mod: string
-    specifier: TSESTree.ImportSpecifier
-  }> = []
+    mod: string;
+    specifier: TSESTree.ImportSpecifier;
+  }> = [];
 
   for (const node of context.sourceCode?.ast.body) {
     if (!isImportDeclaration(node)) {
-      continue
+      continue;
     }
 
-    const module_ = node.source.value
+    const module_ = node.source.value;
     if (!module_) {
-      continue
+      continue;
     }
 
     for (const specifier of node.specifiers) {
       if (!isImportSpecifier(specifier)) {
-        continue
+        continue;
       }
 
-      specifiers.push({ mod: module_, specifier })
+      specifiers.push({ mod: module_, specifier });
     }
   }
 
-  return specifiers
-}
+  return specifiers;
+};
 
 export const hasPkgImport = (context: RuleContext<any, any>) => {
-  const imports = _getImports(context)
-  return imports.some(({ mod }) => mod === '@pandacss/dev')
-}
+  const imports = _getImports(context);
+  return imports.some(({ mod }) => mod === '@pandacss/dev');
+};
 
-export const isPandaConfigFunction = (context: RuleContext<any, any>, name: string) => {
-  const imports = _getImports(context)
-  return imports.some(({ alias, mod }) => alias === name && mod === '@pandacss/dev')
-}
+export const isPandaConfigFunction = (
+  context: RuleContext<any, any>,
+  name: string,
+) => {
+  const imports = _getImports(context);
+  return imports.some(
+    ({ alias, mod }) => alias === name && mod === '@pandacss/dev',
+  );
+};
 
 const _getImports = (context: RuleContext<any, any>) => {
-  const specifiers = getImportSpecifiers(context)
+  const specifiers = getImportSpecifiers(context);
 
   const imports: ImportResult[] = specifiers.map(({ mod, specifier }) => ({
     alias: specifier.local.name,
     mod,
     name: (specifier.imported as any).name,
-  }))
+  }));
 
-  return imports
-}
+  return imports;
+};
 
 // Caching imports per context to avoid redundant computations
-const importsCache = new WeakMap<RuleContext<any, any>, ImportResult[]>()
+const importsCache = new WeakMap<RuleContext<any, any>, ImportResult[]>();
 
 const getImports = (context: RuleContext<any, any>) => {
   if (importsCache.has(context)) {
-    return importsCache.get(context)!
+    return importsCache.get(context)!;
   }
 
-  const imports = _getImports(context)
-  const filteredImports = imports.filter((imp) => syncAction('matchImports', getSyncOptions(context), imp))
-  importsCache.set(context, filteredImports)
-  return filteredImports
-}
+  const imports = _getImports(context);
+  const filteredImports = imports.filter((imp) =>
+    syncAction('matchImports', getSyncOptions(context), imp),
+  );
+  importsCache.set(context, filteredImports);
+  return filteredImports;
+};
 
-const isValidStyledProperty = <T extends Node>(node: T, context: RuleContext<any, any>) => {
-  return isJSXIdentifier(node) && isValidProperty(node.name, context)
-}
+const isValidStyledProperty = <T extends Node>(
+  node: T,
+  context: RuleContext<any, any>,
+) => {
+  return isJSXIdentifier(node) && isValidProperty(node.name, context);
+};
 
 export const isPandaIsh = (name: string, context: RuleContext<any, any>) => {
-  const imports = getImports(context)
+  const imports = getImports(context);
   if (imports.length === 0) {
-    return false
+    return false;
   }
 
-  return syncAction('matchFile', getSyncOptions(context), name, imports)
-}
+  return syncAction('matchFile', getSyncOptions(context), name, imports);
+};
 
 const findDeclaration = (name: string, context: RuleContext<any, any>) => {
   try {
-    const source = context.sourceCode
+    const source = context.sourceCode;
 
     if (!source) {
-      console.warn("⚠️ ESLint's sourceCode is not available. Ensure that the rule is invoked with valid code.")
-      return undefined
+      console.warn(
+        "⚠️ ESLint's sourceCode is not available. Ensure that the rule is invoked with valid code.",
+      );
+      return undefined;
     }
 
     const scope = analyze(source.ast, {
       sourceType: 'module',
-    })
+    });
     const decl = scope.variables
       .find((v) => v.name === name)
-      ?.defs.find((d) => isIdentifier(d.name) && d.name.name === name)?.node
+      ?.defs.find((d) => isIdentifier(d.name) && d.name.name === name)?.node;
     if (isVariableDeclarator(decl)) {
-      return decl
+      return decl;
     }
   } catch (error) {
-    console.error('Error in findDeclaration:', error)
-    return undefined
+    console.error('Error in findDeclaration:', error);
+    return undefined;
   }
-}
+};
 
-const isLocalStyledFactory = (node: TSESTree.JSXOpeningElement, context: RuleContext<any, any>) => {
+const isLocalStyledFactory = (
+  node: TSESTree.JSXOpeningElement,
+  context: RuleContext<any, any>,
+) => {
   if (!isJSXIdentifier(node.name)) {
-    return
+    return;
   }
 
-  const decl = findDeclaration(node.name.name, context)
+  const decl = findDeclaration(node.name.name, context);
 
   if (!decl) {
-    return
+    return;
   }
 
   if (!isCallExpression(decl.init)) {
-    return
+    return;
   }
 
   if (!isIdentifier(decl.init.callee)) {
-    return
+    return;
   }
 
   // Check if the callee is 'styled' from panda imports
-  const calleeName = decl.init.callee.name
-  const rawImports = _getImports(context)
-  const isStyledImport = rawImports.some((imp) => imp.alias === calleeName && imp.mod.includes('panda'))
+  const calleeName = decl.init.callee.name;
+  const rawImports = _getImports(context);
+  const isStyledImport = rawImports.some(
+    (imp) => imp.alias === calleeName && imp.mod.includes('panda'),
+  );
 
   if (!isStyledImport && !isPandaIsh(calleeName, context)) {
-    return
+    return;
   }
 
-  return true
-}
+  return true;
+};
 
 export const isValidFile = (context: RuleContext<any, any>) => {
-  return syncAction('isValidFile', getSyncOptions(context))
-}
+  return syncAction('isValidFile', getSyncOptions(context));
+};
 
-export const isValidProperty = (name: string, context: RuleContext<any, any>, calleName?: string) => {
-  return syncAction('isValidProperty', getSyncOptions(context), name, calleName)
-}
+export const isValidProperty = (
+  name: string,
+  context: RuleContext<any, any>,
+  calleName?: string,
+) => {
+  return syncAction(
+    'isValidProperty',
+    getSyncOptions(context),
+    name,
+    calleName,
+  );
+};
 
-export const isPandaImport = (node: TSESTree.ImportDeclaration, context: RuleContext<any, any>) => {
-  const imports = getImports(context)
-  return imports.some((imp) => imp.mod === node.source.value)
-}
+export const isPandaImport = (
+  node: TSESTree.ImportDeclaration,
+  context: RuleContext<any, any>,
+) => {
+  const imports = getImports(context);
+  return imports.some((imp) => imp.mod === node.source.value);
+};
 
-export const isPandaProp = (node: TSESTree.JSXAttribute, context: RuleContext<any, any>) => {
-  const jsxAncestor = getAncestor(isJSXOpeningElement, node)
+export const isPandaProp = (
+  node: TSESTree.JSXAttribute,
+  context: RuleContext<any, any>,
+) => {
+  const jsxAncestor = getAncestor(isJSXOpeningElement, node);
 
   if (!jsxAncestor) {
-    return
+    return;
   }
 
   // <styled.div /> && <Box />
-  if (!isJSXMemberExpression(jsxAncestor.name) && !isJSXIdentifier(jsxAncestor.name)) {
-    return
+  if (
+    !isJSXMemberExpression(jsxAncestor.name) &&
+    !isJSXIdentifier(jsxAncestor.name)
+  ) {
+    return;
   }
 
-  let isPandaComponent = false
-  let componentName: string | undefined
+  let isPandaComponent = false;
+  let componentName: string | undefined;
 
   if (isJSXMemberExpression(jsxAncestor.name)) {
     // For <styled.div>, check if 'styled' is a Panda import
-    const objectName = (jsxAncestor.name.object as any).name
-    componentName = objectName
+    const objectName = (jsxAncestor.name.object as any).name;
+    componentName = objectName;
     // Check if 'styled' is imported from panda - check both filtered and raw imports
-    const imports = getImports(context)
-    const rawImports = _getImports(context)
+    const imports = getImports(context);
+    const rawImports = _getImports(context);
     isPandaComponent =
       imports.some((imp) => imp.alias === objectName) ||
-      rawImports.some((imp) => imp.alias === objectName && imp.mod.includes('panda')) ||
-      isPandaIsh(objectName, context)
+      rawImports.some(
+        (imp) => imp.alias === objectName && imp.mod.includes('panda'),
+      ) ||
+      isPandaIsh(objectName, context);
 
     // For styled.div, all props are valid styled props
     if (isPandaComponent) {
-      return true
+      return true;
     }
   } else if (isJSXIdentifier(jsxAncestor.name)) {
     // For <Circle> or <PandaComp>
-    componentName = jsxAncestor.name.name
+    componentName = jsxAncestor.name.name;
 
     // Check if it's a local styled factory (e.g., const PandaComp = styled(div))
-    const isLocalStyled = isLocalStyledFactory(jsxAncestor, context)
+    const isLocalStyled = isLocalStyledFactory(jsxAncestor, context);
 
     // For local styled components, we need to check if the prop is a valid Panda prop
     if (isLocalStyled) {
-      const property = node.name.name
+      const property = node.name.name;
       // Special props like 'css' and props starting with '_' are Panda props
-      if (property === 'css' || (typeof property === 'string' && property.startsWith('_'))) {
-        return true
+      if (
+        property === 'css' ||
+        (typeof property === 'string' && property.startsWith('_'))
+      ) {
+        return true;
       }
 
       // Other props need to be valid style properties
       if (typeof property !== 'string' || !isValidProperty(property, context)) {
-        return false
+        return false;
       }
 
-      return true
+      return true;
     }
 
     // For imported Panda components like Circle
-    isPandaComponent = isPandaIsh(componentName, context)
+    isPandaComponent = isPandaIsh(componentName, context);
   }
 
   if (!isPandaComponent) {
-    return
+    return;
   }
 
-  const property = node.name.name
+  const property = node.name.name;
   // Ensure prop is a styled prop
-  if (typeof property !== 'string' || !isValidProperty(property, context, componentName)) {
-    return
+  if (
+    typeof property !== 'string' ||
+    !isValidProperty(property, context, componentName)
+  ) {
+    return;
   }
 
-  return true
-}
+  return true;
+};
 
-export const isStyledProperty = (node: TSESTree.Property, context: RuleContext<any, any>, calleeName?: string) => {
-  if (!isIdentifier(node.key) && !isLiteral(node.key) && !isTemplateLiteral(node.key)) {
-    return
+export const isStyledProperty = (
+  node: TSESTree.Property,
+  context: RuleContext<any, any>,
+  calleeName?: string,
+) => {
+  if (
+    !isIdentifier(node.key) &&
+    !isLiteral(node.key) &&
+    !isTemplateLiteral(node.key)
+  ) {
+    return;
   }
 
-  if (isIdentifier(node.key) && !isValidProperty(node.key.name, context, calleeName)) {
-    return
+  if (
+    isIdentifier(node.key) &&
+    !isValidProperty(node.key.name, context, calleeName)
+  ) {
+    return;
   }
 
   if (
@@ -268,265 +325,328 @@ export const isStyledProperty = (node: TSESTree.Property, context: RuleContext<a
     typeof node.key.value === 'string' &&
     !isValidProperty(node.key.value, context, calleeName)
   ) {
-    return
+    return;
   }
 
-  if (isTemplateLiteral(node.key) && !isValidProperty(node.key.quasis[0].value.raw, context, calleeName)) {
-    return
+  if (
+    isTemplateLiteral(node.key) &&
+    !isValidProperty(node.key.quasis[0].value.raw, context, calleeName)
+  ) {
+    return;
   }
 
-  return true
-}
+  return true;
+};
 
-export const isInPandaFunction = (node: TSESTree.Property, context: RuleContext<any, any>) => {
-  const callAncestor = getAncestor(isCallExpression, node)
+export const isInPandaFunction = (
+  node: TSESTree.Property,
+  context: RuleContext<any, any>,
+) => {
+  const callAncestor = getAncestor(isCallExpression, node);
   if (!callAncestor) {
-    return
+    return;
   }
 
-  let calleeName: string | undefined
+  let calleeName: string | undefined;
 
   // E.g. css({...}), cvs({...})
   if (isIdentifier(callAncestor.callee)) {
-    calleeName = callAncestor.callee.name
+    calleeName = callAncestor.callee.name;
   }
 
   // E.g. css.raw({...})
-  if (isMemberExpression(callAncestor.callee) && isIdentifier(callAncestor.callee.object)) {
-    calleeName = callAncestor.callee.object.name
+  if (
+    isMemberExpression(callAncestor.callee) &&
+    isIdentifier(callAncestor.callee.object)
+  ) {
+    calleeName = callAncestor.callee.object.name;
   }
 
   if (!calleeName) {
-    return
+    return;
   }
 
   if (!isPandaIsh(calleeName, context)) {
-    return
+    return;
   }
 
-  return calleeName
-}
+  return calleeName;
+};
 
-export const isInJSXProp = (node: TSESTree.Property, context: RuleContext<any, any>) => {
-  const jsxExprAncestor = getAncestor(isJSXExpressionContainer, node)
-  const jsxAttributeAncestor = getAncestor(isJSXAttribute, node)
+export const isInJSXProp = (
+  node: TSESTree.Property,
+  context: RuleContext<any, any>,
+) => {
+  const jsxExprAncestor = getAncestor(isJSXExpressionContainer, node);
+  const jsxAttributeAncestor = getAncestor(isJSXAttribute, node);
 
   if (!jsxExprAncestor || !jsxAttributeAncestor) {
-    return
+    return;
   }
 
   // Get the JSX element to check if it's a Panda component
-  const jsxElement = getAncestor(isJSXOpeningElement, jsxAttributeAncestor)
+  const jsxElement = getAncestor(isJSXOpeningElement, jsxAttributeAncestor);
   if (!jsxElement) {
-    return
+    return;
   }
 
   // Check if it's a Panda component (styled.div, Circle, etc.)
-  let isPandaComponent = false
+  let isPandaComponent = false;
   if (isJSXMemberExpression(jsxElement.name)) {
     // For <styled.div>, check if 'styled' is a Panda import
-    const objectName = (jsxElement.name.object as any).name
-    isPandaComponent = isPandaIsh(objectName, context)
+    const objectName = (jsxElement.name.object as any).name;
+    isPandaComponent = isPandaIsh(objectName, context);
   } else if (isJSXIdentifier(jsxElement.name)) {
     // For <Circle> or <PandaComp>
-    const componentName = jsxElement.name.name
-    isPandaComponent = isPandaIsh(componentName, context) || Boolean(isLocalStyledFactory(jsxElement, context))
+    const componentName = jsxElement.name.name;
+    isPandaComponent =
+      isPandaIsh(componentName, context) ||
+      Boolean(isLocalStyledFactory(jsxElement, context));
   }
 
   if (!isPandaComponent) {
-    return
+    return;
   }
 
   // Check if the attribute name is a valid styled prop
   if (!isJSXIdentifier(jsxAttributeAncestor.name)) {
-    return
+    return;
   }
 
   if (!isValidStyledProperty(jsxAttributeAncestor.name, context)) {
-    return
+    return;
   }
 
-  return true
-}
+  return true;
+};
 
-export const isPandaAttribute = (node: TSESTree.Property, context: RuleContext<any, any>) => {
-  const callAncestor = getAncestor(isCallExpression, node)
+export const isPandaAttribute = (
+  node: TSESTree.Property,
+  context: RuleContext<any, any>,
+) => {
+  const callAncestor = getAncestor(isCallExpression, node);
 
   if (callAncestor) {
-    const callee = isInPandaFunction(node, context)
+    const callee = isInPandaFunction(node, context);
     if (!callee) {
-      return
+      return;
     }
 
-    return isStyledProperty(node, context, callee)
+    return isStyledProperty(node, context, callee);
   }
 
   // Object could be in JSX prop value i.e css prop or a pseudo
-  return isInJSXProp(node, context) && isStyledProperty(node, context)
-}
+  return isInJSXProp(node, context) && isStyledProperty(node, context);
+};
 
-export const resolveLonghand = (name: string, context: RuleContext<any, any>) => {
-  return syncAction('resolveLongHand', getSyncOptions(context), name)
-}
+export const resolveLonghand = (
+  name: string,
+  context: RuleContext<any, any>,
+) => {
+  return syncAction('resolveLongHand', getSyncOptions(context), name);
+};
 
-export const resolveShorthands = (name: string, context: RuleContext<any, any>) => {
-  return syncAction('resolveShorthands', getSyncOptions(context), name)
-}
+export const resolveShorthands = (
+  name: string,
+  context: RuleContext<any, any>,
+) => {
+  return syncAction('resolveShorthands', getSyncOptions(context), name);
+};
 
-export const isColorAttribute = (attribute: string, context: RuleContext<any, any>) => {
-  return syncAction('isColorAttribute', getSyncOptions(context), attribute)
-}
+export const isColorAttribute = (
+  attribute: string,
+  context: RuleContext<any, any>,
+) => {
+  return syncAction('isColorAttribute', getSyncOptions(context), attribute);
+};
 
-export const isColorToken = (value: string | undefined, context: RuleContext<any, any>) => {
+export const isColorToken = (
+  value: string | undefined,
+  context: RuleContext<any, any>,
+) => {
   if (!value) {
-    return
+    return;
   }
 
-  return syncAction('isColorToken', getSyncOptions(context), value)
-}
+  return syncAction('isColorToken', getSyncOptions(context), value);
+};
 
 export const extractTokens = (value: string) => {
-  const regex = /token\(([^"'(),]+)(?:,\s*([^"'(),]+))?\)|\{([^\n\r{}]+)\}/g
-  const matches = []
-  let match
+  const regex = /token\(([^"'(),]+)(?:,\s*([^"'(),]+))?\)|\{([^\n\r{}]+)\}/g;
+  const matches = [];
+  let match;
 
   while ((match = regex.exec(value)) !== null) {
-    const tokenFromFirstSyntax = match[1] || match[2] || match[3]
-    const tokensFromSecondSyntax = match[4] && match[4].match(/(\w+\.\w+(\.\w+)?)/g)
+    const tokenFromFirstSyntax = match[1] || match[2] || match[3];
+    const tokensFromSecondSyntax =
+      match[4] && match[4].match(/(\w+\.\w+(\.\w+)?)/g);
 
     if (tokenFromFirstSyntax) {
-      matches.push(tokenFromFirstSyntax)
+      matches.push(tokenFromFirstSyntax);
     }
 
     if (tokensFromSecondSyntax) {
-      matches.push(...tokensFromSecondSyntax)
+      matches.push(...tokensFromSecondSyntax);
     }
   }
 
-  return matches.filter(Boolean)
-}
+  return matches.filter(Boolean);
+};
 
 // Caching invalid tokens to avoid redundant computations
-const invalidTokensCache = new Map<string, string[]>()
+const invalidTokensCache = new Map<string, string[]>();
 
-export const getInvalidTokens = (value: string, context: RuleContext<any, any>) => {
+export const getInvalidTokens = (
+  value: string,
+  context: RuleContext<any, any>,
+) => {
   if (invalidTokensCache.has(value)) {
-    return invalidTokensCache.get(value)!
+    return invalidTokensCache.get(value)!;
   }
 
-  const tokens = extractTokens(value)
+  const tokens = extractTokens(value);
   if (!tokens.length) {
-    return []
+    return [];
   }
 
-  const invalidTokens = syncAction('filterInvalidTokens', getSyncOptions(context), tokens)
-  invalidTokensCache.set(value, invalidTokens)
-  return invalidTokens
-}
+  const invalidTokens = syncAction(
+    'filterInvalidTokens',
+    getSyncOptions(context),
+    tokens,
+  );
+  invalidTokensCache.set(value, invalidTokens);
+  return invalidTokens;
+};
 
 // Caching deprecated tokens to avoid redundant computations
-const deprecatedTokensCache = new Map<string, DeprecatedToken[]>()
+const deprecatedTokensCache = new Map<string, DeprecatedToken[]>();
 
-export const getDeprecatedTokens = (property: string, value: string, context: RuleContext<any, any>) => {
-  const propertyCategory = syncAction('getPropCategory', getSyncOptions(context), property)
+export const getDeprecatedTokens = (
+  property: string,
+  value: string,
+  context: RuleContext<any, any>,
+) => {
+  const propertyCategory = syncAction(
+    'getPropCategory',
+    getSyncOptions(context),
+    property,
+  );
 
-  const tokens = extractTokens(value)
+  const tokens = extractTokens(value);
 
   if (!propertyCategory && !tokens.length) {
-    return []
+    return [];
   }
 
-  const values = tokens.length ? tokens : [{ category: propertyCategory, value: value.split('/')[0] }]
+  const values = tokens.length
+    ? tokens
+    : [{ category: propertyCategory, value: value.split('/')[0] }];
 
   if (deprecatedTokensCache.has(value)) {
-    return deprecatedTokensCache.get(value)!
+    return deprecatedTokensCache.get(value)!;
   }
 
-  const deprecatedTokens = syncAction('filterDeprecatedTokens', getSyncOptions(context), values)
-  deprecatedTokensCache.set(value, deprecatedTokens)
+  const deprecatedTokens = syncAction(
+    'filterDeprecatedTokens',
+    getSyncOptions(context),
+    values,
+  );
+  deprecatedTokensCache.set(value, deprecatedTokens);
 
-  return deprecatedTokens
-}
+  return deprecatedTokens;
+};
 
 export const getTokenImport = (context: RuleContext<any, any>) => {
-  const imports = _getImports(context)
-  return imports.find((imp) => imp.name === 'token')
-}
+  const imports = _getImports(context);
+  return imports.find((imp) => imp.name === 'token');
+};
 
-export const getTaggedTemplateCaller = (node: TSESTree.TaggedTemplateExpression) => {
+export const getTaggedTemplateCaller = (
+  node: TSESTree.TaggedTemplateExpression,
+) => {
   // css``
   if (isIdentifier(node.tag)) {
-    return node.tag.name
+    return node.tag.name;
   }
 
   // styled.h1``
   if (isMemberExpression(node.tag)) {
     if (!isIdentifier(node.tag.object)) {
-      return
+      return;
     }
 
-    return node.tag.object.name
+    return node.tag.object.name;
   }
 
   // styled(Comp)``
   if (isCallExpression(node.tag)) {
     if (!isIdentifier(node.tag.callee)) {
-      return
+      return;
     }
 
-    return node.tag.callee.name
+    return node.tag.callee.name;
   }
-}
+};
 
-export const isStyledTaggedTemplate = (node: TSESTree.TaggedTemplateExpression, context: RuleContext<any, any>) => {
-  const caller = getTaggedTemplateCaller(node)
+export const isStyledTaggedTemplate = (
+  node: TSESTree.TaggedTemplateExpression,
+  context: RuleContext<any, any>,
+) => {
+  const caller = getTaggedTemplateCaller(node);
   if (!caller) {
-    return false
+    return false;
   }
 
   // Check if 'styled' is imported from panda
-  const rawImports = _getImports(context)
-  const isStyledImport = rawImports.some((imp) => imp.alias === caller && imp.mod.includes('panda'))
+  const rawImports = _getImports(context);
+  const isStyledImport = rawImports.some(
+    (imp) => imp.alias === caller && imp.mod.includes('panda'),
+  );
 
-  return isStyledImport || isPandaIsh(caller, context)
-}
+  return isStyledImport || isPandaIsh(caller, context);
+};
 
-export function isRecipeVariant(node: TSESTree.Property, context: RuleContext<any, any>) {
-  const caller = isInPandaFunction(node, context)
+export function isRecipeVariant(
+  node: TSESTree.Property,
+  context: RuleContext<any, any>,
+) {
+  const caller = isInPandaFunction(node, context);
   if (!caller) {
-    return
+    return;
   }
 
   // Check if the caller is either 'cva' or 'sva'
-  const recipe = getImports(context).find((imp) => ['cva', 'sva'].includes(imp.name) && imp.alias === caller)
+  const recipe = getImports(context).find(
+    (imp) => ['cva', 'sva'].includes(imp.name) && imp.alias === caller,
+  );
   if (!recipe) {
-    return
+    return;
   }
 
   //* Nesting is different here because of slots and variants. We don't want to warn about those.
-  let currentNode: any = node
-  let length = 0
-  let styleObjectParent: null | string = null
+  let currentNode: any = node;
+  let length = 0;
+  let styleObjectParent: null | string = null;
 
   // Traverse up the AST
   while (currentNode) {
-    const keyName = currentNode?.key?.name
+    const keyName = currentNode?.key?.name;
     if (keyName && ['base', 'variants'].includes(keyName)) {
-      styleObjectParent = keyName
+      styleObjectParent = keyName;
     }
 
-    currentNode = currentNode.parent
+    currentNode = currentNode.parent;
     if (!styleObjectParent) {
-      length++
+      length++;
     }
   }
 
   // Determine the required length based on caller and styleObjectParent
-  const isCvaCaller = caller === 'cva'
-  const requiredLength = isCvaCaller ? 2 : 4
-  const extraLength = styleObjectParent === 'base' ? 0 : 4
+  const isCvaCaller = caller === 'cva';
+  const requiredLength = isCvaCaller ? 2 : 4;
+  const extraLength = styleObjectParent === 'base' ? 0 : 4;
 
   if (length < requiredLength + extraLength) {
-    return true
+    return true;
   }
 }

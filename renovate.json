@@ -1,15 +1,26 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "dependencyDashboard": false,
-  "extends": ["config:base", ":semanticCommitTypeAll(chore)", "schedule:earlyMondays"],
+  "extends": [
+    "config:base",
+    ":semanticCommitTypeAll(chore)",
+    "schedule:earlyMondays"
+  ],
   "packageRules": [
     {
       "automerge": true,
-      "matchUpdateTypes": ["minor", "patch", "pin", "digest"]
+      "matchUpdateTypes": [
+        "minor",
+        "patch",
+        "pin",
+        "digest"
+      ]
     },
     {
       "groupName": "astro",
-      "matchPackagePatterns": ["astro*"]
+      "matchPackagePatterns": [
+        "astro*"
+      ]
     }
   ],
   "rebaseWhen": "conflicted",

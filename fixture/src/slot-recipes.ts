@@ -1,4 +1,4 @@
-import { type SlotRecipeConfig } from '@pandacss/types'
+import { type SlotRecipeConfig } from '@pandacss/types';
 
 export const slotRecipes: Record<string, SlotRecipeConfig> = {
   badge: {
@@ -58,4 +58,4 @@ export const slotRecipes: Record<string, SlotRecipeConfig> = {
       },
     },
   },
-}
+};

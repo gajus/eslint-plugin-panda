@@ -1,4 +1,4 @@
-import { type SemanticTokens } from '@pandacss/types'
+import { type SemanticTokens } from '@pandacss/types';
 
 export const semanticTokens: SemanticTokens = {
   colors: {
@@ -35,4 +35,4 @@ export const semanticTokens: SemanticTokens = {
   spacing: {
     gutter: { value: { base: '{spacing.4}', lg: '{spacing.5}' } },
   },
-}
+};

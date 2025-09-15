@@ -1,10 +1,14 @@
-import sandboxConfig from '../../sandbox/panda.config'
-import { fixturePreset } from './config'
-import { mergeConfigs } from '@pandacss/config'
-import { Generator } from '@pandacss/generator'
-import { PandaContext } from '@pandacss/node'
-import { parseJson, stringifyJson } from '@pandacss/shared'
-import { type Config, type LoadConfigResult, type UserConfig } from '@pandacss/types'
+import sandboxConfig from '../../sandbox/panda.config';
+import { fixturePreset } from './config';
+import { mergeConfigs } from '@pandacss/config';
+import { Generator } from '@pandacss/generator';
+import { PandaContext } from '@pandacss/node';
+import { parseJson, stringifyJson } from '@pandacss/shared';
+import {
+  type Config,
+  type LoadConfigResult,
+  type UserConfig,
+} from '@pandacss/types';
 
 const config: UserConfig = {
   ...fixturePreset,
@@ -14,7 +18,7 @@ const config: UserConfig = {
   jsxFramework: 'react',
   optimize: true,
   outdir: 'styled-system',
-}
+};
 
 export const fixtureDefaults = {
   config,
@@ -23,15 +27,17 @@ export const fixtureDefaults = {
   hooks: {},
   path: '',
   serialized: stringifyJson(config),
-} as LoadConfigResult
+} as LoadConfigResult;
 
 export const createGeneratorContext = (userConfig?: Config) => {
   const resolvedConfig = (
-    userConfig ? mergeConfigs([userConfig, fixtureDefaults.config]) : fixtureDefaults.config
-  ) as UserConfig
+    userConfig
+      ? mergeConfigs([userConfig, fixtureDefaults.config])
+      : fixtureDefaults.config
+  ) as UserConfig;
 
-  return new Generator({ ...fixtureDefaults, config: resolvedConfig })
-}
+  return new Generator({ ...fixtureDefaults, config: resolvedConfig });
+};
 
 // TODO why is this unused?
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -41,7 +47,7 @@ export const createContext = (userConfig?: Config) => {
     // @ts-expect-error - TODO explain why this is needed
     sandboxConfig,
     { importMap: './panda' },
-  ]) as UserConfig
+  ]) as UserConfig;
 
   return new PandaContext({
     ...fixtureDefaults,
@@ -50,5 +56,5 @@ export const createContext = (userConfig?: Config) => {
       // @ts-expect-error - TODO explain why this is needed
       useInMemoryFileSystem: true,
     },
-  })
-}
+  });
+};

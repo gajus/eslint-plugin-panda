@@ -4,4 +4,4 @@ export const layers = {
   reset: 'reset',
   tokens: 'tokens',
   utilities: 'utilities',
-}
+};

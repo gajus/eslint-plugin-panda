@@ -6,11 +6,19 @@
   },
   "workspaces": {
     "plugin": {
-      "entry": ["tests/**/*.test.ts", "tsdown.config.ts"],
-      "ignoreDependencies": ["@pandacss/generator"]
+      "entry": [
+        "tests/**/*.test.ts",
+        "tsdown.config.ts"
+      ],
+      "ignoreDependencies": [
+        "@pandacss/generator"
+      ]
     },
     "sandbox": {
-      "entry": ["src/main.tsx!", "postcss.config.cjs"]
+      "entry": [
+        "src/main.tsx!",
+        "postcss.config.cjs"
+      ]
     }
   }
 }

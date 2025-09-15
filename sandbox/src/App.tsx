@@ -1,17 +1,17 @@
 // * Too much errors in this file? It's intentional. Thanks for your concern. 🙏
 
-import { css } from '../styled-system/css'
-import { Circle, HStack, panda } from '../styled-system/jsx'
-import { stack } from '../styled-system/patterns'
-import { token } from '../styled-system/tokens'
-import { defineKeyframes } from '@pandacss/dev'
+import { css } from '../styled-system/css';
+import { Circle, HStack, panda } from '../styled-system/jsx';
+import { stack } from '../styled-system/patterns';
+import { token } from '../styled-system/tokens';
+import { defineKeyframes } from '@pandacss/dev';
 
 const keyframes = defineKeyframes({
   fadeIn: {
     '0%': { opacity: '0' },
     '100%': { opacity: '1' },
   },
-})
+});
 
 // @ts-expect-error noidea
 const literal = css`
@@ -19,13 +19,13 @@ const literal = css`
   margin-right: {sizess.4};
   padding-left: {sizess.4};
   font-weight: token(fontWeightss.bold, 700);
-`
+`;
 
-console.log(keyframes, literal)
+console.log(keyframes, literal);
 
-const LocalFactoryComp = panda('button')
+const LocalFactoryComp = panda('button');
 
-const pbe = '4'
+const pbe = '4';
 const App = () => {
   const className = css({
     bg: 'red.100',
@@ -37,12 +37,12 @@ const App = () => {
     marginTop: '{spacings.4} token(spacing.600)',
     paddingBlockEnd: ['4', pbe],
     pt: token('sizes.4'),
-  })
+  });
 
-  const color = 'red'
-  const circleSize = '4'
-  const ta = 'left'
-  const justify = 'center'
+  const color = 'red';
+  const circleSize = '4';
+  const ta = 'left';
+  const justify = 'center';
 
   return (
     <div
@@ -63,8 +63,14 @@ const App = () => {
       })}
     >
       <panda.a href={`mailto:${1}`} />
-      <Circle _hover={{ bg: 'red.200' }} size={circleSize} />
-      <HStack debug gap="40px">
+      <Circle
+        _hover={{ bg: 'red.200' }}
+        size={circleSize}
+      />
+      <HStack
+        debug
+        gap="40px"
+      >
         <div className={className}>Element 1</div>
         <panda.div
           bg="red.200"
@@ -80,7 +86,7 @@ const App = () => {
       </HStack>
       <LocalFactoryComp debug />
     </div>
-  )
-}
+  );
+};
 
-export default App
+export default App;

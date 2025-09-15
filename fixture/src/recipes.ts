@@ -1,4 +1,4 @@
-import { type RecipeConfig } from '@pandacss/types'
+import { type RecipeConfig } from '@pandacss/types';
 
 export const recipes: Record<string, RecipeConfig> = {
   buttonStyle: {
@@ -100,4 +100,4 @@ export const recipes: Record<string, RecipeConfig> = {
     },
     className: 'tooltipStyle',
   },
-}
+};

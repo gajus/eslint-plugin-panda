@@ -1,9 +1,17 @@
 {
   "compilerOptions": {
     "paths": {
-      "fixture": ["../fixture/src/index.ts"]
+      "fixture": [
+        "../fixture/src/index.ts"
+      ]
     }
   },
   "extends": "../tsconfig.build.json",
-  "include": ["src/**/*", "tests", "test-utils.ts", "eslint.config.ts", "tsdown.config.ts"]
+  "include": [
+    "src/**/*",
+    "tests",
+    "test-utils.ts",
+    "eslint.config.ts",
+    "tsdown.config.ts"
+  ]
 }
