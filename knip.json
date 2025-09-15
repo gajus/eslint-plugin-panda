@@ -17,7 +17,8 @@
     "sandbox": {
       "entry": [
         "src/main.tsx!",
-        "postcss.config.cjs"
+        "postcss.config.cjs",
+        "panda.config.ts"
       ]
     }
   }

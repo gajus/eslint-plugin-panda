@@ -1,8 +1,8 @@
 import { type ImportResult } from '.';
+import { createContext } from '../../tests/fixtures/create-context';
 import { findConfig } from '@pandacss/config';
 import { resolveTsPathPattern } from '@pandacss/config/ts-path';
 import { loadConfigAndCreateContext, type PandaContext } from '@pandacss/node';
-import { createContext } from 'fixture';
 import path from 'path';
 import { runAsWorker } from 'synckit';
 

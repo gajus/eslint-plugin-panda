@@ -35,6 +35,6 @@ export default defineConfig(
     },
   },
   {
-    ignores: ['**/dist/', '**/.*/', '**/styled-system/'],
+    ignores: ['**/dist/', '**/.*/', '**/styled-system/', '**/pnpm-lock.yaml'],
   },
 );

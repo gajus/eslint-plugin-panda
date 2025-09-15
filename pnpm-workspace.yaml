@@ -3,6 +3,5 @@ onlyBuiltDependencies:
   - multiline-ts
   - oxc-resolver
 packages:
-  - 'fixture'
   - 'sandbox'
   - 'plugin'
