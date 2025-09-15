@@ -4,7 +4,7 @@
 
 Disallow usage of !important keyword. Prioritize specificity for a maintainable and predictable styling structure.
 
-📋 This rule is enabled in `plugin:@pandacss/all`.
+📋 This rule is enabled in `plugin:panda/all`.
 
 ## Rule details
 

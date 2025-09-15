@@ -4,7 +4,7 @@
 
 Prohibit the use of escape hatch syntax in the code.
 
-📋 This rule is enabled in `plugin:@pandacss/all`.
+📋 This rule is enabled in `plugin:panda/all`.
 
 ## Rule details
 

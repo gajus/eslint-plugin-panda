@@ -4,9 +4,9 @@
 
 Prevent users from using the token function in situations where they could simply use the raw design token.
 
-📋 This rule is enabled in `plugin:@pandacss/all`.
+📋 This rule is enabled in `plugin:panda/all`.
 
-📋 This rule is enabled in `plugin:@pandacss/recommended`.
+📋 This rule is enabled in `plugin:panda/recommended`.
 
 ## Rule details
 

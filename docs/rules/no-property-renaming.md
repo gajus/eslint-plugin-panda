@@ -4,9 +4,9 @@
 
 Ensure that properties for patterns or style props are not renamed, as it prevents proper tracking.
 
-📋 This rule is enabled in `plugin:@pandacss/all`.
+📋 This rule is enabled in `plugin:panda/all`.
 
-📋 This rule is enabled in `plugin:@pandacss/recommended`.
+📋 This rule is enabled in `plugin:panda/recommended`.
 
 ## Rule details
 

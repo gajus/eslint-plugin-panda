@@ -4,9 +4,9 @@
 
 Prohibit the use of config functions outside the Panda config file.
 
-📋 This rule is enabled in `plugin:@pandacss/all`.
+📋 This rule is enabled in `plugin:panda/all`.
 
-📋 This rule is enabled in `plugin:@pandacss/recommended`.
+📋 This rule is enabled in `plugin:panda/recommended`.
 
 ## Rule details
 

@@ -4,7 +4,7 @@
 
 Discourage the use of shorthand properties and promote the preference for longhand properties in the codebase.
 
-📋 This rule is enabled in `plugin:@pandacss/all`.
+📋 This rule is enabled in `plugin:panda/all`.
 
 ## Rule details
 

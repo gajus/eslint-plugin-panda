@@ -4,9 +4,9 @@
 
 Ensure users don't use dynamic styling. Prefer static styles, leverage CSS variables, or recipes for known dynamic styles.
 
-📋 This rule is enabled in `plugin:@pandacss/all`.
+📋 This rule is enabled in `plugin:panda/all`.
 
-📋 This rule is enabled in `plugin:@pandacss/recommended`.
+📋 This rule is enabled in `plugin:panda/recommended`.
 
 ## Rule details
 

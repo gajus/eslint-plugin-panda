@@ -4,9 +4,9 @@
 
 Disallow the use of Panda CSS in files that are not included in the specified Panda CSS `include` config.
 
-📋 This rule is enabled in `plugin:@pandacss/all`.
+📋 This rule is enabled in `plugin:panda/all`.
 
-📋 This rule is enabled in `plugin:@pandacss/recommended`.
+📋 This rule is enabled in `plugin:panda/recommended`.
 
 ## Rule details
 

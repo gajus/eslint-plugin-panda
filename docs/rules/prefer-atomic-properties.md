@@ -4,7 +4,7 @@
 
 Encourage the use of atomic properties instead of composite properties in the codebase.
 
-📋 This rule is enabled in `plugin:@pandacss/all`.
+📋 This rule is enabled in `plugin:panda/all`.
 
 ## Rule details
 

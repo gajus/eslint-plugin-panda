@@ -4,7 +4,7 @@
 
 Discourage mixing atomic and composite forms of the same property in a style declaration. Atomic styles give more consistent results.
 
-📋 This rule is enabled in `plugin:@pandacss/all`.
+📋 This rule is enabled in `plugin:panda/all`.
 
 ## Rule details
 

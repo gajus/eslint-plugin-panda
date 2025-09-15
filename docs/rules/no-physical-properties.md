@@ -4,7 +4,7 @@
 
 Encourage the use of logical properties over physical properties to foster a responsive and adaptable user interface.
 
-📋 This rule is enabled in `plugin:@pandacss/all`.
+📋 This rule is enabled in `plugin:panda/all`.
 
 ## Rule details
 

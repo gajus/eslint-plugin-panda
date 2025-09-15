@@ -1,44 +1,23 @@
 <!-- This file is built by build-readme.js. Do not edit it directly; edit README.md.template instead. -->
-<br>
-<div align="center">
 
-<p align="center">
-    <a href="https://panda-css.com">
-        <picture>
-            <img alt="Panda CSS" src="https://github.com/chakra-ui/eslint-plugin-panda/raw/main/.github/banner.png" width="100%">
-        </picture>
-    </a>
-</p>
-<p align="center">ESLint plugin for Panda CSS</p>
+## ESLint Plugin for Panda CSS
 
-<p align="center">
-    <a aria-label="Github Actions" href="https://github.com/chakra-ui/eslint-plugin-panda/actions/workflows/quality.yml">
-        <picture>
-            <source media="(prefers-color-scheme: dark)" srcset="https://img.shields.io/github/actions/workflow/status/chakra-ui/eslint-plugin-panda/quality.yml?branch=main&label=%20&message=twitter&color=212022&logo=githubactions&style=for-the-badge">
-            <source media="(prefers-color-scheme: light)" srcset="https://img.shields.io/github/actions/workflow/status/chakra-ui/eslint-plugin-panda/quality.yml?branch=main&label=%20&message=twitter&color=f6f7f8&logo=githubactions&style=for-the-badge&logoColor=%23000">
-            <img alt="Github release actions" src="https://img.shields.io/github/actions/workflow/status/chakra-ui/eslint-plugin-panda/quality.yml?branch=main&label=%20&message=twitter&color=f6f7f8&logo=githubactions&style=for-the-badge&logoColor=%23000">
-        </picture>
-    </a>
-</p>
-
-</div>
-
-## Getting Started
+> [!NOTE] This is a fork of [@pandacss/eslint-plugin](https://github.com/chakra-ui/eslint-plugin-panda).
 
 ### Installation
 
 ```bash
-pnpm add -D @pandacss/eslint-plugin
+pnpm add -D eslint-plugin-panda
 ```
 
 ### Usage
 
-Add `@pandacss/eslint-plugin` to the plugins section of your `.eslintrc` configuration file. You can omit the
-`/eslint-plugin` suffx:
+Add `eslint-plugin-panda` to the plugins section of your `.eslintrc` configuration file. You can omit the
+`eslint-plugin` suffix:
 
 ```json
 {
-  "plugins": ["@pandacss"]
+  "plugins": ["panda"]
 }
 ```
 
@@ -47,7 +26,7 @@ Then configure the rules you want to use under the rules section.
 ```json
 {
   "rules": {
-    "@pandacss/no-debug": "error"
+    "panda/no-debug": "error"
   }
 }
 ```
@@ -56,8 +35,8 @@ You can also enable the `recommended` rules in extends:
 
 ```diff
 {
--   "plugins": ["@pandacss"]
-+   "extends": ["plugin:@pandacss/recommended"]
+-   "plugins": ["panda"]
++   "extends": ["plugin:panda/recommended"]
 }
 ```
 
@@ -65,8 +44,8 @@ Or enable all rules in extends:
 
 ```diff
 {
--   "plugins": ["@pandacss"]
-+   "extends": ["plugin:@pandacss/all"]
+-   "plugins": ["panda"]
++   "extends": ["plugin:panda/all"]
 }
 ```
 
@@ -76,25 +55,25 @@ Or enable all rules in extends:
 ### Flat Config
 
 If you use [the flat config format](https://eslint.org/docs/latest/use/configure/configuration-files), you can import
-the plugin and rules from `@pandacss/eslint-plugin` and put it into your config.
+the plugin and rules from `eslint-plugin-panda` and put it into your config.
 
 ```js filename="eslint.config.mjs"
 import typescriptParser from '@typescript-eslint/parser'
-import panda from '@pandacss/eslint-plugin'
+import panda from 'eslint-plugin-panda'
 
 export default [
   {
     files: ['**/*.js', '**/*.jsx', '**/*.ts', '**/*.tsx'],
     ignores: ['**/*.d.ts', 'styled-system'],
     plugins: {
-      '@pandacss': panda,
+      panda,
     },
     languageOptions: {
       parser: typescriptParser,
     },
     rules: {
       // Configure rules here
-      '@pandacss/no-debug': 'error',
+      'panda/no-debug': 'error',
       // You can also use the recommended rules
       ...panda.configs.recommended.rules,
       // Or all rules
@@ -146,9 +125,9 @@ By default we find the nearest panda config to the linted file.
 const path = require('path')
 
 module.exports = {
-  plugins: ['@pandacss'],
+  plugins: ['panda'],
   settings: {
-    '@pandacss/configPath': path.join('PATH-TO/panda.config.js'),
+    'panda/configPath': path.join('PATH-TO/panda.config.js'),
   },
 }
 ```
@@ -156,16 +135,16 @@ module.exports = {
 #### Flat Config
 
 ```js filename="eslint.config.mjs"
-import panda from '@pandacss/eslint-plugin'
+import panda from 'eslint-plugin-panda'
 import path from 'node:path'
 
 export default [
   {
     plugins: {
-      '@pandacss': panda,
+      panda,
     },
     settings: {
-      '@pandacss/configPath': path.join('PATH-TO/panda.config.js'),
+      'panda/configPath': path.join('PATH-TO/panda.config.js'),
     },
   },
 ]
