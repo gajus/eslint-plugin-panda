@@ -1,25 +1,25 @@
 import { eslintTester } from '../test-utils'
 import rule, { RULE_NAME } from '../src/rules/no-dynamic-styling'
 
-const javascript = String.raw
+import multiline from 'multiline-ts';
 
 const valids = [
   {
-    code: javascript`
+    code: multiline`
 import { css } from './panda/css';
 
 const styles = css({ bg: 'gray.900' })`,
   },
 
   {
-    code: javascript`
+    code: multiline`
 import { css } from './panda/css';
 
 const styles = css({ padding: ['4', '8'] })`,
   },
 
   {
-    code: javascript`
+    code: multiline`
 import { Circle } from './panda/jsx';
 
 function App(){
@@ -28,7 +28,7 @@ function App(){
   },
 
   {
-    code: javascript`
+    code: multiline`
 import { styled } from './panda/jsx';
 
 function App(){
@@ -36,7 +36,7 @@ function App(){
 }`,
   },
   {
-    code: javascript`
+    code: multiline`
 const foo = 'foo'
 const nonStyles = {bar: [foo]}
 `,
@@ -45,7 +45,7 @@ const nonStyles = {bar: [foo]}
 
 const invalids = [
   {
-    code: javascript`
+    code: multiline`
 import { css } from './panda/css';
 
 const color = 'red.100';
@@ -53,7 +53,7 @@ const styles = css({ bg: color })`,
   },
 
   {
-    code: javascript`
+    code: multiline`
 import { css } from './panda/css';
 
 const size = '8';
@@ -61,7 +61,7 @@ const styles = css({ padding: ['4', size] })`,
   },
 
   {
-    code: javascript`
+    code: multiline`
 import { stack } from './panda/patterns';
 
 const align = 'center';
@@ -69,7 +69,7 @@ const styles = stack({ align: align })`,
   },
 
   {
-    code: javascript`
+    code: multiline`
 import { Circle } from './panda/jsx';
 
 function App(){
@@ -79,7 +79,7 @@ function App(){
   },
 
   {
-    code: javascript`
+    code: multiline`
 import { styled } from './panda/jsx';
 
 function App(){
@@ -89,7 +89,7 @@ function App(){
   },
 
   {
-    code: javascript`
+    code: multiline`
 import { css } from './panda/css';
 
 const property = 'background';
@@ -97,7 +97,7 @@ const styles = css({ [property]: 'red.100' })`,
   },
 
   {
-    code: javascript`
+    code: multiline`
 import { cva,sva } from './panda/css';
 
 function App(){

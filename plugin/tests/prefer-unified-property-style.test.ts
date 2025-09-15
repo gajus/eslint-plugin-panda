@@ -1,18 +1,18 @@
 import { eslintTester } from '../test-utils'
 import rule, { RULE_NAME } from '../src/rules/prefer-unified-property-style'
 
-const javascript = String.raw
+import multiline from 'multiline-ts';
 
 const valids = [
   {
-    code: javascript`
+    code: multiline`
 import { css } from './panda/css';
 
 const styles = css({ marginTop: "2", marginRight: "2", marginBottom: "2", marginLeft: "5" })`,
   },
 
   {
-    code: javascript`
+    code: multiline`
 import { Circle } from './panda/jsx';
 
 function App(){
@@ -23,14 +23,14 @@ function App(){
 
 const invalids = [
   {
-    code: javascript`
+    code: multiline`
 import { css } from './panda/css';
 
 const styles = css({ margin:"2", marginLeft: "5" })`,
   },
 
   {
-    code: javascript`
+    code: multiline`
 import { Circle } from './panda/jsx';
 
 function App(){

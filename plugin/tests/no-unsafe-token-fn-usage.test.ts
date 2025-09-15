@@ -1,18 +1,18 @@
 import { eslintTester } from '../test-utils'
 import rule, { RULE_NAME } from '../src/rules/no-unsafe-token-fn-usage'
 
-const javascript = String.raw
+import multiline from 'multiline-ts';
 
 const valids = [
   {
-    code: javascript`
+    code: multiline`
 import { css } from './panda/css';
 
 const styles = css({ bg: 'token(colors.red.300) 50%' })`,
   },
 
   {
-    code: javascript`
+    code: multiline`
 import { css } from './panda/css';
 import { token } from './panda/tokens';
 
@@ -22,7 +22,7 @@ function App(){
   },
 
   {
-    code: javascript`
+    code: multiline`
 import { Circle } from './panda/jsx';
 
 function App(){
@@ -33,7 +33,7 @@ function App(){
 
 const invalids = [
   {
-    code: javascript`
+    code: multiline`
 import { token } from './panda/tokens';
 import { css } from './panda/css';
 
@@ -41,7 +41,7 @@ const styles = css({ bg: token('colors.red.300') })`,
   },
 
   {
-    code: javascript`
+    code: multiline`
   import { token } from './panda/tokens';
   import { css } from './panda/css';
 
@@ -51,7 +51,7 @@ const styles = css({ bg: token('colors.red.300') })`,
   },
 
   {
-    code: javascript`
+    code: multiline`
   import { Circle } from './panda/jsx';
 
   function App(){

@@ -1,25 +1,25 @@
 import { eslintTester } from '../test-utils'
 import rule, { RULE_NAME } from '../src/rules/no-hardcoded-color'
 
-const javascript = String.raw
+import multiline from 'multiline-ts';
 
 const valids = [
   {
-    code: javascript`
+    code: multiline`
 import { css } from './panda/css';
 
 const styles = css({ color: 'red.100' })`,
   },
 
   {
-    code: javascript`
+    code: multiline`
 import { css } from './panda/css';
 
 const styles = css({ color: 'red.100/30' })`,
   },
 
   {
-    code: javascript`
+    code: multiline`
 import { css } from './panda/css';
 
 function App(){
@@ -28,7 +28,7 @@ function App(){
   },
 
   {
-    code: javascript`
+    code: multiline`
 import { Circle } from './panda/jsx';
 
 function App(){
@@ -39,7 +39,7 @@ function App(){
 
 const invalids = [
   {
-    code: javascript`
+    code: multiline`
 import { css } from './panda/css';
 
 const styles = css({ color: '#FEE2E2' })`,
@@ -47,14 +47,14 @@ const styles = css({ color: '#FEE2E2' })`,
 
   {
     options: [{ noOpacity: true }],
-    code: javascript`
+    code: multiline`
 import { css } from './panda/css';
 
 const styles = css({ color: 'red.100/30' })`,
   },
 
   {
-    code: javascript`
+    code: multiline`
 import { css } from './panda/css';
 
 function App(){
@@ -63,7 +63,7 @@ function App(){
   },
 
   {
-    code: javascript`
+    code: multiline`
 import { Circle } from './panda/jsx';
 
 function App(){

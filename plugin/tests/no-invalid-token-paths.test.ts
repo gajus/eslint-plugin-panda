@@ -1,21 +1,21 @@
 import { eslintTester } from '../test-utils'
 import rule, { RULE_NAME } from '../src/rules/no-invalid-token-paths'
 
-const javascript = String.raw
+import multiline from 'multiline-ts';
 
 const validLiteral = 'const className = css`\n  font-size: {fontSizes.md};\n`'
 const invalidLiteral = 'const className = css`\n  font-size: {fontSizes.emd};\n`'
 
 const valids = [
   {
-    code: javascript`
+    code: multiline`
 import { css } from './panda/css';
 
 const styles = css({ bg: 'token(colors.red.300) 50%' })`,
   },
 
   {
-    code: javascript`
+    code: multiline`
 import { css } from './panda/css';
 
 function App(){
@@ -24,7 +24,7 @@ function App(){
   },
 
   {
-    code: javascript`
+    code: multiline`
 import { Circle } from './panda/jsx';
 
 function App(){
@@ -33,7 +33,7 @@ function App(){
   },
 
   {
-    code: javascript`
+    code: multiline`
 import { css } from './panda/css';
 
 ${validLiteral}`,
@@ -42,7 +42,7 @@ ${validLiteral}`,
 
 const invalids = [
   {
-    code: javascript`
+    code: multiline`
 import { css } from './panda/css';
 
 // colorszz is not a valid token type
@@ -50,7 +50,7 @@ const styles = css({ bg: 'token(colorszz.red.300) 50%' })`,
   },
 
   {
-    code: javascript`
+    code: multiline`
 import { css } from './panda/css';
 
 function App(){
@@ -60,7 +60,7 @@ function App(){
   },
 
   {
-    code: javascript`
+    code: multiline`
 import { Circle } from './panda/jsx';
 
 function App(){
@@ -71,7 +71,7 @@ function App(){
   },
 
   {
-    code: javascript`
+    code: multiline`
 import { css } from './panda/css';
 
 ${invalidLiteral}`,

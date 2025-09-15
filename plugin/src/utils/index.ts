@@ -9,9 +9,6 @@ export const createRule = ESLintUtils.RuleCreator(
   (name) => `https://github.com/gajus/eslint-plugin-panda/blob/main/docs/rules/${name}.md`,
 )
 
-// Define Rule type explicitly
-export type Rule = ReturnType<typeof createRule>
-
 // Determine the distribution directory
 const isBase = process.env.NODE_ENV !== 'test' || import.meta.url.endsWith('dist/index.js')
 

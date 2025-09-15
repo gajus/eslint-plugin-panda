@@ -1,18 +1,18 @@
 import { eslintTester } from '../test-utils'
 import rule, { RULE_NAME } from '../src/rules/no-physical-properties'
 
-const javascript = String.raw
+import multiline from 'multiline-ts';
 
 const valids = [
   {
-    code: javascript`
+    code: multiline`
 import { css } from './panda/css';
 
 const styles = css({ insetInlineStart: '0' })`,
   },
 
   {
-    code: javascript`
+    code: multiline`
 import { css } from './panda/css';
 
 function App(){
@@ -21,7 +21,7 @@ function App(){
   },
 
   {
-    code: javascript`
+    code: multiline`
 import { Circle } from './panda/jsx';
 
 function App(){
@@ -31,14 +31,14 @@ function App(){
 
   // textAlign with non-physical values - regular object literal
   {
-    code: javascript`
+    code: multiline`
 import { css } from './panda/css';
 
 const styles = css({ textAlign: 'start' })`,
   },
 
   {
-    code: javascript`
+    code: multiline`
 import { css } from './panda/css';
 
 function App(){
@@ -48,7 +48,7 @@ function App(){
 
   // textAlign with non-physical values - JSX expression container
   {
-    code: javascript`
+    code: multiline`
 import { Box } from './panda/jsx';
 
 function App(){
@@ -57,7 +57,7 @@ function App(){
   },
 
   {
-    code: javascript`
+    code: multiline`
 import { Box } from './panda/jsx';
 
 function App(){
@@ -68,14 +68,14 @@ function App(){
 
 const invalids = [
   {
-    code: javascript`
+    code: multiline`
 import { css } from './panda/css';
 
 const styles = css({ left: '0' })`,
   },
 
   {
-    code: javascript`
+    code: multiline`
 import { css } from './panda/css';
 
 function App(){
@@ -84,7 +84,7 @@ function App(){
   },
 
   {
-    code: javascript`
+    code: multiline`
 import { Circle } from './panda/jsx';
 
 function App(){
@@ -94,14 +94,14 @@ function App(){
 
   // textAlign with physical values - regular object literal
   {
-    code: javascript`
+    code: multiline`
 import { css } from './panda/css';
 
 const styles = css({ textAlign: 'left' })`,
   },
 
   {
-    code: javascript`
+    code: multiline`
 import { css } from './panda/css';
 
 function App(){
@@ -111,7 +111,7 @@ function App(){
 
   // textAlign with physical values - JSX expression container
   {
-    code: javascript`
+    code: multiline`
 import { Box } from './panda/jsx';
 
 function App(){
@@ -120,7 +120,7 @@ function App(){
   },
 
   {
-    code: javascript`
+    code: multiline`
 import { Box } from './panda/jsx';
 
 function App(){

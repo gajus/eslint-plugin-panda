@@ -1,11 +1,11 @@
 import { eslintTester } from '../test-utils'
 import rule, { RULE_NAME } from '../src/rules/no-property-renaming'
 
-const javascript = String.raw
+import multiline from 'multiline-ts';
 
 const valids = [
   {
-    code: javascript`
+    code: multiline`
 import { css } from './panda/css';
 
 function Text({ textStyle }){
@@ -14,7 +14,7 @@ function Text({ textStyle }){
   },
 
   {
-    code: javascript`
+    code: multiline`
 import { css } from './panda/css';
 
 function Text(props){
@@ -23,7 +23,7 @@ function Text(props){
   },
 
   {
-    code: javascript`
+    code: multiline`
 import { Circle } from './panda/jsx';
 
 function CustomCircle(props){
@@ -37,7 +37,7 @@ function CustomCircle(props){
   },
 
   {
-    code: javascript`
+    code: multiline`
 import { Circle } from './panda/jsx';
 
 function CustomCircle(props){
@@ -52,7 +52,7 @@ function CustomCircle(props){
 
 const invalids = [
   {
-    code: javascript`
+    code: multiline`
 import { css } from './panda/css';
 
 function Text({ variant }){
@@ -61,7 +61,7 @@ function Text({ variant }){
   },
 
   {
-    code: javascript`
+    code: multiline`
 import { css } from './panda/css';
 
 function Text(props){
@@ -71,7 +71,7 @@ function Text(props){
 
   //TODO detect pattern attributes as panda property
   //   {
-  //     code: javascript`
+  //     code: multiline`
   // import { Circle } from './panda/jsx';
 
   // function CustomCircle(props){
@@ -85,7 +85,7 @@ function Text(props){
   //   },
 
   //   {
-  //     code: javascript`
+  //     code: multiline`
   // import { Circle } from './panda/jsx';
 
   // function CustomCircle(props){

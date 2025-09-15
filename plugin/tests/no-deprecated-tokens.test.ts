@@ -1,11 +1,11 @@
 import { eslintTester } from '../test-utils'
 import rule, { RULE_NAME } from '../src/rules/no-deprecated-tokens'
 
-const javascript = String.raw
+import multiline from 'multiline-ts';
 
 const valids = [
   {
-    code: javascript`
+    code: multiline`
 import { css } from './panda/css';
 
 const styles = css({ color: 'red.100' })`,
@@ -14,7 +14,7 @@ const styles = css({ color: 'red.100' })`,
 
 const invalids = [
   {
-    code: javascript`
+    code: multiline`
 import { css } from './panda/css';
 
 // Assumes that the token is deprecated
