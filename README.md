@@ -1,5 +1,3 @@
-<!-- This file is built by build-readme.js. Do not edit it directly; edit README.md.template instead. -->
-
 ## ESLint Plugin for Panda CSS
 
 > [!NOTE] This is a fork of [@pandacss/eslint-plugin](https://github.com/chakra-ui/eslint-plugin-panda).

@@ -1,5 +1,5 @@
 import { isRecipeVariant, isPandaAttribute, isPandaProp, resolveLonghand } from '../utils/helpers'
-import { type Rule, createRule } from '../utils'
+import { createRule } from '../utils'
 import { isIdentifier, isJSXIdentifier, isLiteral, isJSXExpressionContainer } from '../utils/nodes'
 import { physicalProperties, physicalPropertyValues } from '../utils/physical-properties'
 import type { TSESTree, TSESLint } from '@typescript-eslint/utils'
@@ -126,7 +126,7 @@ const createValueReport = (
   })
 }
 
-const rule: Rule = createRule({
+const rule = createRule({
   name: RULE_NAME,
   meta: {
     docs: {

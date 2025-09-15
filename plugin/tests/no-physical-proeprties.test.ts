@@ -1,4 +1,4 @@
-import { tester } from '../test-utils'
+import { eslintTester } from '../test-utils'
 import rule, { RULE_NAME } from '../src/rules/no-physical-properties'
 
 const javascript = String.raw
@@ -64,7 +64,7 @@ function App(){
   return <Box textAlign={"end"} />;
 }`,
   },
-]
+] as const
 
 const invalids = [
   {
@@ -127,9 +127,9 @@ function App(){
   return <Box textAlign={"right"} />;
 }`,
   },
-]
+] as const
 
-tester.run(RULE_NAME, rule, {
+eslintTester.run(RULE_NAME, rule, {
   valid: valids.map(({ code }) => ({
     code,
   })),

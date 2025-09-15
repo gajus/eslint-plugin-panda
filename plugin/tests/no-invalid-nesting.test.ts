@@ -1,4 +1,4 @@
-import { tester } from '../test-utils'
+import { eslintTester } from '../test-utils'
 import rule, { RULE_NAME } from '../src/rules/no-invalid-nesting'
 
 const javascript = String.raw
@@ -42,7 +42,7 @@ function App() {
   );
 }`,
   },
-]
+] as const
 
 const invalids = [
   {
@@ -83,9 +83,9 @@ function App() {
   );
 }`,
   },
-]
+] as const
 
-tester.run(RULE_NAME, rule, {
+eslintTester.run(RULE_NAME, rule, {
   valid: valids.map(({ code }) => ({
     code,
   })),

@@ -1,12 +1,12 @@
 import type { TSESTree } from '@typescript-eslint/utils'
-import { type Rule, createRule } from '../utils'
+import { createRule } from '../utils'
 import { isPandaAttribute, isPandaProp, isRecipeVariant, isValidProperty, resolveLonghand } from '../utils/helpers'
 import { compositeProperties } from '../utils/composite-properties'
 import { isIdentifier, isJSXIdentifier } from '../utils/nodes'
 
 export const RULE_NAME = 'prefer-atomic-properties'
 
-const rule: Rule = createRule({
+const rule = createRule({
   name: RULE_NAME,
   meta: {
     docs: {

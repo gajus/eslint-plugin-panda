@@ -1,11 +1,11 @@
 import type { TSESTree } from '@typescript-eslint/utils'
-import { type Rule, createRule } from '../utils'
+import { createRule } from '../utils'
 import { isPandaAttribute, isPandaProp, isRecipeVariant } from '../utils/helpers'
 import { isIdentifier, isJSXExpressionContainer, isMemberExpression } from '../utils/nodes'
 
 export const RULE_NAME = 'no-property-renaming'
 
-const rule: Rule = createRule({
+const rule = createRule({
   name: RULE_NAME,
   meta: {
     docs: {

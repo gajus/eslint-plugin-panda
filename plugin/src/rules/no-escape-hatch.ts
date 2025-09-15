@@ -1,12 +1,12 @@
 import { isPandaAttribute, isPandaProp, isRecipeVariant } from '../utils/helpers'
-import { type Rule, createRule } from '../utils'
+import { createRule } from '../utils'
 import { getArbitraryValue } from '@pandacss/shared'
 import { isIdentifier, isJSXExpressionContainer, isLiteral, isTemplateLiteral } from '../utils/nodes'
 import { TSESTree } from '@typescript-eslint/utils'
 
 export const RULE_NAME = 'no-escape-hatch'
 
-const rule: Rule = createRule({
+const rule = createRule({
   name: RULE_NAME,
   meta: {
     docs: {

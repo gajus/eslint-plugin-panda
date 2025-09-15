@@ -1,12 +1,12 @@
 import { isPandaAttribute, isPandaProp, isRecipeVariant, isValidProperty, resolveLonghand } from '../utils/helpers'
-import { type Rule, createRule } from '../utils'
+import { createRule } from '../utils'
 import { compositeProperties } from '../utils/composite-properties'
 import { isIdentifier, isJSXIdentifier } from '../utils/nodes'
 import type { TSESTree } from '@typescript-eslint/utils'
 
 export const RULE_NAME = 'prefer-composite-properties'
 
-const rule: Rule = createRule({
+const rule = createRule({
   name: RULE_NAME,
   meta: {
     docs: {

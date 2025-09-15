@@ -1,10 +1,10 @@
-import { type Rule, createRule } from '../utils'
+import { createRule } from '../utils'
 import { isPandaImport, isValidFile } from '../utils/helpers'
 import { TSESTree } from '@typescript-eslint/utils'
 
 export const RULE_NAME = 'file-not-included'
 
-const rule: Rule = createRule({
+const rule = createRule({
   name: RULE_NAME,
   meta: {
     docs: {

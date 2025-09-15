@@ -1,4 +1,4 @@
-import { tester } from '../test-utils'
+import { eslintTester } from '../test-utils'
 import rule, { RULE_NAME } from '../src/rules/no-invalid-token-paths'
 
 const javascript = String.raw
@@ -38,7 +38,7 @@ import { css } from './panda/css';
 
 ${validLiteral}`,
   },
-]
+] as const
 
 const invalids = [
   {
@@ -76,9 +76,9 @@ import { css } from './panda/css';
 
 ${invalidLiteral}`,
   },
-]
+] as const
 
-tester.run(RULE_NAME, rule, {
+eslintTester.run(RULE_NAME, rule, {
   valid: valids.map(({ code }) => ({
     code,
   })),

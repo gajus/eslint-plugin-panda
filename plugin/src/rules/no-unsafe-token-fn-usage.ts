@@ -1,12 +1,12 @@
 import { extractTokens, getTokenImport, isPandaAttribute, isPandaProp, isRecipeVariant } from '../utils/helpers'
-import { type Rule, createRule } from '../utils'
+import { createRule } from '../utils'
 import { isCallExpression, isIdentifier, isJSXExpressionContainer, isLiteral, isTemplateLiteral } from '../utils/nodes'
 import { type TSESTree } from '@typescript-eslint/utils'
 import { getArbitraryValue } from '@pandacss/shared'
 
 export const RULE_NAME = 'no-unsafe-token-fn-usage'
 
-const rule: Rule = createRule({
+const rule = createRule({
   name: RULE_NAME,
   meta: {
     docs: {

@@ -1,4 +1,4 @@
-import { tester } from '../test-utils'
+import { eslintTester } from '../test-utils'
 import rule, { RULE_NAME } from '../src/rules/no-unsafe-token-fn-usage'
 
 const javascript = String.raw
@@ -60,7 +60,7 @@ const styles = css({ bg: token('colors.red.300') })`,
   },
 ]
 
-tester.run(RULE_NAME, rule, {
+eslintTester.run(RULE_NAME, rule, {
   valid: valids.map(({ code }) => ({
     code,
   })),

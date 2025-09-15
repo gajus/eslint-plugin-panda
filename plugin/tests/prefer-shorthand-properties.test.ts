@@ -28,7 +28,7 @@ function App(){
   return <Circle _hover={{  pos: 'absolute' }} />;
 }`,
   },
-]
+] as const
 
 const invalids = [
   {
@@ -55,7 +55,7 @@ function App(){
   return <Circle _hover={{  position: 'absolute' }} />;
 }`,
   },
-]
+] as const
 
 tester.run(RULE_NAME, rule, {
   valid: valids.map(({ code }) => ({

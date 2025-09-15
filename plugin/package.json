@@ -49,6 +49,7 @@
     "eslint": "*"
   },
   "devDependencies": {
+    "@typescript-eslint/rule-tester": "^8.43.0",
     "typescript": "^5.7.2"
   }
 }

@@ -1,10 +1,10 @@
-import { type Rule, createRule } from '../utils'
+import { createRule } from '../utils'
 import { isPandaProp, isPandaAttribute, isRecipeVariant } from '../utils/helpers'
 import { TSESTree } from '@typescript-eslint/utils'
 
 export const RULE_NAME = 'no-debug'
 
-const rule: Rule = createRule({
+const rule = createRule({
   name: RULE_NAME,
   meta: {
     docs: {

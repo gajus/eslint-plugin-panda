@@ -6,13 +6,13 @@ import {
   isPandaProp,
   isRecipeVariant,
 } from '../utils/helpers'
-import { type Rule, createRule } from '../utils'
+import { createRule } from '../utils'
 import { isIdentifier, isJSXExpressionContainer, isJSXIdentifier, isLiteral, isTemplateLiteral } from '../utils/nodes'
 import { TSESTree } from '@typescript-eslint/utils'
 
 export const RULE_NAME = 'no-hardcoded-color'
 
-const rule: Rule = createRule({
+const rule = createRule({
   name: RULE_NAME,
   meta: {
     docs: {

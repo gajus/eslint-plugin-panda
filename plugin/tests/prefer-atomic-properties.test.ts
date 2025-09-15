@@ -28,7 +28,7 @@ function App(){
   return <Circle _hover={{  borderTopStyle: 'solid', borderTopWidth: '1px', borderTopColor: 'blue' }} />;
 }`,
   },
-]
+] as const
 
 const invalids = [
   {
@@ -55,7 +55,7 @@ function App(){
   return <Circle _hover={{  borderTop: 'solid 1px blue' }} />;
 }`,
   },
-]
+] as const
 
 tester.run(RULE_NAME, rule, {
   valid: valids.map(({ code }) => ({

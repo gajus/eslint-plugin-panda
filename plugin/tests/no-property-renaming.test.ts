@@ -1,4 +1,4 @@
-import { tester } from '../test-utils'
+import { eslintTester } from '../test-utils'
 import rule, { RULE_NAME } from '../src/rules/no-property-renaming'
 
 const javascript = String.raw
@@ -48,7 +48,7 @@ function CustomCircle(props){
   )
 }`,
   },
-]
+] as const
 
 const invalids = [
   {
@@ -96,9 +96,9 @@ function Text(props){
   //   )
   // }`,
   //   },
-]
+] as const
 
-tester.run(RULE_NAME, rule, {
+eslintTester.run(RULE_NAME, rule, {
   valid: valids.map(({ code }) => ({
     code,
   })),

@@ -1,4 +1,4 @@
-import { tester } from '../test-utils'
+import { eslintTester } from '../test-utils'
 import rule, { RULE_NAME } from '../src/rules/no-hardcoded-color'
 
 const javascript = String.raw
@@ -35,7 +35,7 @@ function App(){
   return <Circle _hover={{  borderColor: 'gray.100' }} />;
 }`,
   },
-]
+] as const
 
 const invalids = [
   {
@@ -70,9 +70,9 @@ function App(){
   return <Circle _hover={{  borderColor: 'hsl(220deg, 14%, 96%)' }} />;
 }`,
   },
-]
+] as const
 
-tester.run(RULE_NAME, rule, {
+eslintTester.run(RULE_NAME, rule, {
   valid: valids.map(({ code }) => ({
     code,
   })),

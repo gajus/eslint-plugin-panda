@@ -1,5 +1,5 @@
 import { type TSESTree } from '@typescript-eslint/utils'
-import { type Rule, createRule } from '../utils'
+import { createRule } from '../utils'
 import { isInPandaFunction, isPandaAttribute, isPandaProp, isRecipeVariant } from '../utils/helpers'
 import {
   isArrayExpression,
@@ -12,7 +12,7 @@ import {
 
 export const RULE_NAME = 'no-dynamic-styling'
 
-const rule: Rule = createRule({
+const rule = createRule({
   name: RULE_NAME,
   meta: {
     docs: {

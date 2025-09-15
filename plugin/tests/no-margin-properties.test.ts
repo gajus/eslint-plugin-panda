@@ -1,4 +1,4 @@
-import { tester } from '../test-utils'
+import { eslintTester } from '../test-utils'
 import rule, { RULE_NAME } from '../src/rules/no-margin-properties'
 
 const javascript = String.raw
@@ -28,7 +28,7 @@ function App(){
   return <Flex gap="2" />;
 }`,
   },
-]
+] as const
 
 const invalids = [
   {
@@ -55,9 +55,9 @@ function App(){
   return <Circle marginX="2" />;
 }`,
   },
-]
+] as const
 
-tester.run(RULE_NAME, rule, {
+eslintTester.run(RULE_NAME, rule, {
   valid: valids.map(({ code }) => ({
     code,
   })),

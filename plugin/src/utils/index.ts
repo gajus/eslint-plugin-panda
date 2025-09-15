@@ -6,7 +6,7 @@ import type { run } from './worker'
 
 // Rule creator
 export const createRule = ESLintUtils.RuleCreator(
-  (name) => `https://github.com/chakra-ui/eslint-plugin-panda/blob/main/docs/rules/${name}.md`,
+  (name) => `https://github.com/gajus/eslint-plugin-panda/blob/main/docs/rules/${name}.md`,
 )
 
 // Define Rule type explicitly
@@ -14,6 +14,7 @@ export type Rule = ReturnType<typeof createRule>
 
 // Determine the distribution directory
 const isBase = process.env.NODE_ENV !== 'test' || import.meta.url.endsWith('dist/index.js')
+
 export const distDir = fileURLToPath(new URL(isBase ? './' : '../../dist', import.meta.url))
 
 // Create synchronous function using synckit

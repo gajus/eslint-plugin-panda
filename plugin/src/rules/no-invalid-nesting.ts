@@ -1,11 +1,11 @@
 import { isLiteral, isTemplateLiteral } from '../utils/nodes'
-import { type Rule, createRule } from '../utils'
+import { createRule } from '../utils'
 import { isInJSXProp, isInPandaFunction, isRecipeVariant, isStyledProperty } from '../utils/helpers'
 import { TSESTree } from '@typescript-eslint/utils'
 
 export const RULE_NAME = 'no-invalid-nesting'
 
-const rule: Rule = createRule({
+const rule = createRule({
   name: RULE_NAME,
   meta: {
     docs: {

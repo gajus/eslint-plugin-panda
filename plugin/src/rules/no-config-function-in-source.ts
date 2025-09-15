@@ -1,5 +1,5 @@
 import { isIdentifier, isVariableDeclaration } from '../utils/nodes'
-import { type Rule, createRule } from '../utils'
+import { createRule } from '../utils'
 import { getAncestor, getImportSpecifiers, hasPkgImport, isPandaConfigFunction, isValidFile } from '../utils/helpers'
 import { TSESTree } from '@typescript-eslint/utils'
 
@@ -22,7 +22,7 @@ const CONFIG_FUNCTIONS = new Set([
   'defineSemanticTokens',
 ])
 
-const rule: Rule = createRule({
+const rule = createRule({
   name: RULE_NAME,
   meta: {
     docs: {

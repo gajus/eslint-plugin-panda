@@ -1,4 +1,4 @@
-import { tester } from '../test-utils'
+import { eslintTester } from '../test-utils'
 import rule, { RULE_NAME } from '../src/rules/prefer-composite-properties'
 
 const javascript = String.raw
@@ -28,7 +28,7 @@ function App(){
   return <Circle _hover={{  borderTop: 'solid 1px blue' }} />;
 }`,
   },
-]
+] as const
 
 const invalids = [
   {
@@ -57,9 +57,9 @@ function App(){
 }`,
     errors: 3,
   },
-]
+] as const
 
-tester.run(RULE_NAME, rule, {
+eslintTester.run(RULE_NAME, rule, {
   valid: valids.map(({ code }) => ({
     code,
   })),

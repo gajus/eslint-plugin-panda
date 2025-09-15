@@ -1,4 +1,4 @@
-import { tester } from '../test-utils'
+import { eslintTester } from '../test-utils'
 import rule, { RULE_NAME } from '../src/rules/file-not-included'
 
 const javascript = String.raw
@@ -17,7 +17,7 @@ import { css } from './panda/css';
 import { Circle } from './panda/jsx';
 `
 
-tester.run(RULE_NAME, rule, {
+eslintTester.run(RULE_NAME, rule, {
   valid: [
     {
       code: validCode,

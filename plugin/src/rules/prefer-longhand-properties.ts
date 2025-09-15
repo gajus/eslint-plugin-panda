@@ -1,11 +1,11 @@
 import { isPandaAttribute, isPandaProp, isRecipeVariant, resolveLonghand } from '../utils/helpers'
-import { type Rule, createRule } from '../utils'
+import { createRule } from '../utils'
 import { isIdentifier, isJSXIdentifier } from '../utils/nodes'
 import type { TSESTree } from '@typescript-eslint/utils'
 
 export const RULE_NAME = 'prefer-longhand-properties'
 
-const rule: Rule = createRule({
+const rule = createRule({
   name: RULE_NAME,
   meta: {
     docs: {

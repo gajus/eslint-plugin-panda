@@ -1,4 +1,4 @@
-import { tester } from '../test-utils'
+import { eslintTester } from '../test-utils'
 import rule, { RULE_NAME } from '../src/rules/no-config-function-in-source'
 
 const javascript = String.raw
@@ -36,7 +36,7 @@ const styles = css({
 });
 `
 
-tester.run(RULE_NAME, rule, {
+eslintTester.run(RULE_NAME, rule, {
   valid: [
     {
       code: config,
