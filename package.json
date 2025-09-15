@@ -21,11 +21,6 @@
   "files": [
     "dist"
   ],
-  "lint-staged": {
-    "*": [
-      "pnpm format"
-    ]
-  },
   "main": "plugin/dist/index.js",
   "name": "eslint-plugin-panda",
   "packageManager": "pnpm@10.16.1",
