@@ -12,3 +12,5 @@ runs:
         cache: 'pnpm'
     - shell: bash
       run: pnpm install
+    - shell: bash
+      run: pnpm build
