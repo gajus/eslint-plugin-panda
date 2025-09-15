@@ -1,7 +1,7 @@
 import { eslintTester } from '../test-utils'
 import rule, { RULE_NAME } from '../src/rules/no-invalid-token-paths'
 
-import multiline from 'multiline-ts';
+import multiline from 'multiline-ts'
 
 const validLiteral = 'const className = css`\n  font-size: {fontSizes.md};\n`'
 const invalidLiteral = 'const className = css`\n  font-size: {fontSizes.emd};\n`'

@@ -1,7 +1,7 @@
 import { eslintTester } from '../test-utils'
 import rule, { RULE_NAME } from '../src/rules/no-deprecated-tokens'
 
-import multiline from 'multiline-ts';
+import multiline from 'multiline-ts'
 
 const valids = [
   {
