@@ -41,7 +41,6 @@
     "@pandacss/shared": "^0.53.2",
     "@typescript-eslint/scope-manager": "^8.43.0",
     "@typescript-eslint/utils": "^8.21.0",
-    "hookable": "^5.5.3",
     "synckit": "^0.9.0"
   },
   "peerDependencies": {
