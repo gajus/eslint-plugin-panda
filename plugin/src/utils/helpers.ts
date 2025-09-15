@@ -20,6 +20,7 @@ import {
   getPandaContext,
   matchFile,
   matchImports,
+  resolveLongHand,
   type run,
   runAsync,
 } from './worker';
@@ -459,7 +460,7 @@ export const resolveLonghand = (
   name: string,
   context: RuleContext<any, any>,
 ) => {
-  return syncAction('resolveLongHand', getSyncOptions(context), name);
+  return resolveLongHand(getPandaContext(getSyncOptions(context)), name);
 };
 
 export const resolveShorthands = (

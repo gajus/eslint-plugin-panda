@@ -130,11 +130,6 @@ export function run(
   options: Options,
   name: string,
 ): string[] | undefined;
-export function run(
-  action: 'resolveLongHand',
-  options: Options,
-  name: string,
-): string | undefined;
 
 export function run(
   action: 'isValidProperty',
@@ -182,11 +177,6 @@ export function runAsync(
   options: Options,
   name: string,
 ): string[] | undefined;
-export function runAsync(
-  action: 'resolveLongHand',
-  options: Options,
-  name: string,
-): string | undefined;
 
 export function runAsync(
   action: 'isValidProperty',
@@ -228,9 +218,6 @@ export function runAsync(action: string, options: Options, ...args: any): any {
     case 'isValidProperty':
       // @ts-expect-error cast
       return isValidProperty(context, ...args);
-    case 'resolveLongHand':
-      // @ts-expect-error cast
-      return resolveLongHand(context, ...args);
     case 'resolveShorthands':
       // @ts-expect-error cast
       return resolveShorthands(context, ...args);
@@ -287,7 +274,7 @@ export const matchImports = (
   });
 };
 
-const resolveLongHand = (
+export const resolveLongHand = (
   context: PandaContext,
   name: string,
 ): string | undefined => {
