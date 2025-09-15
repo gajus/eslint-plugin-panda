@@ -21,7 +21,7 @@ export const RULE_NAME = 'no-invalid-token-paths';
 const rule = createRule({
   create(context) {
     // Cache for invalid tokens to avoid redundant computations
-    const invalidTokensCache = new Map<string, string[]>();
+    const invalidTokensCache = new Map<string, string[] | undefined>();
 
     const sendReport = (node: TSESTree.Node, value: string | undefined) => {
       if (!value) {
@@ -29,12 +29,13 @@ const rule = createRule({
       }
 
       let tokens: string[] | undefined = invalidTokensCache.get(value);
+
       if (!tokens) {
         tokens = getInvalidTokens(value, context);
         invalidTokensCache.set(value, tokens);
       }
 
-      if (tokens.length === 0) {
+      if (!tokens || tokens.length === 0) {
         return;
       }
 
@@ -114,7 +115,7 @@ const rule = createRule({
             invalidTokensCache.set(styles, tokens);
           }
 
-          if (tokens.length === 0) {
+          if (!tokens || tokens.length === 0) {
             continue;
           }
 

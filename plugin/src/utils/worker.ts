@@ -20,11 +20,10 @@ export type DeprecatedToken =
       value: string;
     };
 
-export const getContext = async (options: Options) => {
+export async function getContext(options: Options) {
   if (process.env.NODE_ENV === 'test') {
     const context = createContext() as unknown as PandaContext;
     context.getFiles = () => ['App.tsx'];
-
     return context;
   } else {
     const configPath = findConfig({
@@ -38,9 +37,9 @@ export const getContext = async (options: Options) => {
 
     return await contextCache[configPath];
   }
-};
+}
 
-const _getContext = async (configPath: string | undefined) => {
+async function _getContext(configPath: string | undefined) {
   if (!configPath) {
     throw new Error('Invalid config path');
   }
@@ -49,48 +48,51 @@ const _getContext = async (configPath: string | undefined) => {
 
   const context = await loadConfigAndCreateContext({ configPath, cwd });
   return context;
-};
+}
 
-const filterDeprecatedTokens = (
+async function filterDeprecatedTokens(
   context: PandaContext,
   tokens: DeprecatedToken[],
-): DeprecatedToken[] => {
+): Promise<DeprecatedToken[]> {
   return tokens.filter((token) => {
     const value =
       typeof token === 'string' ? token : token.category + '.' + token.value;
     return context.utility.tokens.isDeprecated(value);
   });
-};
+}
 
-const filterInvalidTokens = (
+async function filterInvalidTokens(
   context: PandaContext,
   paths: string[],
-): string[] => {
+): Promise<string[]> {
   return paths.filter((path) => !context.utility.tokens.view.get(path));
-};
+}
 
-const getPropertyCategory = (context: PandaContext, _attribute: string) => {
-  const longhand = resolveLongHand(context, _attribute);
+async function getPropertyCategory(context: PandaContext, _attribute: string) {
+  const longhand = await resolveLongHand(context, _attribute);
   const attribute = longhand || _attribute;
   const attributeConfig = context.utility.config[attribute];
   return typeof attributeConfig?.values === 'string'
     ? attributeConfig.values
     : undefined;
-};
+}
 
-const isColorAttribute = (
+async function isColorAttribute(
   context: PandaContext,
   _attribute: string,
-): boolean => {
-  const category = getPropertyCategory(context, _attribute);
+): Promise<boolean> {
+  const category = await getPropertyCategory(context, _attribute);
   return category === 'colors';
-};
+}
 
-const isColorToken = (context: PandaContext, value: string): boolean => {
+async function isColorToken(
+  context: PandaContext,
+  value: string,
+): Promise<boolean> {
   return Boolean(
     context.utility.tokens.view.categoryMap.get('colors')?.get(value),
   );
-};
+}
 
 const arePathsEqual = (path1: string, path2: string) => {
   const normalizedPath1 = path.resolve(path1);
@@ -109,61 +111,124 @@ export function run(
   action: 'filterInvalidTokens',
   options: Options,
   paths: string[],
-): Promise<string[]>;
+): string[];
+
 export function run(
   action: 'isColorToken',
   options: Options,
   value: string,
-): Promise<boolean>;
+): boolean;
+
 export function run(
   action: 'isColorAttribute',
   options: Options,
   attribute: string,
-): Promise<boolean>;
-export function run(
-  action: 'isValidFile',
-  options: Options,
-  fileName: string,
-): Promise<string>;
+): boolean;
+
+export function run(action: 'isValidFile', options: Options): boolean;
+
 export function run(
   action: 'resolveShorthands',
   options: Options,
   name: string,
-): Promise<string[] | undefined>;
+): string[] | undefined;
 export function run(
   action: 'resolveLongHand',
   options: Options,
   name: string,
-): Promise<string | undefined>;
+): string | undefined;
 
 export function run(
   action: 'isValidProperty',
   options: Options,
   name: string,
   patternName?: string,
-): Promise<boolean>;
+): boolean;
 export function run(
   action: 'matchFile',
   options: Options,
   name: string,
   imports: ImportResult[],
-): Promise<boolean>;
+): boolean;
 export function run(
   action: 'matchImports',
   options: Options,
   result: MatchImportResult,
-): Promise<boolean>;
+): boolean;
 export function run(
   action: 'getPropCategory',
   options: Options,
   property: string,
-): Promise<string>;
+): string;
 export function run(
   action: 'filterDeprecatedTokens',
   options: Options,
   tokens: DeprecatedToken[],
+): DeprecatedToken[];
+export function run(action: string, options: Options, ...args: any[]): any {
+  // @ts-expect-error cast
+  return runAsync(action, options, ...args);
+}
+
+export function runAsync(
+  action: 'filterInvalidTokens',
+  options: Options,
+  paths: string[],
+): Promise<string[]>;
+export function runAsync(
+  action: 'isColorToken',
+  options: Options,
+  value: string,
+): Promise<boolean>;
+export function runAsync(
+  action: 'isColorAttribute',
+  options: Options,
+  attribute: string,
+): Promise<boolean>;
+export function runAsync(
+  action: 'isValidFile',
+  options: Options,
+  fileName: string,
+): Promise<string>;
+export function runAsync(
+  action: 'resolveShorthands',
+  options: Options,
+  name: string,
+): Promise<string[] | undefined>;
+export function runAsync(
+  action: 'resolveLongHand',
+  options: Options,
+  name: string,
+): Promise<string | undefined>;
+
+export function runAsync(
+  action: 'isValidProperty',
+  options: Options,
+  name: string,
+  patternName?: string,
+): Promise<boolean>;
+export function runAsync(
+  action: 'matchFile',
+  options: Options,
+  name: string,
+  imports: ImportResult[],
+): Promise<boolean>;
+export function runAsync(
+  action: 'matchImports',
+  options: Options,
+  result: MatchImportResult,
+): Promise<boolean>;
+export function runAsync(
+  action: 'getPropCategory',
+  options: Options,
+  property: string,
+): Promise<string>;
+export function runAsync(
+  action: 'filterDeprecatedTokens',
+  options: Options,
+  tokens: DeprecatedToken[],
 ): Promise<DeprecatedToken[]>;
-export async function run(
+export async function runAsync(
   action: string,
   options: Options,
   ...args: any
@@ -206,15 +271,18 @@ export async function run(
   }
 }
 
-const isValidFile = (context: PandaContext, fileName: string): boolean => {
+async function isValidFile(
+  context: PandaContext,
+  fileName: string,
+): Promise<boolean> {
   return context.getFiles().some((file) => arePathsEqual(file, fileName));
-};
+}
 
-const isValidProperty = (
+async function isValidProperty(
   context: PandaContext,
   name: string,
   patternName?: string,
-) => {
+) {
   if (context.isValidProperty(name)) {
     return true;
   }
@@ -231,18 +299,19 @@ const isValidProperty = (
   }
 
   return Object.keys(pattern).includes(name);
-};
+}
 
-const matchFile = (
+async function matchFile(
   context: PandaContext,
   name: string,
   imports: ImportResult[],
-) => {
+) {
   const file = context.imports.file(imports);
-  return file.match(name);
-};
 
-const matchImports = (context: PandaContext, result: MatchImportResult) => {
+  return file.match(name);
+}
+
+async function matchImports(context: PandaContext, result: MatchImportResult) {
   return context.imports.match(result, (module_) => {
     const { tsOptions } = context.parserOptions;
     if (!tsOptions?.pathMappings) {
@@ -251,12 +320,12 @@ const matchImports = (context: PandaContext, result: MatchImportResult) => {
 
     return resolveTsPathPattern(tsOptions.pathMappings, module_);
   });
-};
+}
 
-const resolveLongHand = (
+async function resolveLongHand(
   context: PandaContext,
   name: string,
-): string | undefined => {
+): Promise<string | undefined> {
   const reverseShorthandsMap = new Map();
 
   for (const [key, values] of context.utility.getPropShorthandsMap()) {
@@ -266,13 +335,13 @@ const resolveLongHand = (
   }
 
   return reverseShorthandsMap.get(name);
-};
+}
 
-const resolveShorthands = (
+async function resolveShorthands(
   context: PandaContext,
   name: string,
-): string[] | undefined => {
+): Promise<string[] | undefined> {
   return context.utility.getPropShorthandsMap().get(name);
-};
+}
 
-runAsWorker(run);
+runAsWorker(run as any);

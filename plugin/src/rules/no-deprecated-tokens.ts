@@ -20,7 +20,10 @@ export const RULE_NAME = 'no-deprecated-tokens';
 const rule = createRule({
   create(context) {
     // Cache for deprecated tokens to avoid redundant computations
-    const deprecatedTokensCache = new Map<string, DeprecatedToken[]>();
+    const deprecatedTokensCache = new Map<
+      string,
+      DeprecatedToken[] | undefined
+    >();
 
     const sendReport = (
       property: string,
@@ -33,12 +36,13 @@ const rule = createRule({
 
       let tokens: DeprecatedToken[] | undefined =
         deprecatedTokensCache.get(value);
+
       if (!tokens) {
         tokens = getDeprecatedTokens(property, value, context);
         deprecatedTokensCache.set(value, tokens);
       }
 
-      if (tokens.length === 0) {
+      if (!tokens || tokens.length === 0) {
         return;
       }
 
