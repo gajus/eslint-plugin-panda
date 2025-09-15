@@ -42,7 +42,22 @@ eslintTester.run(RULE_NAME, rule, {
         });
       `,
       filename: 'App.tsx',
-      errors: [{ messageId: 'configFunction', suggestions: [] }],
+      errors: [{
+        messageId: 'configFunction',
+        suggestions: [ {
+          messageId: 'delete',
+          output: multiLine`
+            import {   } from '@pandacss/dev';
+            import { css } from './panda/css';
+            
+            
+            
+            const styles = css({
+              animation: 'fadeIn 1s ease-in-out',
+            });
+          `
+        }]
+      }],
     },
   ],
 })
