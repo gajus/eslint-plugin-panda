@@ -1,0 +1,15 @@
+{
+  "$schema": "https://unpkg.com/knip@5/schema.json",
+  "rules": {
+    "unresolved": "warn",
+    "enumMembers": "warn"
+  },
+  "workspaces": {
+    "plugin": {
+      "entry": ["tests/**/*.test.ts", "tsdown.config.ts"]
+    },
+    "sandbox": {
+      "entry": ["src/main.tsx!", "postcss.config.cjs"]
+    }
+  }
+}

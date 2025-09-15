@@ -8,14 +8,11 @@
   "author": "Segun Adebayo <joseshegs@gmail.com>",
   "devDependencies": {
     "@pandacss/config": "^0.40.0",
-    "@pandacss/core": "^0.40.0",
     "@pandacss/generator": "^0.40.0",
     "@pandacss/node": "^0.40.0",
     "@pandacss/preset-base": "^0.40.0",
     "@pandacss/preset-panda": "^0.40.0",
     "@pandacss/shared": "^0.40.0",
-    "@pandacss/token-dictionary": "^0.40.0",
-    "@pandacss/types": "^0.40.0",
-    "postcss": "^8.4.33"
+    "@pandacss/types": "^0.40.0"
   }
 }
