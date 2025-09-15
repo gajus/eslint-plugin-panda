@@ -1,7 +1,7 @@
 {
-  "name": "@pandacss/eslint-plugin",
+  "name": "eslint-plugin-panda",
   "version": "0.2.12",
-  "description": "Eslint plugin for Panda CSS",
+  "description": "ESLint plugin for Panda CSS",
   "author": "Abraham Aremu <anubra266@gmail.com>",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
@@ -9,6 +9,10 @@
   "sideEffects": false,
   "publishConfig": {
     "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/gajus/eslint-plugin-panda"
   },
   "exports": {
     ".": {
