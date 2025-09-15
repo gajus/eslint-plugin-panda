@@ -20,7 +20,7 @@ export type DeprecatedToken =
       value: string;
     };
 
-const getContext = (options: Options) => {
+export const getPandaContext = (options: Options) => {
   if (process.env.NODE_ENV === 'test') {
     const context = createContext() as unknown as PandaContext;
     context.getFiles = () => ['App.tsx'];
@@ -32,14 +32,14 @@ const getContext = (options: Options) => {
 
     // The context cache ensures we don't reload the same config multiple times
     if (!contextCache[configPath]) {
-      contextCache[configPath] = _getContext(configPath);
+      contextCache[configPath] = _getPandaContext(configPath);
     }
 
     return contextCache[configPath];
   }
 };
 
-const _getContext = (configPath: string | undefined) => {
+const _getPandaContext = (configPath: string | undefined) => {
   if (!configPath) {
     throw new Error('Invalid config path');
   }
@@ -50,7 +50,6 @@ const _getContext = (configPath: string | undefined) => {
   return context;
 };
 
-// Refactored to arrow function, removed async
 const filterDeprecatedTokens = (
   context: PandaContext,
   tokens: DeprecatedToken[],
@@ -62,7 +61,6 @@ const filterDeprecatedTokens = (
   });
 };
 
-// Refactored to arrow function, removed async
 const filterInvalidTokens = (
   context: PandaContext,
   paths: string[],
@@ -70,7 +68,6 @@ const filterInvalidTokens = (
   return paths.filter((path) => !context.utility.tokens.view.get(path));
 };
 
-// Refactored to arrow function, removed async
 const getPropertyCategory = (context: PandaContext, _attribute: string) => {
   const longhand = resolveLongHand(context, _attribute);
   const attribute = longhand || _attribute;
@@ -80,7 +77,6 @@ const getPropertyCategory = (context: PandaContext, _attribute: string) => {
     : undefined;
 };
 
-// Refactored to arrow function, removed async
 const isColorAttribute = (
   context: PandaContext,
   _attribute: string,
@@ -89,7 +85,6 @@ const isColorAttribute = (
   return category === 'colors';
 };
 
-// Refactored to arrow function, removed async
 const isColorToken = (context: PandaContext, value: string): boolean => {
   return Boolean(
     context.utility.tokens.view.categoryMap.get('colors')?.get(value),
@@ -154,11 +149,6 @@ export function run(
   imports: ImportResult[],
 ): boolean;
 export function run(
-  action: 'matchImports',
-  options: Options,
-  result: MatchImportResult,
-): boolean;
-export function run(
   action: 'getPropCategory',
   options: Options,
   property: string,
@@ -217,11 +207,6 @@ export function runAsync(
   imports: ImportResult[],
 ): boolean;
 export function runAsync(
-  action: 'matchImports',
-  options: Options,
-  result: MatchImportResult,
-): boolean;
-export function runAsync(
   action: 'getPropCategory',
   options: Options,
   property: string,
@@ -232,7 +217,7 @@ export function runAsync(
   tokens: DeprecatedToken[],
 ): DeprecatedToken[];
 export function runAsync(action: string, options: Options, ...args: any): any {
-  const context = getContext(options);
+  const context = getPandaContext(options);
 
   switch (action) {
     case 'filterDeprecatedTokens':
@@ -258,9 +243,6 @@ export function runAsync(action: string, options: Options, ...args: any): any {
     case 'matchFile':
       // @ts-expect-error cast
       return matchFile(context, ...args);
-    case 'matchImports':
-      // @ts-expect-error cast
-      return matchImports(context, ...args);
     case 'resolveLongHand':
       // @ts-expect-error cast
       return resolveLongHand(context, ...args);
@@ -270,12 +252,10 @@ export function runAsync(action: string, options: Options, ...args: any): any {
   }
 }
 
-// Refactored to arrow function, removed async
 const isValidFile = (context: PandaContext, fileName: string): boolean => {
   return context.getFiles().some((file) => arePathsEqual(file, fileName));
 };
 
-// Refactored to arrow function, removed async
 const isValidProperty = (
   context: PandaContext,
   name: string,
@@ -299,7 +279,6 @@ const isValidProperty = (
   return Object.keys(pattern).includes(name);
 };
 
-// Refactored to arrow function, removed async
 const matchFile = (
   context: PandaContext,
   name: string,
@@ -309,8 +288,10 @@ const matchFile = (
   return file.match(name);
 };
 
-// Refactored to arrow function, removed async
-const matchImports = (context: PandaContext, result: MatchImportResult) => {
+export const matchImports = (
+  context: PandaContext,
+  result: MatchImportResult,
+) => {
   return context.imports.match(result, (module_) => {
     const { tsOptions } = context.parserOptions;
     if (!tsOptions?.pathMappings) {
@@ -321,7 +302,6 @@ const matchImports = (context: PandaContext, result: MatchImportResult) => {
   });
 };
 
-// Refactored to arrow function, removed async
 const resolveLongHand = (
   context: PandaContext,
   name: string,
@@ -337,7 +317,6 @@ const resolveLongHand = (
   return reverseShorthandsMap.get(name);
 };
 
-// Refactored to arrow function, removed async
 const resolveShorthands = (
   context: PandaContext,
   name: string,

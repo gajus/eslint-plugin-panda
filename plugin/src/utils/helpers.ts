@@ -15,7 +15,13 @@ import {
   isVariableDeclarator,
   type Node,
 } from './nodes';
-import { type DeprecatedToken, type run, runAsync } from './worker';
+import {
+  type DeprecatedToken,
+  getPandaContext,
+  matchImports,
+  type run,
+  runAsync,
+} from './worker';
 import { analyze } from '@typescript-eslint/scope-manager';
 import { type TSESTree } from '@typescript-eslint/utils';
 import { type RuleContext } from '@typescript-eslint/utils/ts-eslint';
@@ -115,7 +121,7 @@ const getImports = (context: RuleContext<any, any>) => {
 
   const imports = _getImports(context);
   const filteredImports = imports.filter((imp) =>
-    syncAction('matchImports', getSyncOptions(context), imp),
+    matchImports(getPandaContext(getSyncOptions(context)), imp),
   );
   importsCache.set(context, filteredImports);
   return filteredImports;
