@@ -1,11 +1,4 @@
 {
-  "compilerOptions": {
-    "paths": {
-      "fixture": [
-        "../fixture/src/index.ts"
-      ]
-    }
-  },
   "extends": "../tsconfig.build.json",
   "include": [
     "src/**/*",
