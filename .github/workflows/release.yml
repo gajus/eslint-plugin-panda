@@ -61,7 +61,7 @@ jobs:
         run: pnpm run generate:docs
   release:
     environment: release
-    depends-on:
+    needs:
       - prettier
       - tests
       - eslint
