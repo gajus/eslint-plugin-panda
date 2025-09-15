@@ -2,7 +2,6 @@
   "name": "eslint-plugin-panda",
   "version": "0.2.12",
   "description": "ESLint plugin for Panda CSS",
-  "author": "Abraham Aremu <anubra266@gmail.com>",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
