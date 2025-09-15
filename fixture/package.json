@@ -6,9 +6,6 @@
   "main": "src/index.ts",
   "types": "src/index.ts",
   "author": "Segun Adebayo <joseshegs@gmail.com>",
-  "scripts": {
-    "deps": "pnpm up '@pandacss/*' --latest"
-  },
   "devDependencies": {
     "@pandacss/config": "^0.40.0",
     "@pandacss/core": "^0.40.0",

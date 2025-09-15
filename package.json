@@ -4,20 +4,16 @@
   "description": "ESLint plugin for Panda CSS",
   "author": "Abraham Aremu <anubra266@gmail.com>",
   "scripts": {
-    "prepare": "husky",
-    "dev": "pnpm -r --parallel dev",
     "build": "pnpm -r --parallel build",
-    "test": "vitest run",
-    "docs": "rm -rf docs/rules && pnpm build:docs",
-    "build:docs": "rm -rf docs/rules && DOCGEN=1 vitest run && pnpm readme",
-    "readme": "node tools/build-readme.js && pnpm prettier-fix",
-    "deps": "pnpm -r --parallel deps",
-    "lint": "eslint . --ext .ts",
-    "prettier": "prettier --check .",
-    "prettier-fix": "prettier --write .",
+    "dev": "pnpm -r --parallel dev",
+    "format": "prettier --write .",
+    "generate:docs": "eslint-doc-generator",
+    "lint:eslint": "eslint . --ext .ts",
+    "lint:prettier": "prettier --check .",
+    "lint:tsc": "pnpm -r --parallel lint:tsc",
+    "prepare": "husky",
     "release": "changeset publish",
-    "release-dev": "changeset version --snapshot dev && changeset publish --tag dev",
-    "typecheck": "pnpm -r --parallel typecheck"
+    "test:vitest": "vitest run"
   },
   "main": "plugin/dist/index.js",
   "files": [
@@ -38,7 +34,7 @@
     "@typescript-eslint/eslint-plugin": "^8.21.0",
     "@typescript-eslint/parser": "^8.21.0",
     "eslint": "^8.56.0",
-    "eslint-docgen": "^0.7.1",
+    "eslint-doc-generator": "^2.2.2",
     "eslint-plugin-eslint-plugin": "^5.2.1",
     "husky": "^9.0.6",
     "lint-staged": "^15.2.0",
@@ -47,13 +43,8 @@
   },
   "lint-staged": {
     "*": [
-      "pnpm prettier-fix"
+      "pnpm format"
     ]
   },
-  "packageManager": "pnpm@8.15.8",
-  "pnpm": {
-    "patchedDependencies": {
-      "eslint-docgen@0.7.1": "patches/eslint-docgen@0.7.1.patch"
-    }
-  }
+  "packageManager": "pnpm@8.15.8"
 }

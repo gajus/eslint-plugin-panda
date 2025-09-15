@@ -1,5 +1,4 @@
 name: Quality
-
 on:
   push:
     branches:
@@ -7,11 +6,9 @@ on:
   pull_request:
     branches:
       - main
-
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
-
 jobs:
   prettier:
     name: Prettier
@@ -24,7 +21,7 @@ jobs:
         uses: ./.github/composite-actions/install
 
       - name: Run Prettier
-        run: pnpm prettier
+        run: pnpm run lint:prettier
 
   tests:
     name: Unit Tests
@@ -37,7 +34,7 @@ jobs:
         uses: ./.github/composite-actions/install
 
       - name: Run tests
-        run: pnpm test
+        run: pnpm run test:vitest
 
   eslint:
     name: ESLint
@@ -50,7 +47,7 @@ jobs:
         uses: ./.github/composite-actions/install
 
       - name: Run ESLint
-        run: pnpm lint
+        run: pnpm run lint:eslint
         env:
           NODE_OPTIONS: "--max-old-space-size=4096"
 
@@ -65,7 +62,7 @@ jobs:
         uses: ./.github/composite-actions/install
 
       - name: Run TypeScript type check
-        run: pnpm typecheck
+        run: pnpm run lint:tsc
 
   docs:
     name: Docs
@@ -78,4 +75,4 @@ jobs:
         uses: ./.github/composite-actions/install
 
       - name: Build docs
-        run: pnpm build:docs
+        run: pnpm run generate:docs

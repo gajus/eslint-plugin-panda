@@ -87,31 +87,37 @@ You can see an example using `typescript-eslint` at [sandbox/v9/eslint.config.mj
 
 ## Rules
 
-Rules with ⚙️ have options. Click on the rule to see the options.
+<!-- begin auto-generated rules list -->
 
-Where rules are included in the configs `recommended`, or `all` it is indicated below.
+💼 Configurations enabled in.\
+⚠️ Configurations set to warn in.\
+🌐 Set in the `all` configuration.\
+✅ Set in the `recommended` configuration.\
+💡 Manually fixable by [editor suggestions](https://eslint.org/docs/latest/use/core-concepts#rule-suggestions).
 
-| Rule                                                                                     | `recommended` |
-| ---------------------------------------------------------------------------------------- | ------------- |
-| [`@pandacss/file-not-included`](docs/rules/file-not-included.md)                         | ✔️            |
-| [`@pandacss/no-config-function-in-source`](docs/rules/no-config-function-in-source.md)   | ✔️            |
-| [`@pandacss/no-debug`](docs/rules/no-debug.md)                                           | ✔️            |
-| [`@pandacss/no-deprecated-tokens`](docs/rules/no-deprecated-tokens.md)                   | ✔️            |
-| [`@pandacss/no-dynamic-styling`](docs/rules/no-dynamic-styling.md)                       | ✔️            |
-| [`@pandacss/no-escape-hatch`](docs/rules/no-escape-hatch.md)                             |               |
-| [`@pandacss/no-hardcoded-color`](docs/rules/no-hardcoded-color.md) ⚙️                    | ✔️            |
-| [`@pandacss/no-important`](docs/rules/no-important.md)                                   |               |
-| [`@pandacss/no-invalid-token-paths`](docs/rules/no-invalid-token-paths.md)               | ✔️            |
-| [`@pandacss/no-invalid-nesting`](docs/rules/no-invalid-nesting.md)                       | ✔️            |
-| [`@pandacss/no-margin-properties`](docs/rules/no-margin-properties.md) ⚙️                |               |
-| [`@pandacss/no-physical-properties`](docs/rules/no-physical-properties.md) ⚙️            |               |
-| [`@pandacss/no-property-renaming`](docs/rules/no-property-renaming.md)                   | ✔️            |
-| [`@pandacss/no-unsafe-token-fn-usage`](docs/rules/no-unsafe-token-fn-usage.md)           | ✔️            |
-| [`@pandacss/prefer-longhand-properties`](docs/rules/prefer-longhand-properties.md) ⚙️    |               |
-| [`@pandacss/prefer-shorthand-properties`](docs/rules/prefer-shorthand-properties.md) ⚙️  |               |
-| [`@pandacss/prefer-atomic-properties`](docs/rules/prefer-atomic-properties.md) ⚙️        |               |
-| [`@pandacss/prefer-composite-properties`](docs/rules/prefer-composite-properties.md) ⚙️  |               |
-| [`@pandacss/prefer-unified-property-style`](docs/rules/prefer-unified-property-style.md) |               |
+| Name                                                                         | Description                                                                                                                                                                                                                     | 💼    | ⚠️    | 💡  |
+| :--------------------------------------------------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | :---- | :---- | :-- |
+| [file-not-included](docs/rules/file-not-included.md)                         | Disallow the use of Panda CSS in files that are not included in the specified Panda CSS `include` config.                                                                                                                       | 🌐 ✅ |       |     |
+| [no-config-function-in-source](docs/rules/no-config-function-in-source.md)   | Prohibit the use of config functions outside the Panda config file.                                                                                                                                                             | 🌐 ✅ |       | 💡  |
+| [no-debug](docs/rules/no-debug.md)                                           | Disallow the inclusion of the debug attribute when shipping code to the production environment.                                                                                                                                 |       | 🌐 ✅ | 💡  |
+| [no-deprecated-tokens](docs/rules/no-deprecated-tokens.md)                   | Disallow the use of deprecated tokens within token function syntax.                                                                                                                                                             |       | 🌐 ✅ |     |
+| [no-dynamic-styling](docs/rules/no-dynamic-styling.md)                       | Ensure users don't use dynamic styling. Prefer static styles, leverage CSS variables, or recipes for known dynamic styles.                                                                                                      |       | 🌐 ✅ |     |
+| [no-escape-hatch](docs/rules/no-escape-hatch.md)                             | Prohibit the use of escape hatch syntax in the code.                                                                                                                                                                            |       | 🌐    | 💡  |
+| [no-hardcoded-color](docs/rules/no-hardcoded-color.md)                       | Enforce the exclusive use of design tokens as values for colors within the codebase.                                                                                                                                            |       | 🌐 ✅ |     |
+| [no-important](docs/rules/no-important.md)                                   | Disallow usage of !important keyword. Prioritize specificity for a maintainable and predictable styling structure.                                                                                                              |       | 🌐    | 💡  |
+| [no-invalid-nesting](docs/rules/no-invalid-nesting.md)                       | Warn against invalid nesting. Nested styles must contain the `&` character.                                                                                                                                                     | ✅    | 🌐    |     |
+| [no-invalid-token-paths](docs/rules/no-invalid-token-paths.md)               | Disallow the use of invalid token paths within token function syntax.                                                                                                                                                           | 🌐 ✅ |       |     |
+| [no-margin-properties](docs/rules/no-margin-properties.md)                   | Discourage using margin properties for spacing; prefer defining spacing in parent elements with `flex` or `grid` using the `gap` property for a more resilient layout. Margins make components less reusable in other contexts. |       | 🌐    |     |
+| [no-physical-properties](docs/rules/no-physical-properties.md)               | Encourage the use of logical properties over physical properties to foster a responsive and adaptable user interface.                                                                                                           |       | 🌐    | 💡  |
+| [no-property-renaming](docs/rules/no-property-renaming.md)                   | Ensure that properties for patterns or style props are not renamed, as it prevents proper tracking.                                                                                                                             |       | 🌐 ✅ |     |
+| [no-unsafe-token-fn-usage](docs/rules/no-unsafe-token-fn-usage.md)           | Prevent users from using the token function in situations where they could simply use the raw design token.                                                                                                                     |       | 🌐 ✅ | 💡  |
+| [prefer-atomic-properties](docs/rules/prefer-atomic-properties.md)           | Encourage the use of atomic properties instead of composite properties in the codebase.                                                                                                                                         |       | 🌐    |     |
+| [prefer-composite-properties](docs/rules/prefer-composite-properties.md)     | Encourage the use of composite properties instead of atomic properties in the codebase.                                                                                                                                         |       | 🌐    |     |
+| [prefer-longhand-properties](docs/rules/prefer-longhand-properties.md)       | Discourage the use of shorthand properties and promote the preference for longhand properties in the codebase.                                                                                                                  |       | 🌐    | 💡  |
+| [prefer-shorthand-properties](docs/rules/prefer-shorthand-properties.md)     | Discourage the use of longhand properties and promote the preference for shorthand properties in the codebase.                                                                                                                  |       | 🌐    | 💡  |
+| [prefer-unified-property-style](docs/rules/prefer-unified-property-style.md) | Discourage mixing atomic and composite forms of the same property in a style declaration. Atomic styles give more consistent results.                                                                                           |       | 🌐    |     |
+
+<!-- end auto-generated rules list -->
 
 ## Settings
 

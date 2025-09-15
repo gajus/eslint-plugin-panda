@@ -30,8 +30,7 @@
     "prepare": "pnpm build",
     "build": "tsup",
     "dev": "tsup --watch",
-    "deps": "pnpm up '@pandacss/*' --latest",
-    "typecheck": "tsc --noEmit"
+    "lint:tsc": "tsc --noEmit"
   },
   "files": [
     "dist"

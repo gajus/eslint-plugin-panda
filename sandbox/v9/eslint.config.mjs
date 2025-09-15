@@ -5,7 +5,7 @@ import globals from 'globals'
 import reactHooks from 'eslint-plugin-react-hooks'
 import reactRefresh from 'eslint-plugin-react-refresh'
 
-import panda from '@pandacss/eslint-plugin'
+import panda from 'eslint-plugin-panda'
 
 const compat = new FlatCompat()
 
