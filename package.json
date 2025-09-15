@@ -1,7 +1,7 @@
 {
   "name": "eslint-plugin-panda",
   "version": "0.0.1",
-  "description": "Eslint plugin for Panda CSS",
+  "description": "ESLint plugin for Panda CSS",
   "author": "Abraham Aremu <anubra266@gmail.com>",
   "scripts": {
     "prepare": "husky",
