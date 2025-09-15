@@ -27,7 +27,7 @@ eslintTester.run(RULE_NAME, rule, {
     {
       code: invalidCode,
       filename: 'Invalid.tsx',
-      errors: 1,
+      errors: [{ messageId: 'include' }],
     },
   ],
 })
