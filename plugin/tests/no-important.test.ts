@@ -36,7 +36,20 @@ eslintTester.run(RULE_NAME, rule, {
   import { css } from './panda/css';
   
   const styles = css({ marginLeft: '4px!' })`,
-      errors: [{ messageId: 'important' }],
+      errors: [
+        {
+          messageId: 'important',
+          suggestions: [
+            {
+              messageId: 'remove',
+              output: multiline`
+  import { css } from './panda/css';
+  
+  const styles = css({ marginLeft: '4px' })`,
+            },
+          ],
+        },
+      ],
     },
 
     {
@@ -46,7 +59,22 @@ eslintTester.run(RULE_NAME, rule, {
   function App(){
     return <div className={css({ background: '#111 !important' })} />;
   }`,
-      errors: [{ messageId: 'important' }],
+      errors: [
+        {
+          messageId: 'important',
+          suggestions: [
+            {
+              messageId: 'remove',
+              output: multiline`
+  import { css } from './panda/css';
+  
+  function App(){
+    return <div className={css({ background: '#111' })} />;
+  }`,
+            },
+          ],
+        },
+      ],
     },
 
     {
@@ -56,7 +84,22 @@ eslintTester.run(RULE_NAME, rule, {
   function App(){
     return <Circle _hover={{ position: '[absolute!]' }} />;
   }`,
-      errors: [{ messageId: 'important' }],
+      errors: [
+        {
+          messageId: 'important',
+          suggestions: [
+            {
+              messageId: 'remove',
+              output: multiline`
+  import { Circle } from './panda/jsx';
+  
+  function App(){
+    return <Circle _hover={{ position: '[absolute]' }} />;
+  }`,
+            },
+          ],
+        },
+      ],
     },
   ],
 })

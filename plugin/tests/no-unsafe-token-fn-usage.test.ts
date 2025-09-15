@@ -38,7 +38,21 @@ eslintTester.run(RULE_NAME, rule, {
   import { css } from './panda/css';
   
   const styles = css({ bg: token('colors.red.300') })`,
-      errors: [{ messageId: 'noUnsafeTokenFnUsage' }],
+      errors: [
+        {
+          messageId: 'noUnsafeTokenFnUsage',
+          suggestions: [
+            {
+              messageId: 'replace',
+              output: multiline`
+  import { token } from './panda/tokens';
+  import { css } from './panda/css';
+  
+  const styles = css({ bg: 'red.300' })`,
+            },
+          ],
+        },
+      ],
     },
 
     {
@@ -49,7 +63,23 @@ eslintTester.run(RULE_NAME, rule, {
     function App(){
       return <div className={css({ bg: 'token(colors.red.300)' })} />;
     }`,
-      errors: [{ messageId: 'noUnsafeTokenFnUsage' }],
+      errors: [
+        {
+          messageId: 'noUnsafeTokenFnUsage',
+          suggestions: [
+            {
+              messageId: 'replace',
+              output: multiline`
+    import { token } from './panda/tokens';
+    import { css } from './panda/css';
+  
+    function App(){
+      return <div className={css({ bg: 'red.300' })} />;
+    }`,
+            },
+          ],
+        },
+      ],
     },
 
     {
@@ -59,7 +89,22 @@ eslintTester.run(RULE_NAME, rule, {
     function App(){
       return <Circle margin='[{sizes.4}]' />;
     }`,
-      errors: [{ messageId: 'noUnsafeTokenFnUsage' }],
+      errors: [
+        {
+          messageId: 'noUnsafeTokenFnUsage',
+          suggestions: [
+            {
+              messageId: 'replace',
+              output: multiline`
+    import { Circle } from './panda/jsx';
+  
+    function App(){
+      return <Circle margin='4' />;
+    }`,
+            },
+          ],
+        },
+      ],
     },
   ],
 })

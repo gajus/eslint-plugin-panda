@@ -18,7 +18,7 @@ eslintTester.run(RULE_NAME, rule, {
   
   // Assumes that the token is deprecated
   const styles = css({ color: 'red.400' })`,
-      errors: [{ messageId: 'noDeprecatedTokenPaths' }],
+      errors: [{ messageId: 'noDeprecatedTokens' }],
     },
   ],
 })

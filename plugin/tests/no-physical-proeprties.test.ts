@@ -72,7 +72,20 @@ eslintTester.run(RULE_NAME, rule, {
   import { css } from './panda/css';
   
   const styles = css({ left: '0' })`,
-      errors: [{ messageId: 'physical' }],
+      errors: [
+        {
+          messageId: 'physical',
+          suggestions: [
+            {
+              messageId: 'replace',
+              output: multiline`
+  import { css } from './panda/css';
+  
+  const styles = css({ insetInlineStart: '0' })`,
+            },
+          ],
+        },
+      ],
     },
 
     {
@@ -82,7 +95,22 @@ eslintTester.run(RULE_NAME, rule, {
   function App(){
     return <div className={css({ marginLeft: '4' })} />;
   }`,
-      errors: [{ messageId: 'physical' }],
+      errors: [
+        {
+          messageId: 'physical',
+          suggestions: [
+            {
+              messageId: 'replace',
+              output: multiline`
+  import { css } from './panda/css';
+  
+  function App(){
+    return <div className={css({ marginInlineStart: '4' })} />;
+  }`,
+            },
+          ],
+        },
+      ],
     },
 
     {
@@ -92,7 +120,22 @@ eslintTester.run(RULE_NAME, rule, {
   function App(){
     return <Circle _hover={{  borderBottom: 'solid 1px' }} />;
   }`,
-      errors: [{ messageId: 'physical' }],
+      errors: [
+        {
+          messageId: 'physical',
+          suggestions: [
+            {
+              messageId: 'replace',
+              output: multiline`
+  import { Circle } from './panda/jsx';
+  
+  function App(){
+    return <Circle _hover={{  borderBlockEnd: 'solid 1px' }} />;
+  }`,
+            },
+          ],
+        },
+      ],
     },
 
     // textAlign with physical values - regular object literal
@@ -101,7 +144,20 @@ eslintTester.run(RULE_NAME, rule, {
   import { css } from './panda/css';
   
   const styles = css({ textAlign: 'left' })`,
-      errors: [{ messageId: 'physicalValue' }],
+      errors: [
+        {
+          messageId: 'physicalValue',
+          suggestions: [
+            {
+              messageId: 'replace',
+              output: multiline`
+  import { css } from './panda/css';
+  
+  const styles = css({ textAlign: "start" })`,
+            },
+          ],
+        },
+      ],
     },
 
     {
@@ -111,7 +167,22 @@ eslintTester.run(RULE_NAME, rule, {
   function App(){
     return <div className={css({ textAlign: 'right' })} />;
   }`,
-      errors: [{ messageId: 'physicalValue' }],
+      errors: [
+        {
+          messageId: 'physicalValue',
+          suggestions: [
+            {
+              messageId: 'replace',
+              output: multiline`
+  import { css } from './panda/css';
+  
+  function App(){
+    return <div className={css({ textAlign: "end" })} />;
+  }`,
+            },
+          ],
+        },
+      ],
     },
 
     // textAlign with physical values - JSX expression container
@@ -122,7 +193,22 @@ eslintTester.run(RULE_NAME, rule, {
   function App(){
     return <Box textAlign={"left"} />;
   }`,
-      errors: [{ messageId: 'physicalValue' }],
+      errors: [
+        {
+          messageId: 'physicalValue',
+          suggestions: [
+            {
+              messageId: 'replace',
+              output: multiline`
+  import { Box } from './panda/jsx';
+  
+  function App(){
+    return <Box textAlign={"start"} />;
+  }`,
+            },
+          ],
+        },
+      ],
     },
 
     {
@@ -132,7 +218,22 @@ eslintTester.run(RULE_NAME, rule, {
   function App(){
     return <Box textAlign={"right"} />;
   }`,
-      errors: [{ messageId: 'physicalValue' }],
+      errors: [
+        {
+          messageId: 'physicalValue',
+          suggestions: [
+            {
+              messageId: 'replace',
+              output: multiline`
+  import { Box } from './panda/jsx';
+  
+  function App(){
+    return <Box textAlign={"end"} />;
+  }`,
+            },
+          ],
+        },
+      ],
     },
   ],
 })

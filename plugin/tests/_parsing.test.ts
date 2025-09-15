@@ -55,13 +55,15 @@ const invalids = [
   },
 ]
 
+// Note: We're only testing detection, not the actual fixes
+// The rules provide suggestions but we're not validating them here
 eslintTester.run(RULE_NAME, rule as any, {
   valid: valids.map(({ code }) => ({
     code: imports + code,
   })),
   invalid: invalids.map(({ code }) => ({
     code: imports + code,
-    errors: 1,
+    errors: 1 as any, // Just check that an error is reported
   })),
 })
 
@@ -86,7 +88,7 @@ eslintTester.run(RULE_NAME2, rule2 as any, {
   })),
   invalid: invalids2.map((code) => ({
     code: imports + code,
-    errors: 1,
+    errors: [{ messageId: 'dynamic' }],
   })),
 })
 
@@ -130,13 +132,15 @@ const invalids3 = [
   },
 ]
 
+// Note: We're only testing detection, not the actual fixes
+// The rules provide suggestions but we're not validating them here
 eslintTester.run(RULE_NAME3, rule3 as any, {
   valid: valids3.map((code) => ({
     code: imports + code,
   })),
   invalid: invalids3.map(({ code }) => ({
     code: imports + code,
-    errors: 1,
+    errors: 1 as any, // Just check that an error is reported
   })),
 })
 
@@ -162,13 +166,15 @@ const invalids4 = [
   { code: '<Circle bg={tk("colors.red.300")} />' },
 ]
 
+// Note: We're only testing detection, not the actual fixes
+// The rules provide suggestions but we're not validating them here
 eslintTester.run(RULE_NAME4, rule4 as any, {
   valid: valids4.map((code) => ({
     code: imports4 + code,
   })),
   invalid: invalids4.map(({ code }) => ({
     code: imports4 + code,
-    errors: 1,
+    errors: 1 as any, // Just check that an error is reported
   })),
 })
 
@@ -201,7 +207,7 @@ eslintTester.run(RULE_NAME5, rule5 as any, {
   })),
   invalid: invalids5.map(({ code, errors = 1 }) => ({
     code: imports5 + code,
-    errors,
+    errors: Array(errors).fill({ messageId: 'noInvalidTokenPaths' }),
   })),
 })
 
@@ -291,6 +297,6 @@ eslintTester.run(RULE_NAME6, rule6 as any, {
   })),
   invalid: invalids6.map(({ code }) => ({
     code: imports6 + code,
-    errors: 2,
+    errors: [{ messageId: 'nesting' }, { messageId: 'nesting' }],
   })),
 })
