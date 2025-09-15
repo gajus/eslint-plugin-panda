@@ -24,6 +24,7 @@ export const getContext = async (options: Options) => {
   if (process.env.NODE_ENV === 'test') {
     const context = createContext() as unknown as PandaContext;
     context.getFiles = () => ['App.tsx'];
+
     return context;
   } else {
     const configPath = findConfig({

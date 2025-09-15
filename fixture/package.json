@@ -2,7 +2,6 @@
   "description": "Test fixtures for Panda CSS",
   "devDependencies": {
     "@pandacss/config": "^0.40.0",
-    "@pandacss/generator": "^0.40.0",
     "@pandacss/node": "^0.40.0",
     "@pandacss/preset-base": "^0.40.0",
     "@pandacss/preset-panda": "^0.40.0",

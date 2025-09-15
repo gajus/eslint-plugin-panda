@@ -5,7 +5,7 @@ import presetBase from '@pandacss/preset-base';
 import presetPanda from '@pandacss/preset-panda';
 import { type PresetCore, type Theme } from '@pandacss/types';
 
-export const conditions = {
+const conditions = {
   ...presetBase.conditions,
   dark: '[data-theme=dark] &, .dark &, &.dark, &[data-theme=dark]',
   light: '[data-theme=light] &, .light &, &.light, &[data-theme=light]',

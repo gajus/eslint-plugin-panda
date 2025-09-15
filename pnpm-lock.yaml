@@ -49,9 +49,6 @@ importers:
       '@pandacss/config':
         specifier: ^0.40.0
         version: 0.40.1
-      '@pandacss/generator':
-        specifier: ^0.40.0
-        version: 0.40.1
       '@pandacss/node':
         specifier: ^0.40.0
         version: 0.40.1(typescript@5.9.2)

@@ -1,4 +1,4 @@
-/** @type {import('./lib/types').Configuration} */
+/** @type {import('lint-staged').Configuration} */
 module.exports = {
   '*': ['pnpm format'],
   '**/*.{ts,tsx,cjs,js,jsx,json}': () => [

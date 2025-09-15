@@ -1,7 +1,6 @@
 import sandboxConfig from '../../sandbox/panda.config';
 import { fixturePreset } from './config';
 import { mergeConfigs } from '@pandacss/config';
-import { Generator } from '@pandacss/generator';
 import { PandaContext } from '@pandacss/node';
 import { parseJson, stringifyJson } from '@pandacss/shared';
 import {
@@ -20,7 +19,7 @@ const config: UserConfig = {
   outdir: 'styled-system',
 };
 
-export const fixtureDefaults = {
+const fixtureDefaults = {
   config,
   dependencies: [],
   deserialize: () => parseJson(stringifyJson(config)),
@@ -28,16 +27,6 @@ export const fixtureDefaults = {
   path: '',
   serialized: stringifyJson(config),
 } as LoadConfigResult;
-
-export const createGeneratorContext = (userConfig?: Config) => {
-  const resolvedConfig = (
-    userConfig
-      ? mergeConfigs([userConfig, fixtureDefaults.config])
-      : fixtureDefaults.config
-  ) as UserConfig;
-
-  return new Generator({ ...fixtureDefaults, config: resolvedConfig });
-};
 
 // TODO why is this unused?
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
