@@ -2,3 +2,8 @@ packages:
   - 'fixture'
   - 'sandbox'
   - 'plugin'
+
+onlyBuiltDependencies:
+  - esbuild
+  - multiline-ts
+  - oxc-resolver
