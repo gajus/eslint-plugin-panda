@@ -8,9 +8,6 @@ importers:
         specifier: ^5.3.3
         version: 5.9.2
     devDependencies:
-      '@types/eslint':
-        specifier: ^9.6.1
-        version: 9.6.1
       '@types/node':
         specifier: ^20.11.5
         version: 20.19.14
@@ -5780,6 +5777,7 @@ snapshots:
     dependencies:
       '@types/estree': 1.0.8
       '@types/json-schema': 7.0.15
+    optional: true
   '@types/estree@1.0.8': {}
   '@types/json-schema@7.0.15': {}
   '@types/node@12.20.55': {}
