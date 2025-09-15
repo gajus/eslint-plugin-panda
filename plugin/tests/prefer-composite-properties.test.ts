@@ -36,7 +36,7 @@ eslintTester.run(RULE_NAME, rule, {
   import { css } from './panda/css';
   
   const styles = css({ rowGap: '4', columnGap: '4' })`,
-      errors: 2,
+      errors: [{ messageId: 'composite' }, { messageId: 'composite' }],
     },
 
     {
@@ -46,6 +46,7 @@ eslintTester.run(RULE_NAME, rule, {
   function App(){
     return <div className={css({ bgColor: 'red.100' })} />;
   }`,
+      errors: [{ messageId: 'composite' }],
     },
 
     {
@@ -55,7 +56,7 @@ eslintTester.run(RULE_NAME, rule, {
   function App(){
     return <Circle _hover={{  borderTopStyle: 'solid', borderTopWidth: '1px', borderTopColor: 'blue' }} />;
   }`,
-      errors: 3,
+      errors: [{ messageId: 'composite' }, { messageId: 'composite' }, { messageId: 'composite' }],
     },
   ],
 })

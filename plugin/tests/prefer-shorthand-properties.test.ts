@@ -1,9 +1,9 @@
-import { tester } from '../test-utils'
+import { eslintTester } from '../test-utils'
 import rule, { RULE_NAME } from '../src/rules/prefer-shorthand-properties'
 
 import multiline from 'multiline-ts'
 
-tester.run(RULE_NAME, rule, {
+eslintTester.run(RULE_NAME, rule, {
   valid: [
     {
       code: multiline`
@@ -36,6 +36,7 @@ tester.run(RULE_NAME, rule, {
   import { css } from './panda/css';
   
   const styles = css({ marginLeft: '4' })`,
+      errors: [{ messageId: 'shorthand' }],
     },
 
     {
@@ -45,6 +46,7 @@ tester.run(RULE_NAME, rule, {
   function App(){
     return <div className={css({ background: 'red.100' })} />;
   }`,
+      errors: [{ messageId: 'shorthand' }],
     },
 
     {
@@ -54,6 +56,7 @@ tester.run(RULE_NAME, rule, {
   function App(){
     return <Circle _hover={{  position: 'absolute' }} />;
   }`,
+      errors: [{ messageId: 'shorthand' }],
     },
   ],
 })

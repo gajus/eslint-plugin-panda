@@ -36,6 +36,7 @@ eslintTester.run(RULE_NAME, rule, {
   import { css } from './panda/css';
   
   const styles = css({ ml: '4' })`,
+      errors: [{ messageId: 'longhand' }],
     },
 
     {
@@ -45,6 +46,7 @@ eslintTester.run(RULE_NAME, rule, {
   function App(){
     return <div className={css({ bg: 'red.100' })} />;
   }`,
+      errors: [{ messageId: 'longhand' }],
     },
 
     {
@@ -54,6 +56,7 @@ eslintTester.run(RULE_NAME, rule, {
   function App(){
     return <Circle _hover={{  pos: 'absolute' }} />;
   }`,
+      errors: [{ messageId: 'longhand' }],
     },
   ],
 })

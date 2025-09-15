@@ -50,6 +50,7 @@ eslintTester.run(RULE_NAME, rule, {
   
   const color = 'red.100';
   const styles = css({ bg: color })`,
+      errors: [{ messageId: 'dynamic' }],
     },
 
     {
@@ -58,6 +59,7 @@ eslintTester.run(RULE_NAME, rule, {
   
   const size = '8';
   const styles = css({ padding: ['4', size] })`,
+      errors: [{ messageId: 'dynamic' }],
     },
 
     {
@@ -66,6 +68,7 @@ eslintTester.run(RULE_NAME, rule, {
   
   const align = 'center';
   const styles = stack({ align: align })`,
+      errors: [{ messageId: 'dynamic' }],
     },
 
     {
@@ -76,6 +79,7 @@ eslintTester.run(RULE_NAME, rule, {
     const bool = true;
     return <Circle debug={bool} />;
   }`,
+      errors: [{ messageId: 'dynamic' }],
     },
 
     {
@@ -86,6 +90,7 @@ eslintTester.run(RULE_NAME, rule, {
     const color = 'red.100';
     return <styled.div color={color} />;
   }`,
+      errors: [{ messageId: 'dynamic' }],
     },
 
     {
@@ -94,6 +99,7 @@ eslintTester.run(RULE_NAME, rule, {
   
   const property = 'background';
   const styles = css({ [property]: 'red.100' })`,
+      errors: [{ messageId: 'dynamicProperty' }],
     },
 
     {
@@ -110,6 +116,7 @@ eslintTester.run(RULE_NAME, rule, {
       }
     });
   }`,
+      errors: [{ messageId: 'dynamicRecipeVariant' }],
     },
   ],
 })

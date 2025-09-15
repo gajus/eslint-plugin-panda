@@ -27,6 +27,7 @@ eslintTester.run(RULE_NAME, rule, {
   import { css } from './panda/css';
   
   const styles = css({ margin:"2", marginLeft: "5" })`,
+      errors: [{ messageId: 'unify' }],
     },
 
     {
@@ -36,6 +37,7 @@ eslintTester.run(RULE_NAME, rule, {
   function App(){
     return <Circle border="solid 1px" borderColor="gray.800" />;
   }`,
+      errors: [{ messageId: 'unify' }],
     },
   ],
 })

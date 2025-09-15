@@ -58,6 +58,7 @@ eslintTester.run(RULE_NAME, rule, {
   function Text({ variant }){
     return <p className={css({ textStyle: variant })} />;
   }`,
+      errors: [{ messageId: 'noRenaming' }],
     },
 
     {
@@ -67,6 +68,7 @@ eslintTester.run(RULE_NAME, rule, {
   function Text(props){
     return <p className={css({ textStyle: props.variant })} />;
   }`,
+      errors: [{ messageId: 'noRenaming' }],
     },
 
     //TODO detect pattern attributes as panda property

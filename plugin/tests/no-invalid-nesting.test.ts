@@ -52,6 +52,7 @@ eslintTester.run(RULE_NAME, rule, {
   const styles = css({
     ':hover': { marginLeft: '4px' },
   })`,
+      errors: [{ messageId: 'nesting' }],
     },
 
     {
@@ -67,6 +68,7 @@ eslintTester.run(RULE_NAME, rule, {
       />
     );
   }`,
+      errors: [{ messageId: 'nesting' }],
     },
 
     {
@@ -82,6 +84,7 @@ eslintTester.run(RULE_NAME, rule, {
       />
     );
   }`,
+      errors: [{ messageId: 'nesting' }],
     },
   ],
 })

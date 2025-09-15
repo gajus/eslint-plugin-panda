@@ -36,6 +36,7 @@ eslintTester.run(RULE_NAME, rule, {
   import { css } from './panda/css';
   
   const styles = css({ marginLeft: '4' })`,
+      errors: [{ messageId: 'noMargin' }],
     },
 
     {
@@ -45,6 +46,7 @@ eslintTester.run(RULE_NAME, rule, {
   function App(){
     return <div className={css({ margin: '3' })} />;
   }`,
+      errors: [{ messageId: 'noMargin' }],
     },
 
     {
@@ -54,6 +56,7 @@ eslintTester.run(RULE_NAME, rule, {
   function App(){
     return <Circle marginX="2" />;
   }`,
+      errors: [{ messageId: 'noMargin' }],
     },
   ],
 })

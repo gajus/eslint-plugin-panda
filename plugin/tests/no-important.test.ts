@@ -36,6 +36,7 @@ eslintTester.run(RULE_NAME, rule, {
   import { css } from './panda/css';
   
   const styles = css({ marginLeft: '4px!' })`,
+      errors: [{ messageId: 'important' }],
     },
 
     {
@@ -45,6 +46,7 @@ eslintTester.run(RULE_NAME, rule, {
   function App(){
     return <div className={css({ background: '#111 !important' })} />;
   }`,
+      errors: [{ messageId: 'important' }],
     },
 
     {
@@ -54,6 +56,7 @@ eslintTester.run(RULE_NAME, rule, {
   function App(){
     return <Circle _hover={{ position: '[absolute!]' }} />;
   }`,
+      errors: [{ messageId: 'important' }],
     },
   ],
 })

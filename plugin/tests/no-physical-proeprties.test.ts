@@ -72,6 +72,7 @@ eslintTester.run(RULE_NAME, rule, {
   import { css } from './panda/css';
   
   const styles = css({ left: '0' })`,
+      errors: [{ messageId: 'physical' }],
     },
 
     {
@@ -81,6 +82,7 @@ eslintTester.run(RULE_NAME, rule, {
   function App(){
     return <div className={css({ marginLeft: '4' })} />;
   }`,
+      errors: [{ messageId: 'physical' }],
     },
 
     {
@@ -90,6 +92,7 @@ eslintTester.run(RULE_NAME, rule, {
   function App(){
     return <Circle _hover={{  borderBottom: 'solid 1px' }} />;
   }`,
+      errors: [{ messageId: 'physical' }],
     },
 
     // textAlign with physical values - regular object literal
@@ -98,6 +101,7 @@ eslintTester.run(RULE_NAME, rule, {
   import { css } from './panda/css';
   
   const styles = css({ textAlign: 'left' })`,
+      errors: [{ messageId: 'physicalValue' }],
     },
 
     {
@@ -107,6 +111,7 @@ eslintTester.run(RULE_NAME, rule, {
   function App(){
     return <div className={css({ textAlign: 'right' })} />;
   }`,
+      errors: [{ messageId: 'physicalValue' }],
     },
 
     // textAlign with physical values - JSX expression container
@@ -117,6 +122,7 @@ eslintTester.run(RULE_NAME, rule, {
   function App(){
     return <Box textAlign={"left"} />;
   }`,
+      errors: [{ messageId: 'physicalValue' }],
     },
 
     {
@@ -126,6 +132,7 @@ eslintTester.run(RULE_NAME, rule, {
   function App(){
     return <Box textAlign={"right"} />;
   }`,
+      errors: [{ messageId: 'physicalValue' }],
     },
   ],
 })

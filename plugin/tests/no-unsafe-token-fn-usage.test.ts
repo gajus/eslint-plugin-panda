@@ -38,6 +38,7 @@ eslintTester.run(RULE_NAME, rule, {
   import { css } from './panda/css';
   
   const styles = css({ bg: token('colors.red.300') })`,
+      errors: [{ messageId: 'noUnsafeTokenFnUsage' }],
     },
 
     {
@@ -48,6 +49,7 @@ eslintTester.run(RULE_NAME, rule, {
     function App(){
       return <div className={css({ bg: 'token(colors.red.300)' })} />;
     }`,
+      errors: [{ messageId: 'noUnsafeTokenFnUsage' }],
     },
 
     {
@@ -57,6 +59,7 @@ eslintTester.run(RULE_NAME, rule, {
     function App(){
       return <Circle margin='[{sizes.4}]' />;
     }`,
+      errors: [{ messageId: 'noUnsafeTokenFnUsage' }],
     },
   ],
 })
