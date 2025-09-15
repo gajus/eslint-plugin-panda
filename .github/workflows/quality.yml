@@ -1,11 +1,13 @@
 name: Quality
 on:
-  push:
-    branches:
-      - main
   pull_request:
     branches:
       - main
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - ready_for_review
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
@@ -16,63 +18,49 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-
       - name: Install
         uses: ./.github/composite-actions/install
-
       - name: Run Prettier
         run: pnpm run lint:prettier
-
   tests:
     name: Unit Tests
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-
       - name: Install
         uses: ./.github/composite-actions/install
-
       - name: Run tests
         run: pnpm run test:vitest
-
   eslint:
     name: ESLint
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-
       - name: Install
         uses: ./.github/composite-actions/install
-
       - name: Run ESLint
         run: pnpm run lint:eslint
         env:
           NODE_OPTIONS: "--max-old-space-size=4096"
-
   types:
     name: TypeScript
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-
       - name: Install
         uses: ./.github/composite-actions/install
-
       - name: Run TypeScript type check
         run: pnpm run lint:tsc
-
   docs:
     name: Docs
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-
       - name: Install
         uses: ./.github/composite-actions/install
-
       - name: Build docs
         run: pnpm run generate:docs
