@@ -3,86 +3,72 @@ import rule, { RULE_NAME } from '../src/rules/no-hardcoded-color'
 
 import multiline from 'multiline-ts'
 
-const valids = [
-  {
-    code: multiline`
-import { css } from './panda/css';
-
-const styles = css({ color: 'red.100' })`,
-  },
-
-  {
-    code: multiline`
-import { css } from './panda/css';
-
-const styles = css({ color: 'red.100/30' })`,
-  },
-
-  {
-    code: multiline`
-import { css } from './panda/css';
-
-function App(){
-  return <div className={css({ background: 'green.300' })} />;
-}`,
-  },
-
-  {
-    code: multiline`
-import { Circle } from './panda/jsx';
-
-function App(){
-  return <Circle _hover={{  borderColor: 'gray.100' }} />;
-}`,
-  },
-] as const
-
-const invalids = [
-  {
-    code: multiline`
-import { css } from './panda/css';
-
-const styles = css({ color: '#FEE2E2' })`,
-  },
-
-  {
-    options: [{ noOpacity: true }],
-    code: multiline`
-import { css } from './panda/css';
-
-const styles = css({ color: 'red.100/30' })`,
-  },
-
-  {
-    code: multiline`
-import { css } from './panda/css';
-
-function App(){
-  return <div className={css({ background: 'rgb(134, 239, 172)' })} />;
-}`,
-  },
-
-  {
-    code: multiline`
-import { Circle } from './panda/jsx';
-
-function App(){
-  return <Circle _hover={{  borderColor: 'hsl(220deg, 14%, 96%)' }} />;
-}`,
-  },
-] as const
-
 eslintTester.run(RULE_NAME, rule, {
-  valid: valids.map(({ code }) => ({
-    code,
-  })),
-  invalid: invalids.map(({ code, options }) =>
-    options
-      ? {
-          code,
-          options,
-          errors: 1,
-        }
-      : { code, errors: 1 },
-  ),
+  valid: [
+    {
+      code: multiline`
+  import { css } from './panda/css';
+  
+  const styles = css({ color: 'red.100' })`,
+    },
+
+    {
+      code: multiline`
+  import { css } from './panda/css';
+  
+  const styles = css({ color: 'red.100/30' })`,
+    },
+
+    {
+      code: multiline`
+  import { css } from './panda/css';
+  
+  function App(){
+    return <div className={css({ background: 'green.300' })} />;
+  }`,
+    },
+
+    {
+      code: multiline`
+  import { Circle } from './panda/jsx';
+  
+  function App(){
+    return <Circle _hover={{  borderColor: 'gray.100' }} />;
+  }`,
+    },
+  ],
+  invalid: [
+    {
+      code: multiline`
+  import { css } from './panda/css';
+  
+  const styles = css({ color: '#FEE2E2' })`,
+    },
+
+    {
+      options: [{ noOpacity: true }],
+      code: multiline`
+  import { css } from './panda/css';
+  
+  const styles = css({ color: 'red.100/30' })`,
+    },
+
+    {
+      code: multiline`
+  import { css } from './panda/css';
+  
+  function App(){
+    return <div className={css({ background: 'rgb(134, 239, 172)' })} />;
+  }`,
+    },
+
+    {
+      code: multiline`
+  import { Circle } from './panda/jsx';
+  
+  function App(){
+    return <Circle _hover={{  borderColor: 'hsl(220deg, 14%, 96%)' }} />;
+  }`,
+    },
+  ],
 })
