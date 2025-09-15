@@ -16,7 +16,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: ./.github/composite-actions/install
+      - uses: ./.github/actions/install
       - run: pnpm run lint:prettier
       - run: pnpm run lint:knip
       - run: pnpm run lint:tsc
@@ -24,5 +24,5 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: ./.github/composite-actions/install
+      - uses: ./.github/actions/install
       - run: pnpm run test:vitest
