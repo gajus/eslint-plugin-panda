@@ -43,7 +43,7 @@ jobs:
       - name: Run ESLint
         run: pnpm run lint:eslint
         env:
-          NODE_OPTIONS: "--max-old-space-size=4096"
+          NODE_OPTIONS: '--max-old-space-size=4096'
   types:
     name: TypeScript
     runs-on: ubuntu-latest
