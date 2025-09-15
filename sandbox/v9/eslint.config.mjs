@@ -4,7 +4,6 @@ import tseslint from 'typescript-eslint'
 import globals from 'globals'
 import reactHooks from 'eslint-plugin-react-hooks'
 import reactRefresh from 'eslint-plugin-react-refresh'
-
 import panda from 'eslint-plugin-panda'
 
 const compat = new FlatCompat()
@@ -23,7 +22,7 @@ export default tseslint.config({
     ...compat.config(reactHooks.configs.recommended),
   ],
   plugins: {
-    '@pandacss': panda,
+    panda,
     'react-refresh': reactRefresh,
   },
   languageOptions: {
@@ -34,9 +33,9 @@ export default tseslint.config({
   },
   rules: {
     ...panda.configs.recommended.rules,
-    '@pandacss/no-margin-properties': 'warn',
-    '@pandacss/no-physical-properties': 'error',
-    '@pandacss/no-hardcoded-color': ['error', { noOpacity: true, whitelist: ['inherit'] }],
+    'panda/no-margin-properties': 'warn',
+    'panda/no-physical-properties': 'error',
+    'panda/no-hardcoded-color': ['error', { noOpacity: true, whitelist: ['inherit'] }],
     'react-refresh/only-export-components': ['warn', { allowConstantExport: true }],
   },
 })
