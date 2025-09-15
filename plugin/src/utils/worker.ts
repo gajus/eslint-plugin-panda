@@ -111,124 +111,61 @@ export function run(
   action: 'filterInvalidTokens',
   options: Options,
   paths: string[],
-): string[];
-
-export function run(
-  action: 'isColorToken',
-  options: Options,
-  value: string,
-): boolean;
-
-export function run(
-  action: 'isColorAttribute',
-  options: Options,
-  attribute: string,
-): boolean;
-
-export function run(action: 'isValidFile', options: Options): boolean;
-
-export function run(
-  action: 'resolveShorthands',
-  options: Options,
-  name: string,
-): string[] | undefined;
-export function run(
-  action: 'resolveLongHand',
-  options: Options,
-  name: string,
-): string | undefined;
-
-export function run(
-  action: 'isValidProperty',
-  options: Options,
-  name: string,
-  patternName?: string,
-): boolean;
-export function run(
-  action: 'matchFile',
-  options: Options,
-  name: string,
-  imports: ImportResult[],
-): boolean;
-export function run(
-  action: 'matchImports',
-  options: Options,
-  result: MatchImportResult,
-): boolean;
-export function run(
-  action: 'getPropCategory',
-  options: Options,
-  property: string,
-): string;
-export function run(
-  action: 'filterDeprecatedTokens',
-  options: Options,
-  tokens: DeprecatedToken[],
-): DeprecatedToken[];
-export function run(action: string, options: Options, ...args: any[]): any {
-  // @ts-expect-error cast
-  return runAsync(action, options, ...args);
-}
-
-export function runAsync(
-  action: 'filterInvalidTokens',
-  options: Options,
-  paths: string[],
 ): Promise<string[]>;
-export function runAsync(
+export function run(
   action: 'isColorToken',
   options: Options,
   value: string,
 ): Promise<boolean>;
-export function runAsync(
+export function run(
   action: 'isColorAttribute',
   options: Options,
   attribute: string,
 ): Promise<boolean>;
-export function runAsync(
+export function run(
   action: 'isValidFile',
   options: Options,
   fileName: string,
 ): Promise<string>;
-export function runAsync(
+export function run(
   action: 'resolveShorthands',
   options: Options,
   name: string,
 ): Promise<string[] | undefined>;
-export function runAsync(
+export function run(
   action: 'resolveLongHand',
   options: Options,
   name: string,
 ): Promise<string | undefined>;
 
-export function runAsync(
+export function run(
   action: 'isValidProperty',
   options: Options,
   name: string,
   patternName?: string,
 ): Promise<boolean>;
-export function runAsync(
+export function run(
   action: 'matchFile',
   options: Options,
   name: string,
   imports: ImportResult[],
 ): Promise<boolean>;
-export function runAsync(
+export function run(
   action: 'matchImports',
   options: Options,
   result: MatchImportResult,
 ): Promise<boolean>;
-export function runAsync(
+export function run(
   action: 'getPropCategory',
   options: Options,
   property: string,
 ): Promise<string>;
-export function runAsync(
+export function run(
   action: 'filterDeprecatedTokens',
   options: Options,
   tokens: DeprecatedToken[],
 ): Promise<DeprecatedToken[]>;
-export async function runAsync(
+export async function run(
   action: string,
   options: Options,
   ...args: any
@@ -344,4 +281,4 @@ async function resolveShorthands(
   return context.utility.getPropShorthandsMap().get(name);
 }
 
-runAsWorker(run as any);
+runAsWorker(run);
