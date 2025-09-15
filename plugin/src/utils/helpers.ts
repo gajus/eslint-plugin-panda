@@ -80,7 +80,7 @@ const _getImports = (context: RuleContext<any, any>) => {
 // Caching imports per context to avoid redundant computations
 const importsCache = new WeakMap<RuleContext<any, any>, ImportResult[]>()
 
-export const getImports = (context: RuleContext<any, any>) => {
+const getImports = (context: RuleContext<any, any>) => {
   if (importsCache.has(context)) {
     return importsCache.get(context)!
   }
@@ -436,7 +436,7 @@ export function isRecipeVariant(node: TSESTree.Property, context: RuleContext<an
   if (length < requiredLength + extraLength) return true
 }
 
-export const isPandaComponent = (node: TSESTree.JSXOpeningElement, context: RuleContext<any, any>) => {
+const isPandaComponent = (node: TSESTree.JSXOpeningElement, context: RuleContext<any, any>) => {
   // <styled.div /> && <Box />
   if (!isJSXMemberExpression(node.name) && !isJSXIdentifier(node.name)) return false
 

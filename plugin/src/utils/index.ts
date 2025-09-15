@@ -12,10 +12,10 @@ export const createRule = ESLintUtils.RuleCreator(
 // Determine the distribution directory
 const isBase = process.env.NODE_ENV !== 'test' || import.meta.url.endsWith('dist/index.js')
 
-export const distDir = fileURLToPath(new URL(isBase ? './' : '../../dist', import.meta.url))
+const distDir = fileURLToPath(new URL(isBase ? './' : '../../dist', import.meta.url))
 
 // Create synchronous function using synckit
-export const _syncAction = createSyncFn(join(distDir, 'utils/worker.mjs'))
+const _syncAction = createSyncFn(join(distDir, 'utils/worker.mjs'))
 
 // Define syncAction with proper typing and error handling
 export const syncAction = ((...args: Parameters<typeof run>) => {
