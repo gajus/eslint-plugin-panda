@@ -28,8 +28,8 @@
   },
   "scripts": {
     "prepare": "pnpm build",
-    "build": "tsup",
-    "dev": "tsup --watch",
+    "build": "tsdown",
+    "dev": "tsdown --watch",
     "lint:tsc": "tsc --noEmit"
   },
   "files": [
