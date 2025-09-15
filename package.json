@@ -46,5 +46,5 @@
       "pnpm format"
     ]
   },
-  "packageManager": "pnpm@8.15.8"
+  "packageManager": "pnpm@10.16.1"
 }
