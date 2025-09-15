@@ -5,5 +5,5 @@
     }
   },
   "extends": "../tsconfig.build.json",
-  "include": ["src/**/*", "tests", "test-utils.ts"]
+  "include": ["src/**/*", "tests", "test-utils.ts", "eslint.config.ts", "tsdown.config.ts"]
 }

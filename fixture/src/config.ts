@@ -1,17 +1,16 @@
+import { recipes } from './recipes'
+import { semanticTokens } from './semantic-tokens'
+import { slotRecipes } from './slot-recipes'
 import presetBase from '@pandacss/preset-base'
 import presetPanda from '@pandacss/preset-panda'
-import type { PresetCore, Theme } from '@pandacss/types'
-
-import { recipes } from './recipes'
-import { slotRecipes } from './slot-recipes'
-import { semanticTokens } from './semantic-tokens'
+import { type PresetCore, type Theme } from '@pandacss/types'
 
 export const conditions = {
   ...presetBase.conditions,
-  materialTheme: '[data-color=material] &',
-  pastelTheme: '[data-color=pastel] &',
   dark: '[data-theme=dark] &, .dark &, &.dark, &[data-theme=dark]',
   light: '[data-theme=light] &, .light &, &.light, &[data-theme=light]',
+  materialTheme: '[data-color=material] &',
+  pastelTheme: '[data-color=pastel] &',
 }
 
 const theme = presetPanda.theme
@@ -21,9 +20,6 @@ const tokens = {
     ...theme.tokens?.colors,
     deep: {
       test: {
-        yam: {
-          value: '%555',
-        },
         pool: {
           poller: {
             value: '#fff',
@@ -31,6 +27,9 @@ const tokens = {
           tall: {
             value: '$dfdf',
           },
+        },
+        yam: {
+          value: '%555',
         },
       },
     },
@@ -59,10 +58,10 @@ export const fixturePreset: Omit<PresetCore, 'globalCss' | 'staticCss'> = {
   conditions,
   theme: {
     ...theme,
+    recipes,
+    semanticTokens,
+    slotRecipes,
     textStyles,
     tokens,
-    semanticTokens,
-    recipes,
-    slotRecipes,
   },
 }

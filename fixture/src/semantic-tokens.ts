@@ -1,27 +1,34 @@
-import type { SemanticTokens } from '@pandacss/types'
+import { type SemanticTokens } from '@pandacss/types'
 
 export const semanticTokens: SemanticTokens = {
   colors: {
-    primary: { value: { base: '{colors.red.500}', _dark: '{colors.red.400}' } },
-    secondary: { value: { base: '{colors.red.800}', _dark: '{colors.red.700}' } },
-    complex: { value: { base: '{colors.red.800}', _dark: { _highContrast: '{colors.red.700}' } } },
-    surface: {
-      value: {
-        _materialTheme: { base: '#m-b', _dark: '#m-d' },
-        _pastelTheme: { base: '#p-b', _dark: { md: '#p-d' } },
-      },
-    },
     button: {
-      thick: {
-        value: { base: '#fff', _dark: '#000' },
-      },
       card: {
         body: {
-          value: { base: '#fff', _dark: '#000' },
+          value: { _dark: '#000', base: '#fff' },
         },
         heading: {
-          value: { base: '#fff', _dark: '#000' },
+          value: { _dark: '#000', base: '#fff' },
         },
+      },
+      thick: {
+        value: { _dark: '#000', base: '#fff' },
+      },
+    },
+    complex: {
+      value: {
+        _dark: { _highContrast: '{colors.red.700}' },
+        base: '{colors.red.800}',
+      },
+    },
+    primary: { value: { _dark: '{colors.red.400}', base: '{colors.red.500}' } },
+    secondary: {
+      value: { _dark: '{colors.red.700}', base: '{colors.red.800}' },
+    },
+    surface: {
+      value: {
+        _materialTheme: { _dark: '#m-d', base: '#m-b' },
+        _pastelTheme: { _dark: { md: '#p-d' }, base: '#p-b' },
       },
     },
   },

@@ -3,7 +3,6 @@ import {
   getInvalidTokens,
   getTaggedTemplateCaller,
   isPandaAttribute,
-  isPandaIsh,
   isPandaProp as isPandaProperty,
   isRecipeVariant,
   isStyledTaggedTemplate,

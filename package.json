@@ -1,35 +1,17 @@
 {
-  "name": "eslint-plugin-panda",
-  "version": "0.0.0",
-  "description": "ESLint plugin for Panda CSS",
-  "scripts": {
-    "build": "pnpm -r --parallel build",
-    "dev": "pnpm -r --parallel dev",
-    "format": "prettier --write .",
-    "generate:docs": "eslint-doc-generator",
-    "lint:eslint": "eslint . --ext .ts",
-    "lint:prettier": "prettier --check .",
-    "lint:tsc": "pnpm -r --parallel lint:tsc",
-    "lint:knip": "knip",
-    "prepare": "husky",
-    "release": "changeset publish",
-    "test:vitest": "vitest run"
-  },
-  "main": "plugin/dist/index.js",
-  "files": [
-    "dist"
-  ],
   "dependencies": {
     "@changesets/cli": "^2.27.1",
     "typescript": "^5.3.3"
   },
+  "description": "ESLint plugin for Panda CSS",
   "devDependencies": {
-    "@types/eslint": "^8.56.2",
+    "@types/eslint": "^9.6.1",
     "@types/node": "^20.11.5",
     "@typescript-eslint/eslint-plugin": "^8.43.0",
     "@typescript-eslint/parser": "^8.43.0",
     "@typescript-eslint/rule-tester": "^8.43.0",
-    "eslint": "^8.56.0",
+    "eslint": "^9.35.0",
+    "eslint-config-canonical": "^45.0.0",
     "eslint-doc-generator": "^2.2.2",
     "eslint-plugin-eslint-plugin": "^5.2.1",
     "husky": "^9.0.6",
@@ -38,10 +20,29 @@
     "prettier": "^3.2.4",
     "vitest": "^1.2.1"
   },
+  "files": [
+    "dist"
+  ],
   "lint-staged": {
     "*": [
       "pnpm format"
     ]
   },
-  "packageManager": "pnpm@10.16.1"
+  "main": "plugin/dist/index.js",
+  "name": "eslint-plugin-panda",
+  "packageManager": "pnpm@10.16.1",
+  "scripts": {
+    "build": "pnpm -r --parallel build",
+    "dev": "pnpm -r --parallel dev",
+    "format": "prettier --write .",
+    "generate:docs": "eslint-doc-generator",
+    "lint:eslint": "eslint . --ext .ts",
+    "lint:knip": "knip",
+    "lint:prettier": "prettier --check .",
+    "lint:tsc": "pnpm -r --parallel lint:tsc",
+    "prepare": "husky",
+    "release": "changeset publish",
+    "test:vitest": "vitest run"
+  },
+  "version": "0.0.0"
 }

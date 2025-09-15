@@ -39,7 +39,7 @@ const rule = createRule({
       }
 
       // Regular expression to match token-only values, e.g., token('space.2') or {space.2}
-      const tokenRegex = /^(?:token\([^)]*\)|{[^}]*})$/
+      const tokenRegex = /^(?:token\([^)]*\)|\{[^}]*\})$/
       return !tokenRegex.test(input)
     }
 

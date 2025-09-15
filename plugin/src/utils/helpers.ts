@@ -386,7 +386,7 @@ export const isColorToken = (value: string | undefined, context: RuleContext<any
 }
 
 export const extractTokens = (value: string) => {
-  const regex = /token\(([^"'(),]+)(?:,\s*([^"'(),]+))?\)|{([^\n\r{}]+)}/g
+  const regex = /token\(([^"'(),]+)(?:,\s*([^"'(),]+))?\)|\{([^\n\r{}]+)\}/g
   const matches = []
   let match
 
@@ -529,30 +529,4 @@ export function isRecipeVariant(node: TSESTree.Property, context: RuleContext<an
   if (length < requiredLength + extraLength) {
     return true
   }
-}
-
-const isPandaComponent = (node: TSESTree.JSXOpeningElement, context: RuleContext<any, any>) => {
-  // <styled.div /> && <Box />
-  if (!isJSXMemberExpression(node.name) && !isJSXIdentifier(node.name)) {
-    return false
-  }
-
-  if (isJSXMemberExpression(node.name)) {
-    // For <styled.div>, check if 'styled' is a Panda import
-    const objectName = (node.name.object as any).name
-    // Check if 'styled' is imported from panda - check both filtered and raw imports
-    const imports = getImports(context)
-    const rawImports = _getImports(context)
-    return (
-      imports.some((imp) => imp.alias === objectName) ||
-      rawImports.some((imp) => imp.alias === objectName && imp.mod.includes('panda')) ||
-      isPandaIsh(objectName, context)
-    )
-  } else if (isJSXIdentifier(node.name)) {
-    // For <Circle> or <PandaComp>
-    const componentName = node.name.name
-    return isPandaIsh(componentName, context) || Boolean(isLocalStyledFactory(node, context))
-  }
-
-  return false
 }

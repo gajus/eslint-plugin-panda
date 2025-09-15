@@ -1,9 +1,7 @@
 import { createRule } from '../utils'
 import {
   getDeprecatedTokens,
-  getTaggedTemplateCaller,
   isPandaAttribute,
-  isPandaIsh,
   isPandaProp as isPandaProperty,
   isRecipeVariant,
 } from '../utils/helpers'

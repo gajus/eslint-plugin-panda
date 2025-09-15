@@ -1,66 +1,64 @@
 import { defineConfig } from '@pandacss/dev'
 
 export default defineConfig({
-  preflight: true,
-  include: ['./src/**/*.{tsx,jsx}', './pages/**/*.{jsx,tsx}'],
   exclude: [],
-  outdir: 'styled-system',
+  globalCss: {
+    '*': {
+      fontFamily: 'Inter',
+      margin: '0',
+    },
+    a: {
+      color: 'inherit',
+      textDecoration: 'none',
+    },
+  },
+  include: ['./src/**/*.{tsx,jsx}', './pages/**/*.{jsx,tsx}'],
   jsxFactory: 'panda',
   jsxFramework: 'react',
+  outdir: 'styled-system',
+  preflight: true,
   theme: {
     extend: {
-      tokens: {
-        colors: {
-          red: {
-            400: {
-              value: '#ff0000',
-              description: 'red color',
-              deprecated: true,
-            },
-          },
-        },
-      },
-      semanticTokens: {
-        colors: {
-          text: { value: { base: '{colors.gray.600}', _osDark: '{colors.gray.400}' } },
-          bg: { value: { base: '{colors.gray.600}', _osDark: '{colors.gray.400}' } },
-        },
-      },
       recipes: {
         button: {
-          className: 'button',
-          jsx: ['Button', 'ListedButton', /WithRegex$/, 'PrimaryButtonLike'],
-          description: 'A button styles',
           base: {
             fontSize: 'lg',
           },
-          variants: {
-            size: {
-              sm: {
-                padding: '2',
-                borderRadius: 'sm',
+          className: 'button',
+          compoundVariants: [
+            {
+              css: {
+                fontSize: '12px',
               },
-              md: {
-                padding: '4',
+              size: 'sm',
+              variant: 'primary',
+            },
+            {
+              css: {
+                fontSize: '24px',
+                fontWeight: 'bold',
+                padding: 4,
+              },
+              state: 'focused',
+              variant: ['primary', 'danger'],
+            },
+          ],
+          description: 'A button styles',
+          jsx: ['Button', 'ListedButton', /WithRegex$/, 'PrimaryButtonLike'],
+          variants: {
+            rounded: {
+              true: {
                 borderRadius: 'md',
               },
             },
-            variant: {
-              primary: {
-                color: 'white',
-                backgroundColor: 'blue.500',
+            size: {
+              md: {
+                borderRadius: 'md',
+                padding: '4',
               },
-              danger: {
-                color: 'white',
-                backgroundColor: 'red.500',
-              },
-              secondary: {
-                color: 'pink.300',
-                backgroundColor: 'green.500',
-              },
-              purple: {
-                color: 'amber.300',
-                backgroundColor: 'purple.500',
+              sm: {
+                borderRadius: 'sm',
+                padding: '2',
               },
             },
             state: {
@@ -71,42 +69,48 @@ export default defineConfig({
                 color: 'pink.400',
               },
             },
-            rounded: {
-              true: {
-                borderRadius: 'md',
+            variant: {
+              danger: {
+                backgroundColor: 'red.500',
+                color: 'white',
+              },
+              primary: {
+                backgroundColor: 'blue.500',
+                color: 'white',
+              },
+              purple: {
+                backgroundColor: 'purple.500',
+                color: 'amber.300',
+              },
+              secondary: {
+                backgroundColor: 'green.500',
+                color: 'pink.300',
               },
             },
           },
-          compoundVariants: [
-            {
-              size: 'sm',
-              variant: 'primary',
-              css: {
-                fontSize: '12px',
-              },
-            },
-            {
-              variant: ['primary', 'danger'],
-              state: 'focused',
-              css: {
-                padding: 4,
-                fontWeight: 'bold',
-                fontSize: '24px',
-              },
-            },
-          ],
         },
       },
-    },
-  },
-  globalCss: {
-    '*': {
-      fontFamily: 'Inter',
-      margin: '0',
-    },
-    a: {
-      color: 'inherit',
-      textDecoration: 'none',
+      semanticTokens: {
+        colors: {
+          bg: {
+            value: { _osDark: '{colors.gray.400}', base: '{colors.gray.600}' },
+          },
+          text: {
+            value: { _osDark: '{colors.gray.400}', base: '{colors.gray.600}' },
+          },
+        },
+      },
+      tokens: {
+        colors: {
+          red: {
+            '400': {
+              deprecated: true,
+              description: 'red color',
+              value: '#ff0000',
+            },
+          },
+        },
+      },
     },
   },
 })

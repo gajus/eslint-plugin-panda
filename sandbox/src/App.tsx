@@ -1,10 +1,10 @@
 // * Too much errors in this file? It's intentional. Thanks for your concern. 🙏
 
-import { defineKeyframes } from '@pandacss/dev'
 import { css } from '../styled-system/css'
 import { Circle, HStack, panda } from '../styled-system/jsx'
 import { stack } from '../styled-system/patterns'
 import { token } from '../styled-system/tokens'
+import { defineKeyframes } from '@pandacss/dev'
 
 const keyframes = defineKeyframes({
   fadeIn: {
@@ -13,7 +13,7 @@ const keyframes = defineKeyframes({
   },
 })
 
-//@ts-expect-error noidea
+// @ts-expect-error noidea
 const literal = css`
   color: {colors.red.400};
   margin-right: {sizess.4};
@@ -26,17 +26,17 @@ console.log(keyframes, literal)
 const LocalFactoryComp = panda('button')
 
 const pbe = '4'
-function App() {
+const App = () => {
   const className = css({
     bg: 'red.100',
-    debug: true,
-    color: '{colors.red.400}',
-    fontSize: 'token(fontSizes.2xl, 4px)',
-    marginTop: '{spacings.4} token(spacing.600)',
-    margin: '4',
-    pt: token('sizes.4'),
-    paddingBlockEnd: ['4', pbe],
     borderColor: 'inherit',
+    color: '{colors.red.400}',
+    debug: true,
+    fontSize: 'token(fontSizes.2xl, 4px)',
+    margin: '4',
+    marginTop: '{spacings.4} token(spacing.600)',
+    paddingBlockEnd: ['4', pbe],
+    pt: token('sizes.4'),
   })
 
   const color = 'red'
@@ -47,32 +47,32 @@ function App() {
   return (
     <div
       className={stack({
-        debug: true,
-        padding: '40px',
+        _hover: {
+          backgroundColor: 'green.300',
+          color: 'green.300/40',
+        },
         align: 'stretch !',
-        color: '#111',
         background: 'red',
         backgroundColor: color,
+        color: '#111',
         content: "['escape hatch']",
+        debug: true,
+        justify,
+        padding: '40px',
         textAlign: ta,
-        justify: justify,
-        _hover: {
-          color: 'green.300/40',
-          backgroundColor: 'green.300',
-        },
       })}
     >
       <panda.a href={`mailto:${1}`} />
-      <Circle size={circleSize} _hover={{ bg: 'red.200' }} />
-      <HStack gap="40px" debug>
+      <Circle _hover={{ bg: 'red.200' }} size={circleSize} />
+      <HStack debug gap="40px">
         <div className={className}>Element 1</div>
         <panda.div
-          color={color}
-          fontWeight="bold"
-          fontSize="50px"
           bg="red.200"
           borderColor="red.500"
-          borderTopColor={'#111'}
+          borderTopColor="#111"
+          color={color}
+          fontSize="50px"
+          fontWeight="bold"
           paddingBlockEnd={['4', color]}
         >
           Element 2

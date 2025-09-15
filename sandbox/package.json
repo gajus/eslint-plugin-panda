@@ -1,16 +1,4 @@
 {
-  "name": "sandbox",
-  "private": true,
-  "version": "0.0.0",
-  "type": "module",
-  "scripts": {
-    "prepare": "panda codegen",
-    "sadbox:dev": "vite",
-    "sadbox:build": "tsc && vite build",
-    "lint:eslint": "eslint . --report-unused-disable-directives --max-warnings 0",
-    "preview": "vite preview",
-    "lint:tsc": "tsc --noEmit"
-  },
   "dependencies": {
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
@@ -31,5 +19,17 @@
     "typescript-eslint": "^8.43.0",
     "vite": "^7.1.5",
     "vite-plugin-eslint": "^1.8.1"
-  }
+  },
+  "name": "sandbox",
+  "private": true,
+  "scripts": {
+    "lint:eslint": "eslint . --report-unused-disable-directives --max-warnings 0",
+    "lint:tsc": "tsc --noEmit",
+    "prepare": "panda codegen",
+    "preview": "vite preview",
+    "sadbox:build": "tsc && vite build",
+    "sadbox:dev": "vite"
+  },
+  "type": "module",
+  "version": "0.0.0"
 }

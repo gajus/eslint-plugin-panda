@@ -1,7 +1,7 @@
 export const layers = {
-  reset: 'reset',
   base: 'base',
-  tokens: 'tokens',
   recipes: 'recipes',
+  reset: 'reset',
+  tokens: 'tokens',
   utilities: 'utilities',
 }

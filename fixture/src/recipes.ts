@@ -1,33 +1,62 @@
-import type { RecipeConfig } from '@pandacss/types'
+import { type RecipeConfig } from '@pandacss/types'
 
 export const recipes: Record<string, RecipeConfig> = {
-  textStyle: {
-    className: 'textStyle',
+  buttonStyle: {
     base: {
-      fontFamily: 'mono',
-      divideX: '20px',
+      _hover: {
+        backgroundColor: 'red.200',
+        color: 'white',
+        fontSize: '3xl',
+      },
+      alignItems: 'center',
+      display: 'inline-flex',
+      justifyContent: 'center',
+    },
+    className: 'buttonStyle',
+    defaultVariants: {
+      size: 'md',
+      variant: 'solid',
     },
     variants: {
       size: {
-        h1: {
-          fontSize: '5rem',
-          lineHeight: '1em',
-          fontWeight: 800,
+        md: {
+          height: '3rem',
+          minWidth: '3rem',
+          padding: '0 0.75rem',
         },
-        h2: {
-          fontSize: '3rem',
-          lineHeight: '1.2em',
-          fontWeight: 700,
-          letterSpacing: '-0.03em',
+        sm: {
+          height: '2.5rem',
+          minWidth: '2.5rem',
+          padding: '0 0.5rem',
         },
       },
-    },
-  },
-  tooltipStyle: {
-    className: 'tooltipStyle',
-    base: {
-      '&[data-tooltip], & [data-tooltip]': {
-        color: { _dark: 'red' },
+      variant: {
+        outline: {
+          '&[data-disabled]': {
+            backgroundColor: 'transparent',
+            border: '1px solid gray',
+            color: 'gray',
+          },
+          _hover: {
+            backgroundColor: 'blue',
+            color: 'white',
+          },
+          backgroundColor: 'transparent',
+          border: '1px solid blue',
+          color: 'blue',
+        },
+        solid: {
+          '&[data-disabled]': {
+            backgroundColor: 'gray',
+            color: 'black',
+            fontSize: '2xl',
+          },
+          _hover: {
+            backgroundColor: 'darkblue',
+          },
+          backgroundColor: 'blue',
+          color: 'white',
+        },
       },
     },
   },
@@ -41,63 +70,34 @@ export const recipes: Record<string, RecipeConfig> = {
       },
     },
   },
-  buttonStyle: {
-    className: 'buttonStyle',
+  textStyle: {
     base: {
-      display: 'inline-flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      _hover: {
-        backgroundColor: 'red.200',
-        fontSize: '3xl',
-        color: 'white',
-      },
+      divideX: '20px',
+      fontFamily: 'mono',
     },
+    className: 'textStyle',
     variants: {
       size: {
-        sm: {
-          height: '2.5rem',
-          minWidth: '2.5rem',
-          padding: '0 0.5rem',
+        h1: {
+          fontSize: '5rem',
+          fontWeight: 800,
+          lineHeight: '1em',
         },
-        md: {
-          height: '3rem',
-          minWidth: '3rem',
-          padding: '0 0.75rem',
-        },
-      },
-      variant: {
-        solid: {
-          backgroundColor: 'blue',
-          color: 'white',
-          _hover: {
-            backgroundColor: 'darkblue',
-          },
-          '&[data-disabled]': {
-            backgroundColor: 'gray',
-            color: 'black',
-            fontSize: '2xl',
-          },
-        },
-        outline: {
-          backgroundColor: 'transparent',
-          border: '1px solid blue',
-          color: 'blue',
-          _hover: {
-            backgroundColor: 'blue',
-            color: 'white',
-          },
-          '&[data-disabled]': {
-            backgroundColor: 'transparent',
-            border: '1px solid gray',
-            color: 'gray',
-          },
+        h2: {
+          fontSize: '3rem',
+          fontWeight: 700,
+          letterSpacing: '-0.03em',
+          lineHeight: '1.2em',
         },
       },
     },
-    defaultVariants: {
-      size: 'md',
-      variant: 'solid',
+  },
+  tooltipStyle: {
+    base: {
+      '&[data-tooltip], & [data-tooltip]': {
+        color: { _dark: 'red' },
+      },
     },
+    className: 'tooltipStyle',
   },
 }
