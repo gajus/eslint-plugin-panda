@@ -34,10 +34,10 @@ export const createGeneratorContext = (userConfig?: Config) => {
   return new Generator({ ...fixtureDefaults, config: resolvedConfig })
 }
 
+// TODO why is this unused?
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export const createContext = (userConfig?: Config) => {
   const resolvedConfig = mergeConfigs([
-    // @ts-expect-error
-    userConfig,
     fixtureDefaults.config,
     // @ts-expect-error
     sandboxConfig,
