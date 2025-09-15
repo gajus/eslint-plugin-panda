@@ -159,3 +159,4 @@ This repository started as a fork of [@pandacss/eslint-plugin](https://github.co
 Since then, it has been updated to:
 
 - Added thorough linting and testing.
+- Made it at least 3x faster by replacing `synckit` with `deasync`.
