@@ -1,7 +1,5 @@
 ## ESLint Plugin for Panda CSS
 
-> [!NOTE] This is a fork of [@pandacss/eslint-plugin](https://github.com/chakra-ui/eslint-plugin-panda).
-
 ### Installation
 
 ```bash
@@ -153,3 +151,11 @@ export default [
   },
 ]
 ```
+
+### `@pandacss/eslint-plugin`
+
+This repository started as a fork of [@pandacss/eslint-plugin](https://github.com/chakra-ui/eslint-plugin-panda).
+
+Since then, it has been updated to:
+
+- Added thorough linting and testing.
