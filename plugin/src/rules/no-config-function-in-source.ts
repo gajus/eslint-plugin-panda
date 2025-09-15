@@ -1,42 +1,28 @@
-import { isIdentifier, isVariableDeclaration } from '../utils/nodes'
 import { createRule } from '../utils'
 import { getAncestor, getImportSpecifiers, hasPkgImport, isPandaConfigFunction, isValidFile } from '../utils/helpers'
-import { TSESTree } from '@typescript-eslint/utils'
+import { isIdentifier, isVariableDeclaration } from '../utils/nodes'
+import { type TSESTree } from '@typescript-eslint/utils'
 
 export const RULE_NAME = 'no-config-function-in-source'
 
 const CONFIG_FUNCTIONS = new Set([
   'defineConfig',
-  'defineRecipe',
-  'defineSlotRecipe',
+  'defineGlobalStyles',
+  'defineKeyframes',
+  'defineLayerStyles',
   'defineParts',
   'definePattern',
   'definePreset',
-  'defineKeyframes',
-  'defineGlobalStyles',
-  'defineUtility',
-  'defineTextStyles',
-  'defineLayerStyles',
-  'defineStyles',
-  'defineTokens',
+  'defineRecipe',
   'defineSemanticTokens',
+  'defineSlotRecipe',
+  'defineStyles',
+  'defineTextStyles',
+  'defineTokens',
+  'defineUtility',
 ])
 
 const rule = createRule({
-  name: RULE_NAME,
-  meta: {
-    docs: {
-      description: 'Prohibit the use of config functions outside the Panda config file.',
-    },
-    messages: {
-      configFunction: 'Unnecessary `{{name}}` call. Config functions should only be used in the Panda config file.',
-      delete: 'Delete `{{name}}` call.',
-    },
-    type: 'problem',
-    hasSuggestions: true,
-    schema: [],
-  },
-  defaultOptions: [],
   create(context) {
     // Check if the package is imported; if not, exit early
     if (!hasPkgImport(context)) {
@@ -54,25 +40,30 @@ const rule = createRule({
     return {
       CallExpression(node: TSESTree.CallExpression) {
         // Ensure the callee is an identifier
-        if (!isIdentifier(node.callee)) return
+        if (!isIdentifier(node.callee)) {
+          return
+        }
 
         const functionName = node.callee.name
 
         // Check if the function is a config function
-        if (!CONFIG_FUNCTIONS.has(functionName)) return
+        if (!CONFIG_FUNCTIONS.has(functionName)) {
+          return
+        }
 
         // Verify that it's a Panda config function
-        if (!isPandaConfigFunction(context, functionName)) return
+        if (!isPandaConfigFunction(context, functionName)) {
+          return
+        }
 
         context.report({
-          node,
-          messageId: 'configFunction',
           data: {
             name: functionName,
           },
+          messageId: 'configFunction',
+          node,
           suggest: [
             {
-              messageId: 'delete',
               data: {
                 name: functionName,
               },
@@ -99,12 +90,27 @@ const rule = createRule({
 
                 return fixes
               },
+              messageId: 'delete',
             },
           ],
         })
       },
     }
   },
+  defaultOptions: [],
+  meta: {
+    docs: {
+      description: 'Prohibit the use of config functions outside the Panda config file.',
+    },
+    hasSuggestions: true,
+    messages: {
+      configFunction: 'Unnecessary `{{name}}` call. Config functions should only be used in the Panda config file.',
+      delete: 'Delete `{{name}}` call.',
+    },
+    schema: [],
+    type: 'problem',
+  },
+  name: RULE_NAME,
 })
 
 export default rule

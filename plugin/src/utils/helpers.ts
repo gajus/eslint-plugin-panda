@@ -1,6 +1,3 @@
-import type { RuleContext } from '@typescript-eslint/utils/ts-eslint'
-import type { TSESTree } from '@typescript-eslint/utils'
-import { analyze } from '@typescript-eslint/scope-manager'
 import { type ImportResult, syncAction } from '.'
 import {
   isCallExpression,
@@ -18,39 +15,53 @@ import {
   isVariableDeclarator,
   type Node,
 } from './nodes'
-import type { DeprecatedToken } from './worker'
+import { type DeprecatedToken } from './worker'
+import { analyze } from '@typescript-eslint/scope-manager'
+import { type TSESTree } from '@typescript-eslint/utils'
+import { type RuleContext } from '@typescript-eslint/utils/ts-eslint'
 
 export const getAncestor = <N extends Node>(ofType: (node: Node) => node is N, for_: Node): N | undefined => {
   let current: Node | undefined = for_.parent
   while (current) {
-    if (ofType(current)) return current
+    if (ofType(current)) {
+      return current
+    }
+
     current = current.parent
   }
-
-  return
 }
 
-const getSyncOpts = (context: RuleContext<any, any>) => {
+const getSyncOptions = (context: RuleContext<any, any>) => {
   return {
-    currentFile: context.filename,
     configPath: context.settings['@pandacss/configPath'] as string | undefined,
+    currentFile: context.filename,
   }
 }
 
 export const getImportSpecifiers = (context: RuleContext<any, any>) => {
-  const specifiers: { specifier: TSESTree.ImportSpecifier; mod: string }[] = []
+  const specifiers: Array<{
+    mod: string
+    specifier: TSESTree.ImportSpecifier
+  }> = []
 
-  context.sourceCode?.ast.body.forEach((node) => {
-    if (!isImportDeclaration(node)) return
+  for (const node of context.sourceCode?.ast.body) {
+    if (!isImportDeclaration(node)) {
+      continue
+    }
 
-    const mod = node.source.value
-    if (!mod) return
+    const module_ = node.source.value
+    if (!module_) {
+      continue
+    }
 
-    node.specifiers.forEach((specifier) => {
-      if (!isImportSpecifier(specifier)) return
-      specifiers.push({ specifier, mod })
-    })
-  })
+    for (const specifier of node.specifiers) {
+      if (!isImportSpecifier(specifier)) {
+        continue
+      }
+
+      specifiers.push({ mod: module_, specifier })
+    }
+  }
 
   return specifiers
 }
@@ -68,10 +79,10 @@ export const isPandaConfigFunction = (context: RuleContext<any, any>, name: stri
 const _getImports = (context: RuleContext<any, any>) => {
   const specifiers = getImportSpecifiers(context)
 
-  const imports: ImportResult[] = specifiers.map(({ specifier, mod }) => ({
-    name: (specifier.imported as any).name,
+  const imports: ImportResult[] = specifiers.map(({ mod, specifier }) => ({
     alias: specifier.local.name,
     mod,
+    name: (specifier.imported as any).name,
   }))
 
   return imports
@@ -84,38 +95,44 @@ const getImports = (context: RuleContext<any, any>) => {
   if (importsCache.has(context)) {
     return importsCache.get(context)!
   }
+
   const imports = _getImports(context)
-  const filteredImports = imports.filter((imp) => syncAction('matchImports', getSyncOpts(context), imp))
+  const filteredImports = imports.filter((imp) => syncAction('matchImports', getSyncOptions(context), imp))
   importsCache.set(context, filteredImports)
   return filteredImports
 }
 
-const isValidStyledProp = <T extends Node>(node: T, context: RuleContext<any, any>) => {
+const isValidStyledProperty = <T extends Node>(node: T, context: RuleContext<any, any>) => {
   return isJSXIdentifier(node) && isValidProperty(node.name, context)
 }
 
 export const isPandaIsh = (name: string, context: RuleContext<any, any>) => {
   const imports = getImports(context)
-  if (imports.length === 0) return false
-  return syncAction('matchFile', getSyncOpts(context), name, imports)
+  if (imports.length === 0) {
+    return false
+  }
+
+  return syncAction('matchFile', getSyncOptions(context), name, imports)
 }
 
 const findDeclaration = (name: string, context: RuleContext<any, any>) => {
   try {
-    const src = context.sourceCode
+    const source = context.sourceCode
 
-    if (!src) {
+    if (!source) {
       console.warn("⚠️ ESLint's sourceCode is not available. Ensure that the rule is invoked with valid code.")
       return undefined
     }
 
-    const scope = analyze(src.ast, {
+    const scope = analyze(source.ast, {
       sourceType: 'module',
     })
     const decl = scope.variables
       .find((v) => v.name === name)
       ?.defs.find((d) => isIdentifier(d.name) && d.name.name === name)?.node
-    if (isVariableDeclarator(decl)) return decl
+    if (isVariableDeclarator(decl)) {
+      return decl
+    }
   } catch (error) {
     console.error('Error in findDeclaration:', error)
     return undefined
@@ -123,29 +140,42 @@ const findDeclaration = (name: string, context: RuleContext<any, any>) => {
 }
 
 const isLocalStyledFactory = (node: TSESTree.JSXOpeningElement, context: RuleContext<any, any>) => {
-  if (!isJSXIdentifier(node.name)) return
+  if (!isJSXIdentifier(node.name)) {
+    return
+  }
+
   const decl = findDeclaration(node.name.name, context)
 
-  if (!decl) return
-  if (!isCallExpression(decl.init)) return
-  if (!isIdentifier(decl.init.callee)) return
+  if (!decl) {
+    return
+  }
+
+  if (!isCallExpression(decl.init)) {
+    return
+  }
+
+  if (!isIdentifier(decl.init.callee)) {
+    return
+  }
 
   // Check if the callee is 'styled' from panda imports
   const calleeName = decl.init.callee.name
   const rawImports = _getImports(context)
   const isStyledImport = rawImports.some((imp) => imp.alias === calleeName && imp.mod.includes('panda'))
 
-  if (!isStyledImport && !isPandaIsh(calleeName, context)) return
+  if (!isStyledImport && !isPandaIsh(calleeName, context)) {
+    return
+  }
 
   return true
 }
 
 export const isValidFile = (context: RuleContext<any, any>) => {
-  return syncAction('isValidFile', getSyncOpts(context))
+  return syncAction('isValidFile', getSyncOptions(context))
 }
 
 export const isValidProperty = (name: string, context: RuleContext<any, any>, calleName?: string) => {
-  return syncAction('isValidProperty', getSyncOpts(context), name, calleName)
+  return syncAction('isValidProperty', getSyncOptions(context), name, calleName)
 }
 
 export const isPandaImport = (node: TSESTree.ImportDeclaration, context: RuleContext<any, any>) => {
@@ -156,10 +186,14 @@ export const isPandaImport = (node: TSESTree.ImportDeclaration, context: RuleCon
 export const isPandaProp = (node: TSESTree.JSXAttribute, context: RuleContext<any, any>) => {
   const jsxAncestor = getAncestor(isJSXOpeningElement, node)
 
-  if (!jsxAncestor) return
+  if (!jsxAncestor) {
+    return
+  }
 
   // <styled.div /> && <Box />
-  if (!isJSXMemberExpression(jsxAncestor.name) && !isJSXIdentifier(jsxAncestor.name)) return
+  if (!isJSXMemberExpression(jsxAncestor.name) && !isJSXIdentifier(jsxAncestor.name)) {
+    return
+  }
 
   let isPandaComponent = false
   let componentName: string | undefined
@@ -189,15 +223,17 @@ export const isPandaProp = (node: TSESTree.JSXAttribute, context: RuleContext<an
 
     // For local styled components, we need to check if the prop is a valid Panda prop
     if (isLocalStyled) {
-      const prop = node.name.name
+      const property = node.name.name
       // Special props like 'css' and props starting with '_' are Panda props
-      if (prop === 'css' || (typeof prop === 'string' && prop.startsWith('_'))) {
+      if (property === 'css' || (typeof property === 'string' && property.startsWith('_'))) {
         return true
       }
+
       // Other props need to be valid style properties
-      if (typeof prop !== 'string' || !isValidProperty(prop, context)) {
+      if (typeof property !== 'string' || !isValidProperty(property, context)) {
         return false
       }
+
       return true
     }
 
@@ -205,32 +241,48 @@ export const isPandaProp = (node: TSESTree.JSXAttribute, context: RuleContext<an
     isPandaComponent = isPandaIsh(componentName, context)
   }
 
-  if (!isPandaComponent) return
+  if (!isPandaComponent) {
+    return
+  }
 
-  const prop = node.name.name
+  const property = node.name.name
   // Ensure prop is a styled prop
-  if (typeof prop !== 'string' || !isValidProperty(prop, context, componentName)) return
+  if (typeof property !== 'string' || !isValidProperty(property, context, componentName)) {
+    return
+  }
 
   return true
 }
 
 export const isStyledProperty = (node: TSESTree.Property, context: RuleContext<any, any>, calleeName?: string) => {
-  if (!isIdentifier(node.key) && !isLiteral(node.key) && !isTemplateLiteral(node.key)) return
+  if (!isIdentifier(node.key) && !isLiteral(node.key) && !isTemplateLiteral(node.key)) {
+    return
+  }
 
-  if (isIdentifier(node.key) && !isValidProperty(node.key.name, context, calleeName)) return
+  if (isIdentifier(node.key) && !isValidProperty(node.key.name, context, calleeName)) {
+    return
+  }
+
   if (
     isLiteral(node.key) &&
     typeof node.key.value === 'string' &&
     !isValidProperty(node.key.value, context, calleeName)
-  )
+  ) {
     return
-  if (isTemplateLiteral(node.key) && !isValidProperty(node.key.quasis[0].value.raw, context, calleeName)) return
+  }
+
+  if (isTemplateLiteral(node.key) && !isValidProperty(node.key.quasis[0].value.raw, context, calleeName)) {
+    return
+  }
+
   return true
 }
 
 export const isInPandaFunction = (node: TSESTree.Property, context: RuleContext<any, any>) => {
   const callAncestor = getAncestor(isCallExpression, node)
-  if (!callAncestor) return
+  if (!callAncestor) {
+    return
+  }
 
   let calleeName: string | undefined
 
@@ -244,21 +296,30 @@ export const isInPandaFunction = (node: TSESTree.Property, context: RuleContext<
     calleeName = callAncestor.callee.object.name
   }
 
-  if (!calleeName) return
-  if (!isPandaIsh(calleeName, context)) return
+  if (!calleeName) {
+    return
+  }
+
+  if (!isPandaIsh(calleeName, context)) {
+    return
+  }
 
   return calleeName
 }
 
 export const isInJSXProp = (node: TSESTree.Property, context: RuleContext<any, any>) => {
   const jsxExprAncestor = getAncestor(isJSXExpressionContainer, node)
-  const jsxAttrAncestor = getAncestor(isJSXAttribute, node)
+  const jsxAttributeAncestor = getAncestor(isJSXAttribute, node)
 
-  if (!jsxExprAncestor || !jsxAttrAncestor) return
+  if (!jsxExprAncestor || !jsxAttributeAncestor) {
+    return
+  }
 
   // Get the JSX element to check if it's a Panda component
-  const jsxElement = getAncestor(isJSXOpeningElement, jsxAttrAncestor)
-  if (!jsxElement) return
+  const jsxElement = getAncestor(isJSXOpeningElement, jsxAttributeAncestor)
+  if (!jsxElement) {
+    return
+  }
 
   // Check if it's a Panda component (styled.div, Circle, etc.)
   let isPandaComponent = false
@@ -269,14 +330,21 @@ export const isInJSXProp = (node: TSESTree.Property, context: RuleContext<any, a
   } else if (isJSXIdentifier(jsxElement.name)) {
     // For <Circle> or <PandaComp>
     const componentName = jsxElement.name.name
-    isPandaComponent = isPandaIsh(componentName, context) || !!isLocalStyledFactory(jsxElement, context)
+    isPandaComponent = isPandaIsh(componentName, context) || Boolean(isLocalStyledFactory(jsxElement, context))
   }
 
-  if (!isPandaComponent) return
+  if (!isPandaComponent) {
+    return
+  }
 
   // Check if the attribute name is a valid styled prop
-  if (!isJSXIdentifier(jsxAttrAncestor.name)) return
-  if (!isValidStyledProp(jsxAttrAncestor.name, context)) return
+  if (!isJSXIdentifier(jsxAttributeAncestor.name)) {
+    return
+  }
+
+  if (!isValidStyledProperty(jsxAttributeAncestor.name, context)) {
+    return
+  }
 
   return true
 }
@@ -286,7 +354,10 @@ export const isPandaAttribute = (node: TSESTree.Property, context: RuleContext<a
 
   if (callAncestor) {
     const callee = isInPandaFunction(node, context)
-    if (!callee) return
+    if (!callee) {
+      return
+    }
+
     return isStyledProperty(node, context, callee)
   }
 
@@ -295,24 +366,27 @@ export const isPandaAttribute = (node: TSESTree.Property, context: RuleContext<a
 }
 
 export const resolveLonghand = (name: string, context: RuleContext<any, any>) => {
-  return syncAction('resolveLongHand', getSyncOpts(context), name)
+  return syncAction('resolveLongHand', getSyncOptions(context), name)
 }
 
 export const resolveShorthands = (name: string, context: RuleContext<any, any>) => {
-  return syncAction('resolveShorthands', getSyncOpts(context), name)
+  return syncAction('resolveShorthands', getSyncOptions(context), name)
 }
 
-export const isColorAttribute = (attr: string, context: RuleContext<any, any>) => {
-  return syncAction('isColorAttribute', getSyncOpts(context), attr)
+export const isColorAttribute = (attribute: string, context: RuleContext<any, any>) => {
+  return syncAction('isColorAttribute', getSyncOptions(context), attribute)
 }
 
 export const isColorToken = (value: string | undefined, context: RuleContext<any, any>) => {
-  if (!value) return
-  return syncAction('isColorToken', getSyncOpts(context), value)
+  if (!value) {
+    return
+  }
+
+  return syncAction('isColorToken', getSyncOptions(context), value)
 }
 
 export const extractTokens = (value: string) => {
-  const regex = /token\(([^"'(),]+)(?:,\s*([^"'(),]+))?\)|\{([^{\r\n}]+)\}/g
+  const regex = /token\(([^"'(),]+)(?:,\s*([^"'(),]+))?\)|{([^\n\r{}]+)}/g
   const matches = []
   let match
 
@@ -341,9 +415,11 @@ export const getInvalidTokens = (value: string, context: RuleContext<any, any>) 
   }
 
   const tokens = extractTokens(value)
-  if (!tokens.length) return []
+  if (!tokens.length) {
+    return []
+  }
 
-  const invalidTokens = syncAction('filterInvalidTokens', getSyncOpts(context), tokens)
+  const invalidTokens = syncAction('filterInvalidTokens', getSyncOptions(context), tokens)
   invalidTokensCache.set(value, invalidTokens)
   return invalidTokens
 }
@@ -351,20 +427,22 @@ export const getInvalidTokens = (value: string, context: RuleContext<any, any>) 
 // Caching deprecated tokens to avoid redundant computations
 const deprecatedTokensCache = new Map<string, DeprecatedToken[]>()
 
-export const getDeprecatedTokens = (prop: string, value: string, context: RuleContext<any, any>) => {
-  const propCategory = syncAction('getPropCategory', getSyncOpts(context), prop)
+export const getDeprecatedTokens = (property: string, value: string, context: RuleContext<any, any>) => {
+  const propertyCategory = syncAction('getPropCategory', getSyncOptions(context), property)
 
   const tokens = extractTokens(value)
 
-  if (!propCategory && !tokens.length) return []
+  if (!propertyCategory && !tokens.length) {
+    return []
+  }
 
-  const values = tokens.length ? tokens : [{ category: propCategory, value: value.split('/')[0] }]
+  const values = tokens.length ? tokens : [{ category: propertyCategory, value: value.split('/')[0] }]
 
   if (deprecatedTokensCache.has(value)) {
     return deprecatedTokensCache.get(value)!
   }
 
-  const deprecatedTokens = syncAction('filterDeprecatedTokens', getSyncOpts(context), values)
+  const deprecatedTokens = syncAction('filterDeprecatedTokens', getSyncOptions(context), values)
   deprecatedTokensCache.set(value, deprecatedTokens)
 
   return deprecatedTokens
@@ -383,20 +461,28 @@ export const getTaggedTemplateCaller = (node: TSESTree.TaggedTemplateExpression)
 
   // styled.h1``
   if (isMemberExpression(node.tag)) {
-    if (!isIdentifier(node.tag.object)) return
+    if (!isIdentifier(node.tag.object)) {
+      return
+    }
+
     return node.tag.object.name
   }
 
   // styled(Comp)``
   if (isCallExpression(node.tag)) {
-    if (!isIdentifier(node.tag.callee)) return
+    if (!isIdentifier(node.tag.callee)) {
+      return
+    }
+
     return node.tag.callee.name
   }
 }
 
 export const isStyledTaggedTemplate = (node: TSESTree.TaggedTemplateExpression, context: RuleContext<any, any>) => {
   const caller = getTaggedTemplateCaller(node)
-  if (!caller) return false
+  if (!caller) {
+    return false
+  }
 
   // Check if 'styled' is imported from panda
   const rawImports = _getImports(context)
@@ -407,16 +493,20 @@ export const isStyledTaggedTemplate = (node: TSESTree.TaggedTemplateExpression, 
 
 export function isRecipeVariant(node: TSESTree.Property, context: RuleContext<any, any>) {
   const caller = isInPandaFunction(node, context)
-  if (!caller) return
+  if (!caller) {
+    return
+  }
 
   // Check if the caller is either 'cva' or 'sva'
   const recipe = getImports(context).find((imp) => ['cva', 'sva'].includes(imp.name) && imp.alias === caller)
-  if (!recipe) return
+  if (!recipe) {
+    return
+  }
 
   //* Nesting is different here because of slots and variants. We don't want to warn about those.
   let currentNode: any = node
   let length = 0
-  let styleObjectParent: string | null = null
+  let styleObjectParent: null | string = null
 
   // Traverse up the AST
   while (currentNode) {
@@ -424,8 +514,11 @@ export function isRecipeVariant(node: TSESTree.Property, context: RuleContext<an
     if (keyName && ['base', 'variants'].includes(keyName)) {
       styleObjectParent = keyName
     }
+
     currentNode = currentNode.parent
-    if (!styleObjectParent) length++
+    if (!styleObjectParent) {
+      length++
+    }
   }
 
   // Determine the required length based on caller and styleObjectParent
@@ -433,12 +526,16 @@ export function isRecipeVariant(node: TSESTree.Property, context: RuleContext<an
   const requiredLength = isCvaCaller ? 2 : 4
   const extraLength = styleObjectParent === 'base' ? 0 : 4
 
-  if (length < requiredLength + extraLength) return true
+  if (length < requiredLength + extraLength) {
+    return true
+  }
 }
 
 const isPandaComponent = (node: TSESTree.JSXOpeningElement, context: RuleContext<any, any>) => {
   // <styled.div /> && <Box />
-  if (!isJSXMemberExpression(node.name) && !isJSXIdentifier(node.name)) return false
+  if (!isJSXMemberExpression(node.name) && !isJSXIdentifier(node.name)) {
+    return false
+  }
 
   if (isJSXMemberExpression(node.name)) {
     // For <styled.div>, check if 'styled' is a Panda import
@@ -454,7 +551,7 @@ const isPandaComponent = (node: TSESTree.JSXOpeningElement, context: RuleContext
   } else if (isJSXIdentifier(node.name)) {
     // For <Circle> or <PandaComp>
     const componentName = node.name.name
-    return isPandaIsh(componentName, context) || !!isLocalStyledFactory(node, context)
+    return isPandaIsh(componentName, context) || Boolean(isLocalStyledFactory(node, context))
   }
 
   return false

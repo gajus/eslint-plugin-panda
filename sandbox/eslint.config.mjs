@@ -2,7 +2,6 @@ import eslint from '@eslint/js'
 import { FlatCompat } from '@eslint/eslintrc'
 import tseslint from 'typescript-eslint'
 import globals from 'globals'
-import reactHooks from 'eslint-plugin-react-hooks'
 import reactRefresh from 'eslint-plugin-react-refresh'
 import panda from 'eslint-plugin-panda'
 import { defineConfig } from 'eslint/config'
@@ -17,11 +16,7 @@ export default defineConfig({
     // Ignore panda errors cause that's what we're here for
     // 'src/App.tsx',
   ],
-  extends: [
-    eslint.configs.recommended,
-    ...tseslint.configs.recommended,
-    ...compat.config(reactHooks.configs.recommended),
-  ],
+  extends: [eslint.configs.recommended, ...tseslint.configs.recommended],
   plugins: {
     panda,
     'react-refresh': reactRefresh,

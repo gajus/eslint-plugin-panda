@@ -1,39 +1,4 @@
 {
-  "name": "eslint-plugin-panda",
-  "version": "0.2.12",
-  "description": "ESLint plugin for Panda CSS",
-  "main": "dist/index.js",
-  "module": "dist/index.mjs",
-  "types": "dist/index.d.ts",
-  "sideEffects": false,
-  "publishConfig": {
-    "access": "public"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/gajus/eslint-plugin-panda"
-  },
-  "exports": {
-    ".": {
-      "source": "./src/index.ts",
-      "types": "./dist/index.d.ts",
-      "require": "./dist/index.js",
-      "import": {
-        "types": "./dist/index.d.mts",
-        "default": "./dist/index.mjs"
-      }
-    },
-    "./package.json": "./package.json"
-  },
-  "scripts": {
-    "prepare": "pnpm build",
-    "build": "tsdown",
-    "dev": "tsdown --watch",
-    "lint:tsc": "tsc --noEmit"
-  },
-  "files": [
-    "dist"
-  ],
   "dependencies": {
     "@pandacss/config": "^0.53.2",
     "@pandacss/generator": "^0.53.2",
@@ -43,13 +8,51 @@
     "@typescript-eslint/utils": "^8.21.0",
     "synckit": "^0.9.0"
   },
+  "description": "ESLint plugin for Panda CSS",
+  "devDependencies": {
+    "@typescript-eslint/rule-tester": "^8.43.0",
+    "eslint": "^9.35.0",
+    "eslint-config-canonical": "^45.0.0",
+    "fixture": "workspace:^",
+    "multiline-ts": "^4.0.1",
+    "tsdown": "^0.15.1",
+    "typescript": "^5.7.2"
+  },
+  "exports": {
+    ".": {
+      "import": {
+        "default": "./dist/index.mjs",
+        "types": "./dist/index.d.mts"
+      },
+      "require": "./dist/index.js",
+      "source": "./src/index.ts",
+      "types": "./dist/index.d.ts"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist"
+  ],
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "name": "eslint-plugin-panda",
   "peerDependencies": {
     "eslint": "*"
   },
-  "devDependencies": {
-    "@typescript-eslint/rule-tester": "^8.43.0",
-    "fixture": "workspace:^",
-    "tsdown": "^0.15.1",
-    "typescript": "^5.7.2"
-  }
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/gajus/eslint-plugin-panda"
+  },
+  "version": "0.2.12",
+  "scripts": {
+    "build": "tsdown",
+    "dev": "tsdown --watch",
+    "lint:tsc": "tsc --noEmit",
+    "prepare": "pnpm build"
+  },
+  "sideEffects": false,
+  "types": "dist/index.d.ts"
 }

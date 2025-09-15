@@ -1,45 +1,11 @@
-import { eslintTester } from '../test-utils'
 import rule, { RULE_NAME } from '../src/rules/no-invalid-token-paths'
-
+import { eslintTester } from '../test-utils'
 import multiline from 'multiline-ts'
 
 const validLiteral = 'const className = css`\n  font-size: {fontSizes.md};\n`'
 const invalidLiteral = 'const className = css`\n  font-size: {fontSizes.emd};\n`'
 
 eslintTester.run(RULE_NAME, rule, {
-  valid: [
-    {
-      code: multiline`
-  import { css } from './panda/css';
-  
-  const styles = css({ bg: 'token(colors.red.300) 50%' })`,
-    },
-
-    {
-      code: multiline`
-  import { css } from './panda/css';
-  
-  function App(){
-    return <div className={css({ marginX: '{sizes.4} 20px' })} />;
-  }`,
-    },
-
-    {
-      code: multiline`
-  import { Circle } from './panda/jsx';
-  
-  function App(){
-    return <Circle _hover={{  border: 'solid 1px token(colors.gray.100, #F3F4F6)' }} />;
-  }`,
-    },
-
-    {
-      code: multiline`
-  import { css } from './panda/css';
-  
-  ${validLiteral}`,
-    },
-  ],
   invalid: [
     {
       code: multiline`
@@ -78,6 +44,39 @@ eslintTester.run(RULE_NAME, rule, {
   
   ${invalidLiteral}`,
       errors: [{ messageId: 'noInvalidTokenPaths' }],
+    },
+  ],
+  valid: [
+    {
+      code: multiline`
+  import { css } from './panda/css';
+  
+  const styles = css({ bg: 'token(colors.red.300) 50%' })`,
+    },
+
+    {
+      code: multiline`
+  import { css } from './panda/css';
+  
+  function App(){
+    return <div className={css({ marginX: '{sizes.4} 20px' })} />;
+  }`,
+    },
+
+    {
+      code: multiline`
+  import { Circle } from './panda/jsx';
+  
+  function App(){
+    return <Circle _hover={{  border: 'solid 1px token(colors.gray.100, #F3F4F6)' }} />;
+  }`,
+    },
+
+    {
+      code: multiline`
+  import { css } from './panda/css';
+  
+  ${validLiteral}`,
     },
   ],
 })

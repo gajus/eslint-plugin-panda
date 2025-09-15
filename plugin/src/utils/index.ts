@@ -1,8 +1,8 @@
+import { type run } from './worker'
 import { ESLintUtils } from '@typescript-eslint/utils'
-import { createSyncFn } from 'synckit'
 import { join } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import type { run } from './worker'
+import { createSyncFn } from 'synckit'
 
 // Rule creator
 export const createRule = ESLintUtils.RuleCreator(
@@ -27,9 +27,9 @@ export const syncAction = ((...args: Parameters<typeof run>) => {
   }
 }) as typeof run
 
-export interface ImportResult {
-  name: string
+export type ImportResult = {
   alias: string
-  mod: string
   importMapValue?: string
+  mod: string
+  name: string
 }

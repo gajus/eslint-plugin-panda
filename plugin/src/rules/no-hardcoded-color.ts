@@ -1,53 +1,18 @@
+import { createRule } from '../utils'
 import {
   extractTokens,
+  isPandaAttribute,
+  isPandaProp as isPandaProperty,
+  isRecipeVariant,
   isColorAttribute as originalIsColorAttribute,
   isColorToken as originalIsColorToken,
-  isPandaAttribute,
-  isPandaProp,
-  isRecipeVariant,
 } from '../utils/helpers'
-import { createRule } from '../utils'
 import { isIdentifier, isJSXExpressionContainer, isJSXIdentifier, isLiteral, isTemplateLiteral } from '../utils/nodes'
-import { TSESTree } from '@typescript-eslint/utils'
+import { type TSESTree } from '@typescript-eslint/utils'
 
 export const RULE_NAME = 'no-hardcoded-color'
 
 const rule = createRule({
-  name: RULE_NAME,
-  meta: {
-    docs: {
-      description: 'Enforce the exclusive use of design tokens as values for colors within the codebase.',
-    },
-    messages: {
-      invalidColor: '`{{color}}` is not a valid color token.',
-    },
-    type: 'problem',
-    schema: [
-      {
-        type: 'object',
-        properties: {
-          noOpacity: {
-            type: 'boolean',
-          },
-          whitelist: {
-            type: 'array',
-            items: {
-              type: 'string',
-              minLength: 0,
-            },
-            uniqueItems: true,
-          },
-        },
-        additionalProperties: false,
-      },
-    ],
-  },
-  defaultOptions: [
-    {
-      noOpacity: false,
-      whitelist: [],
-    },
-  ],
   create(context) {
     const noOpacity = context.options[0]?.noOpacity
     const whitelist: string[] = context.options[0]?.whitelist ?? []
@@ -61,9 +26,10 @@ const rule = createRule({
       if (colorTokenCache.has(token)) {
         return colorTokenCache.get(token)!
       }
+
       const result = originalIsColorToken(token, context)
       colorTokenCache.set(token, result)
-      return !!result
+      return Boolean(result)
     }
 
     // Cached version of isColorAttribute
@@ -71,19 +37,26 @@ const rule = createRule({
       if (colorAttributeCache.has(attribute)) {
         return colorAttributeCache.get(attribute)!
       }
+
       const result = originalIsColorAttribute(attribute, context)
       colorAttributeCache.set(attribute, result)
       return result
     }
 
     const isTokenFunctionUsed = (value: string): boolean => {
-      if (!value) return false
+      if (!value) {
+        return false
+      }
+
       const tokens = extractTokens(value)
       return tokens.length > 0
     }
 
     const isValidColorToken = (value: string): boolean => {
-      if (!value) return false
+      if (!value) {
+        return false
+      }
+
       const [colorToken, opacity] = value.split('/')
       const hasOpacity = opacity !== undefined && opacity.length > 0
       const isValidToken = isColorToken(colorToken)
@@ -93,26 +66,39 @@ const rule = createRule({
 
     const reportInvalidColor = (node: TSESTree.Node, color: string) => {
       context.report({
-        node,
-        messageId: 'invalidColor',
         data: {
           color,
         },
+        messageId: 'invalidColor',
+        node,
       })
     }
 
     const checkColorValue = (node: TSESTree.Node, value: string, attributeName: string) => {
-      if (!isColorAttribute(attributeName)) return
-      if (isTokenFunctionUsed(value)) return
-      if (isValidColorToken(value)) return
+      if (!isColorAttribute(attributeName)) {
+        return
+      }
+
+      if (isTokenFunctionUsed(value)) {
+        return
+      }
+
+      if (isValidColorToken(value)) {
+        return
+      }
 
       reportInvalidColor(node, value)
     }
 
     return {
       JSXAttribute(node: TSESTree.JSXAttribute) {
-        if (!isJSXIdentifier(node.name)) return
-        if (!isPandaProp(node, context) || !node.value) return
+        if (!isJSXIdentifier(node.name)) {
+          return
+        }
+
+        if (!isPandaProperty(node, context) || !node.value) {
+          return
+        }
 
         const attributeName = node.name.name
         const valueNode = node.value
@@ -133,9 +119,17 @@ const rule = createRule({
       },
 
       Property(node: TSESTree.Property) {
-        if (!isIdentifier(node.key)) return
-        if (!isPandaAttribute(node, context)) return
-        if (isRecipeVariant(node, context)) return
+        if (!isIdentifier(node.key)) {
+          return
+        }
+
+        if (!isPandaAttribute(node, context)) {
+          return
+        }
+
+        if (isRecipeVariant(node, context)) {
+          return
+        }
 
         const attributeName = node.key.name
         const valueNode = node.value
@@ -150,6 +144,41 @@ const rule = createRule({
       },
     }
   },
+  defaultOptions: [
+    {
+      noOpacity: false,
+      whitelist: [],
+    },
+  ],
+  meta: {
+    docs: {
+      description: 'Enforce the exclusive use of design tokens as values for colors within the codebase.',
+    },
+    messages: {
+      invalidColor: '`{{color}}` is not a valid color token.',
+    },
+    schema: [
+      {
+        additionalProperties: false,
+        properties: {
+          noOpacity: {
+            type: 'boolean',
+          },
+          whitelist: {
+            items: {
+              minLength: 0,
+              type: 'string',
+            },
+            type: 'array',
+            uniqueItems: true,
+          },
+        },
+        type: 'object',
+      },
+    ],
+    type: 'problem',
+  },
+  name: RULE_NAME,
 })
 
 export default rule

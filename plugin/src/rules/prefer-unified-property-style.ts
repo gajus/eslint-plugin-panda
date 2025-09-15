@@ -1,26 +1,18 @@
-import { isPandaAttribute, isPandaProp, isRecipeVariant, isValidProperty, resolveLonghand } from '../utils/helpers'
 import { createRule } from '../utils'
 import { compositeProperties } from '../utils/composite-properties'
+import {
+  isPandaAttribute,
+  isPandaProp as isPandaProperty,
+  isRecipeVariant,
+  isValidProperty,
+  resolveLonghand,
+} from '../utils/helpers'
 import { isIdentifier, isJSXIdentifier, isJSXOpeningElement, isObjectExpression } from '../utils/nodes'
-import type { TSESTree } from '@typescript-eslint/utils'
+import { type TSESTree } from '@typescript-eslint/utils'
 
 export const RULE_NAME = 'prefer-unified-property-style'
 
 const rule = createRule({
-  name: RULE_NAME,
-  meta: {
-    docs: {
-      description:
-        'Discourage mixing atomic and composite forms of the same property in a style declaration. Atomic styles give more consistent results.',
-    },
-    messages: {
-      unify:
-        "You're mixing atomic {{atomicProperties}} with composite property `{{composite}}`. Prefer atomic styling to mixing atomic and composite properties. Remove `{{composite}}` and use one or more of {{atomics}} instead.",
-    },
-    type: 'suggestion',
-    schema: [],
-  },
-  defaultOptions: [],
   create(context) {
     // Cache for resolved longhand properties
     const longhandCache = new Map<string, string>()
@@ -29,6 +21,7 @@ const rule = createRule({
       if (longhandCache.has(name)) {
         return longhandCache.get(name)!
       }
+
       const longhand = resolveLonghand(name, context) ?? name
       longhandCache.set(name, longhand)
       return longhand
@@ -58,14 +51,15 @@ const rule = createRule({
     }
 
     // Caches for helper functions
-    const pandaPropCache = new WeakMap<TSESTree.JSXAttribute, boolean | undefined>()
-    const isCachedPandaProp = (node: TSESTree.JSXAttribute): boolean => {
-      if (pandaPropCache.has(node)) {
-        return pandaPropCache.get(node)!
+    const pandaPropertyCache = new WeakMap<TSESTree.JSXAttribute, boolean | undefined>()
+    const isCachedPandaProperty = (node: TSESTree.JSXAttribute): boolean => {
+      if (pandaPropertyCache.has(node)) {
+        return pandaPropertyCache.get(node)!
       }
-      const result = isPandaProp(node, context)
-      pandaPropCache.set(node, result)
-      return !!result
+
+      const result = isPandaProperty(node, context)
+      pandaPropertyCache.set(node, result)
+      return Boolean(result)
     }
 
     const pandaAttributeCache = new WeakMap<TSESTree.Property, boolean | undefined>()
@@ -73,9 +67,10 @@ const rule = createRule({
       if (pandaAttributeCache.has(node)) {
         return pandaAttributeCache.get(node)!
       }
+
       const result = isPandaAttribute(node, context)
       pandaAttributeCache.set(node, result)
-      return !!result
+      return Boolean(result)
     }
 
     const recipeVariantCache = new WeakMap<TSESTree.Property, boolean | undefined>()
@@ -83,66 +78,106 @@ const rule = createRule({
       if (recipeVariantCache.has(node)) {
         return recipeVariantCache.get(node)!
       }
+
       const result = isRecipeVariant(node, context)
       recipeVariantCache.set(node, result)
-      return !!result
+      return Boolean(result)
     }
 
     const sendReport = (node: TSESTree.Node, composite: string, siblings: string[]) => {
       const atomicPropertiesSet = new Set(
-        siblings.filter((prop) => compositeProperties[composite].includes(getLonghand(prop))),
+        siblings.filter((property) => compositeProperties[composite].includes(getLonghand(property))),
       )
 
-      if (atomicPropertiesSet.size === 0) return
+      if (atomicPropertiesSet.size === 0) {
+        return
+      }
 
       const atomicProperties = Array.from(atomicPropertiesSet)
-        .map((prop) => `\`${prop}\``)
+        .map((property) => `\`${property}\``)
         .join(', ')
 
       const atomics = compositeProperties[composite].map((name) => `\`${name}\``).join(', ')
 
       context.report({
-        node,
-        messageId: 'unify',
         data: {
-          composite,
           atomicProperties,
           atomics,
+          composite,
         },
+        messageId: 'unify',
+        node,
       })
     }
 
     return {
       JSXAttribute(node: TSESTree.JSXAttribute) {
-        if (!isJSXIdentifier(node.name)) return
-        if (!isCachedPandaProp(node)) return
+        if (!isJSXIdentifier(node.name)) {
+          return
+        }
+
+        if (!isCachedPandaProperty(node)) {
+          return
+        }
 
         const composite = resolveCompositeProperty(node.name.name)
-        if (!composite) return
-        if (!isJSXOpeningElement(node.parent)) return
+        if (!composite) {
+          return
+        }
 
-        const siblings = node.parent.attributes.map((attr: any) => attr.name.name)
+        if (!isJSXOpeningElement(node.parent)) {
+          return
+        }
+
+        const siblings = node.parent.attributes.map((attribute: any) => attribute.name.name)
 
         sendReport(node, composite, siblings)
       },
 
       Property(node: TSESTree.Property) {
-        if (!isIdentifier(node.key)) return
-        if (!isCachedPandaAttribute(node)) return
-        if (isCachedRecipeVariant(node)) return
+        if (!isIdentifier(node.key)) {
+          return
+        }
+
+        if (!isCachedPandaAttribute(node)) {
+          return
+        }
+
+        if (isCachedRecipeVariant(node)) {
+          return
+        }
 
         const composite = resolveCompositeProperty(node.key.name)
-        if (!composite) return
-        if (!isObjectExpression(node.parent)) return
+        if (!composite) {
+          return
+        }
+
+        if (!isObjectExpression(node.parent)) {
+          return
+        }
 
         const siblings = node.parent.properties
-          .filter((prop): prop is TSESTree.Property => prop.type === 'Property')
-          .map((prop) => (isIdentifier(prop.key) ? prop.key.name : ''))
+          .filter((property): property is TSESTree.Property => property.type === 'Property')
+          .map((property) => (isIdentifier(property.key) ? property.key.name : ''))
 
         sendReport(node.key, composite, siblings)
       },
     }
   },
+  defaultOptions: [],
+  meta: {
+    docs: {
+      description:
+        'Discourage mixing atomic and composite forms of the same property in a style declaration. Atomic styles give more consistent results.',
+    },
+    messages: {
+      unify:
+        "You're mixing atomic {{atomicProperties}} with composite property `{{composite}}`. Prefer atomic styling to mixing atomic and composite properties. Remove `{{composite}}` and use one or more of {{atomics}} instead.",
+    },
+    schema: [],
+    type: 'suggestion',
+  },
+  name: RULE_NAME,
 })
 
 export default rule

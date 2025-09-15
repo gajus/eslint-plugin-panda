@@ -1,48 +1,8 @@
-import { eslintTester } from '../test-utils'
 import rule, { RULE_NAME } from '../src/rules/no-dynamic-styling'
-
+import { eslintTester } from '../test-utils'
 import multiline from 'multiline-ts'
 
 eslintTester.run(RULE_NAME, rule, {
-  valid: [
-    {
-      code: multiline`
-  import { css } from './panda/css';
-  
-  const styles = css({ bg: 'gray.900' })`,
-    },
-
-    {
-      code: multiline`
-  import { css } from './panda/css';
-  
-  const styles = css({ padding: ['4', '8'] })`,
-    },
-
-    {
-      code: multiline`
-  import { Circle } from './panda/jsx';
-  
-  function App(){
-    return <Circle debug={true} />;
-  }`,
-    },
-
-    {
-      code: multiline`
-  import { styled } from './panda/jsx';
-  
-  function App(){
-    return <styled.div color='red.100' />;
-  }`,
-    },
-    {
-      code: multiline`
-  const foo = 'foo'
-  const nonStyles = {bar: [foo]}
-  `,
-    },
-  ],
   invalid: [
     {
       code: multiline`
@@ -117,6 +77,45 @@ eslintTester.run(RULE_NAME, rule, {
     });
   }`,
       errors: [{ messageId: 'dynamicRecipeVariant' }],
+    },
+  ],
+  valid: [
+    {
+      code: multiline`
+  import { css } from './panda/css';
+  
+  const styles = css({ bg: 'gray.900' })`,
+    },
+
+    {
+      code: multiline`
+  import { css } from './panda/css';
+  
+  const styles = css({ padding: ['4', '8'] })`,
+    },
+
+    {
+      code: multiline`
+  import { Circle } from './panda/jsx';
+  
+  function App(){
+    return <Circle debug={true} />;
+  }`,
+    },
+
+    {
+      code: multiline`
+  import { styled } from './panda/jsx';
+  
+  function App(){
+    return <styled.div color='red.100' />;
+  }`,
+    },
+    {
+      code: multiline`
+  const foo = 'foo'
+  const nonStyles = {bar: [foo]}
+  `,
     },
   ],
 })

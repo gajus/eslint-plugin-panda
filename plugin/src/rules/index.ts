@@ -12,10 +12,10 @@ import noMarginProperties, { RULE_NAME as NoMarginProperties } from './no-margin
 import noPhysicalProperties, { RULE_NAME as NoPhysicalProperties } from './no-physical-properties'
 import noPropertyRenaming, { RULE_NAME as NoPropertyRenaming } from './no-property-renaming'
 import noUnsafeTokenUsage, { RULE_NAME as NoUnsafeTokenUsage } from './no-unsafe-token-fn-usage'
-import preferLonghandProperties, { RULE_NAME as PreferLonghandProperties } from './prefer-longhand-properties'
-import preferShorthandProperties, { RULE_NAME as PreferShorthandProperties } from './prefer-shorthand-properties'
 import preferAtomicProperties, { RULE_NAME as PreferAtomicProperties } from './prefer-atomic-properties'
 import preferCompositeProperties, { RULE_NAME as PreferCompositeProperties } from './prefer-composite-properties'
+import preferLonghandProperties, { RULE_NAME as PreferLonghandProperties } from './prefer-longhand-properties'
+import preferShorthandProperties, { RULE_NAME as PreferShorthandProperties } from './prefer-shorthand-properties'
 import preferUnifiedPropertyStyle, { RULE_NAME as PreferUnifiedPropertyStyle } from './prefer-unified-property-style'
 
 export const rules = {
@@ -27,15 +27,15 @@ export const rules = {
   [NoEscapeHatch]: noEscapeHatch,
   [NoHardCodedColor]: noHardCodedColor,
   [NoImportant]: noImportant,
-  [NoInvalidTokenPaths]: noInvalidTokenPaths,
   [NoInvalidNesting]: noInvalidNesting,
+  [NoInvalidTokenPaths]: noInvalidTokenPaths,
   [NoMarginProperties]: noMarginProperties,
   [NoPhysicalProperties]: noPhysicalProperties,
   [NoPropertyRenaming]: noPropertyRenaming,
   [NoUnsafeTokenUsage]: noUnsafeTokenUsage,
-  [PreferLonghandProperties]: preferLonghandProperties,
-  [PreferShorthandProperties]: preferShorthandProperties,
   [PreferAtomicProperties]: preferAtomicProperties,
   [PreferCompositeProperties]: preferCompositeProperties,
+  [PreferLonghandProperties]: preferLonghandProperties,
+  [PreferShorthandProperties]: preferShorthandProperties,
   [PreferUnifiedPropertyStyle]: preferUnifiedPropertyStyle,
 } as any

@@ -1,44 +1,11 @@
-import { isRecipeVariant, isPandaAttribute, isPandaProp, resolveLonghand } from '../utils/helpers'
 import { createRule } from '../utils'
+import { isPandaAttribute, isPandaProp as isPandaProperty, isRecipeVariant, resolveLonghand } from '../utils/helpers'
 import { isIdentifier, isJSXIdentifier } from '../utils/nodes'
-import type { TSESTree } from '@typescript-eslint/utils'
+import { type TSESTree } from '@typescript-eslint/utils'
 
 export const RULE_NAME = 'no-margin-properties'
 
 const rule = createRule({
-  name: RULE_NAME,
-  meta: {
-    docs: {
-      description:
-        'Discourage using margin properties for spacing; prefer defining spacing in parent elements with `flex` or `grid` using the `gap` property for a more resilient layout. Margins make components less reusable in other contexts.',
-    },
-    messages: {
-      noMargin:
-        'Use flex or grid with the `gap` property to define spacing in parent elements for a more resilient layout.',
-    },
-    type: 'suggestion',
-    schema: [
-      {
-        type: 'object',
-        properties: {
-          whitelist: {
-            type: 'array',
-            items: {
-              type: 'string',
-              minLength: 0,
-            },
-            uniqueItems: true,
-          },
-        },
-        additionalProperties: false,
-      },
-    ],
-  },
-  defaultOptions: [
-    {
-      whitelist: [],
-    },
-  ],
   create(context) {
     const whitelist: string[] = context.options[0]?.whitelist ?? []
 
@@ -49,6 +16,7 @@ const rule = createRule({
       if (longhandCache.has(name)) {
         return longhandCache.get(name)!
       }
+
       const longhand = resolveLonghand(name, context) ?? name
       longhandCache.set(name, longhand)
       return longhand
@@ -62,24 +30,30 @@ const rule = createRule({
     }
 
     const sendReport = (node: TSESTree.Identifier | TSESTree.JSXIdentifier) => {
-      if (whitelist.includes(node.name)) return
-      if (!isMarginProperty(node.name)) return
+      if (whitelist.includes(node.name)) {
+        return
+      }
+
+      if (!isMarginProperty(node.name)) {
+        return
+      }
 
       context.report({
-        node,
         messageId: 'noMargin',
+        node,
       })
     }
 
     // Cache for helper functions
-    const pandaPropCache = new WeakMap<TSESTree.JSXAttribute, boolean | undefined>()
-    const isCachedPandaProp = (node: TSESTree.JSXAttribute): boolean => {
-      if (pandaPropCache.has(node)) {
-        return pandaPropCache.get(node)!
+    const pandaPropertyCache = new WeakMap<TSESTree.JSXAttribute, boolean | undefined>()
+    const isCachedPandaProperty = (node: TSESTree.JSXAttribute): boolean => {
+      if (pandaPropertyCache.has(node)) {
+        return pandaPropertyCache.get(node)!
       }
-      const result = isPandaProp(node, context)
-      pandaPropCache.set(node, result)
-      return !!result
+
+      const result = isPandaProperty(node, context)
+      pandaPropertyCache.set(node, result)
+      return Boolean(result)
     }
 
     const pandaAttributeCache = new WeakMap<TSESTree.Property, boolean | undefined>()
@@ -87,9 +61,10 @@ const rule = createRule({
       if (pandaAttributeCache.has(node)) {
         return pandaAttributeCache.get(node)!
       }
+
       const result = isPandaAttribute(node, context)
       pandaAttributeCache.set(node, result)
-      return !!result
+      return Boolean(result)
     }
 
     const recipeVariantCache = new WeakMap<TSESTree.Property, boolean | undefined>()
@@ -97,28 +72,75 @@ const rule = createRule({
       if (recipeVariantCache.has(node)) {
         return recipeVariantCache.get(node)!
       }
+
       const result = isRecipeVariant(node, context)
       recipeVariantCache.set(node, result)
-      return !!result
+      return Boolean(result)
     }
 
     return {
       JSXAttribute(node: TSESTree.JSXAttribute) {
-        if (!isJSXIdentifier(node.name)) return
-        if (!isCachedPandaProp(node)) return
+        if (!isJSXIdentifier(node.name)) {
+          return
+        }
+
+        if (!isCachedPandaProperty(node)) {
+          return
+        }
 
         sendReport(node.name)
       },
 
       Property(node: TSESTree.Property) {
-        if (!isIdentifier(node.key)) return
-        if (!isCachedPandaAttribute(node)) return
-        if (isCachedRecipeVariant(node)) return
+        if (!isIdentifier(node.key)) {
+          return
+        }
+
+        if (!isCachedPandaAttribute(node)) {
+          return
+        }
+
+        if (isCachedRecipeVariant(node)) {
+          return
+        }
 
         sendReport(node.key)
       },
     }
   },
+  defaultOptions: [
+    {
+      whitelist: [],
+    },
+  ],
+  meta: {
+    docs: {
+      description:
+        'Discourage using margin properties for spacing; prefer defining spacing in parent elements with `flex` or `grid` using the `gap` property for a more resilient layout. Margins make components less reusable in other contexts.',
+    },
+    messages: {
+      noMargin:
+        'Use flex or grid with the `gap` property to define spacing in parent elements for a more resilient layout.',
+    },
+    schema: [
+      {
+        additionalProperties: false,
+        properties: {
+          whitelist: {
+            items: {
+              minLength: 0,
+              type: 'string',
+            },
+            type: 'array',
+            uniqueItems: true,
+          },
+        },
+        type: 'object',
+      },
+    ],
+    type: 'suggestion',
+  },
+  name: RULE_NAME,
 })
 
 export default rule

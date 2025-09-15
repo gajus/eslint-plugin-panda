@@ -1,27 +1,15 @@
-import { isLiteral, isTemplateLiteral } from '../utils/nodes'
 import { createRule } from '../utils'
-import { isInJSXProp, isInPandaFunction, isRecipeVariant, isStyledProperty } from '../utils/helpers'
-import { TSESTree } from '@typescript-eslint/utils'
+import { isInJSXProp as isInJSXProperty, isInPandaFunction, isRecipeVariant, isStyledProperty } from '../utils/helpers'
+import { isLiteral, isTemplateLiteral } from '../utils/nodes'
+import { type TSESTree } from '@typescript-eslint/utils'
 
 export const RULE_NAME = 'no-invalid-nesting'
 
 const rule = createRule({
-  name: RULE_NAME,
-  meta: {
-    docs: {
-      description: 'Warn against invalid nesting. Nested styles must contain the `&` character.',
-    },
-    messages: {
-      nesting: 'Invalid style nesting. Nested styles must contain the `&` character.',
-    },
-    type: 'problem',
-    schema: [],
-  },
-  defaultOptions: [],
   create(context) {
     // Caches for helper functions
     const pandaFunctionCache = new WeakMap<TSESTree.Property, boolean | undefined>()
-    const jsxPropCache = new WeakMap<TSESTree.Property, boolean | undefined>()
+    const jsxPropertyCache = new WeakMap<TSESTree.Property, boolean | undefined>()
     const recipeVariantCache = new WeakMap<TSESTree.Property, boolean | undefined>()
     const styledPropertyCache = new WeakMap<TSESTree.Property, boolean | undefined>()
 
@@ -30,36 +18,40 @@ const rule = createRule({
       if (pandaFunctionCache.has(node)) {
         return pandaFunctionCache.get(node)!
       }
-      const result = !!isInPandaFunction(node, context)
+
+      const result = Boolean(isInPandaFunction(node, context))
       pandaFunctionCache.set(node, result)
-      return !!result
+      return Boolean(result)
     }
 
-    const isCachedInJSXProp = (node: TSESTree.Property): boolean => {
-      if (jsxPropCache.has(node)) {
-        return jsxPropCache.get(node)!
+    const isCachedInJSXProperty = (node: TSESTree.Property): boolean => {
+      if (jsxPropertyCache.has(node)) {
+        return jsxPropertyCache.get(node)!
       }
-      const result = isInJSXProp(node, context)
-      jsxPropCache.set(node, result)
-      return !!result
+
+      const result = isInJSXProperty(node, context)
+      jsxPropertyCache.set(node, result)
+      return Boolean(result)
     }
 
     const isCachedRecipeVariant = (node: TSESTree.Property): boolean => {
       if (recipeVariantCache.has(node)) {
         return recipeVariantCache.get(node)!
       }
+
       const result = isRecipeVariant(node, context)
       recipeVariantCache.set(node, result)
-      return !!result
+      return Boolean(result)
     }
 
     const isCachedStyledProperty = (node: TSESTree.Property): boolean => {
       if (styledPropertyCache.has(node)) {
         return styledPropertyCache.get(node)!
       }
+
       const result = isStyledProperty(node, context)
       styledPropertyCache.set(node, result)
-      return !!result
+      return Boolean(result)
     }
 
     // Function to check if a key is an invalid nesting selector
@@ -69,6 +61,7 @@ const rule = createRule({
       } else if (isTemplateLiteral(node) && node.expressions.length === 0) {
         return !node.quasis[0].value.raw.includes('&')
       }
+
       return false
     }
 
@@ -77,23 +70,43 @@ const rule = createRule({
       'Property[key.type!=/Identifier/][value.type="ObjectExpression"]'(node: TSESTree.Property) {
         // Check if the node is within a Panda function or JSX prop
         const inPandaFunction = isCachedInPandaFunction(node)
-        const inJSXProp = isCachedInJSXProp(node)
+        const inJSXProperty = isCachedInJSXProperty(node)
 
-        if (!inPandaFunction && !inJSXProp) return
-        if (isCachedRecipeVariant(node)) return
-        if (isCachedStyledProperty(node)) return
+        if (!inPandaFunction && !inJSXProperty) {
+          return
+        }
+
+        if (isCachedRecipeVariant(node)) {
+          return
+        }
+
+        if (isCachedStyledProperty(node)) {
+          return
+        }
 
         const keyNode = node.key
 
         if (isInvalidNestingSelector(keyNode)) {
           context.report({
-            node: keyNode,
             messageId: 'nesting',
+            node: keyNode,
           })
         }
       },
     }
   },
+  defaultOptions: [],
+  meta: {
+    docs: {
+      description: 'Warn against invalid nesting. Nested styles must contain the `&` character.',
+    },
+    messages: {
+      nesting: 'Invalid style nesting. Nested styles must contain the `&` character.',
+    },
+    schema: [],
+    type: 'problem',
+  },
+  name: RULE_NAME,
 })
 
 export default rule

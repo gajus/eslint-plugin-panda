@@ -1,9 +1,9 @@
 import rule, { RULE_NAME } from '../src/rules/no-debug'
 import rule2, { RULE_NAME as RULE_NAME2 } from '../src/rules/no-dynamic-styling'
 import rule3, { RULE_NAME as RULE_NAME3 } from '../src/rules/no-escape-hatch'
-import rule4, { RULE_NAME as RULE_NAME4 } from '../src/rules/no-unsafe-token-fn-usage'
-import rule5, { RULE_NAME as RULE_NAME5 } from '../src/rules/no-invalid-token-paths'
 import rule6, { RULE_NAME as RULE_NAME6 } from '../src/rules/no-invalid-nesting'
+import rule5, { RULE_NAME as RULE_NAME5 } from '../src/rules/no-invalid-token-paths'
+import rule4, { RULE_NAME as RULE_NAME4 } from '../src/rules/no-unsafe-token-fn-usage'
 import { eslintTester } from '../test-utils'
 import { getArbitraryValue } from '@pandacss/shared'
 
@@ -12,7 +12,7 @@ import { getArbitraryValue } from '@pandacss/shared'
 const imports = `import { css } from './panda/css';
 import { styled, Circle } from './panda/jsx';\n\n`
 
-//? For testing correct parsing
+// ? For testing correct parsing
 
 const valids = [
   { code: 'const styles = { debug: true }' },
@@ -56,13 +56,13 @@ const invalids = [
 ]
 
 eslintTester.run(RULE_NAME, rule as any, {
-  valid: valids.map(({ code }) => ({
-    code: imports + code,
-  })),
   // @ts-expect-error - we're only testing detection, not the actual fixes
   invalid: invalids.map(({ code }) => ({
     code: imports + code,
     errors: [{ messageId: 'debug', suggestions: 1 }],
+  })),
+  valid: valids.map(({ code }) => ({
+    code: imports + code,
   })),
 })
 
@@ -80,16 +80,16 @@ const valids2 = [
 const invalids2 = ['const styles = css({ bg: color })', '<Circle debug={bool} />', '<styled.div color={color} />']
 
 eslintTester.run(RULE_NAME2, rule2 as any, {
-  valid: valids2.map((code) => ({
-    code: imports + code,
-  })),
   invalid: invalids2.map((code) => ({
     code: imports + code,
     errors: [{ messageId: 'dynamic' }],
   })),
+  valid: valids2.map((code) => ({
+    code: imports + code,
+  })),
 })
 
-//? Testing multiline arbitrary expressions
+// ? Testing multiline arbitrary expressions
 
 const namedGridLines = `
 [
@@ -130,17 +130,17 @@ const invalids3 = [
 ]
 
 eslintTester.run(RULE_NAME3, rule3 as any, {
-  valid: valids3.map((code) => ({
-    code: imports + code,
-  })),
   // @ts-expect-error - we're only testing detection, not the actual fixes
   invalid: invalids3.map(({ code }) => ({
     code: imports + code,
     errors: [{ messageId: 'escapeHatch', suggestions: 1 }],
   })),
+  valid: valids3.map((code) => ({
+    code: imports + code,
+  })),
 })
 
-//? Testing aliased imports
+// ? Testing aliased imports
 
 const imports4 = `import { css } from './panda/css';
 import { token as tk } from './panda/tokens'
@@ -163,17 +163,17 @@ const invalids4 = [
 ]
 
 eslintTester.run(RULE_NAME4, rule4 as any, {
-  valid: valids4.map((code) => ({
-    code: imports4 + code,
-  })),
   // @ts-expect-error - we're only testing detection, not the actual fixes
   invalid: invalids4.map(({ code }) => ({
     code: imports4 + code,
     errors: [{ messageId: 'noUnsafeTokenFnUsage', suggestions: 1 }],
   })),
+  valid: valids4.map((code) => ({
+    code: imports4 + code,
+  })),
 })
 
-//? Testing token paths in template literals syntax
+// ? Testing token paths in template literals syntax
 
 const imports5 = `import { css } from './panda/css';
 import { Circle, styled } from './panda/jsx';\n\n`
@@ -193,20 +193,23 @@ const invalids5 = [
   { code: 'const className = css`\n  font-size: {fontSizes.emd};`' },
   { code: 'const Heading = styled.h1`\n  font-size: {fontSizes.emd};`' },
   { code: 'const Comp = styled(Circle)`\n  font-size: {fontSizes.emd};`' },
-  { code: 'const Comp = styled(Circle)`\n  margin: {sizess.4} {sizes.f4};`', errors: 2 },
+  {
+    code: 'const Comp = styled(Circle)`\n  margin: {sizess.4} {sizes.f4};`',
+    errors: 2,
+  },
 ]
 
 eslintTester.run(RULE_NAME5, rule5 as any, {
+  invalid: invalids5.map(({ code, errors = 1 }) => ({
+    code: imports5 + code,
+    errors: new Array(errors).fill({ messageId: 'noInvalidTokenPaths' }),
+  })),
   valid: valids5.map((code) => ({
     code: imports5 + code,
   })),
-  invalid: invalids5.map(({ code, errors = 1 }) => ({
-    code: imports5 + code,
-    errors: Array(errors).fill({ messageId: 'noInvalidTokenPaths' }),
-  })),
 })
 
-//? Testing nesting in sva and cva
+// ? Testing nesting in sva and cva
 
 const imports6 = `import { cva, sva } from './panda/css';`
 
@@ -287,11 +290,11 @@ const invalids6 = [
 ]
 
 eslintTester.run(RULE_NAME6, rule6 as any, {
-  valid: valids6.map((code) => ({
-    code: imports6 + code,
-  })),
   invalid: invalids6.map(({ code }) => ({
     code: imports6 + code,
     errors: [{ messageId: 'nesting' }, { messageId: 'nesting' }],
+  })),
+  valid: valids6.map((code) => ({
+    code: imports6 + code,
   })),
 })

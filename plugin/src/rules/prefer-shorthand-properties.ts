@@ -1,45 +1,17 @@
-import { isPandaAttribute, isPandaProp, isRecipeVariant, resolveLonghand, resolveShorthands } from '../utils/helpers'
 import { createRule } from '../utils'
+import {
+  isPandaAttribute,
+  isPandaProp as isPandaProperty,
+  isRecipeVariant,
+  resolveLonghand,
+  resolveShorthands,
+} from '../utils/helpers'
 import { isIdentifier, isJSXIdentifier } from '../utils/nodes'
-import type { TSESTree } from '@typescript-eslint/utils'
+import { type TSESTree } from '@typescript-eslint/utils'
 
 export const RULE_NAME = 'prefer-shorthand-properties'
 
 const rule = createRule({
-  name: RULE_NAME,
-  meta: {
-    docs: {
-      description:
-        'Discourage the use of longhand properties and promote the preference for shorthand properties in the codebase.',
-    },
-    messages: {
-      shorthand: 'Use shorthand property instead of `{{longhand}}`. Prefer `{{shorthand}}`.',
-      replace: 'Replace `{{longhand}}` with `{{shorthand}}`.',
-    },
-    type: 'suggestion',
-    hasSuggestions: true,
-    schema: [
-      {
-        type: 'object',
-        properties: {
-          whitelist: {
-            type: 'array',
-            items: {
-              type: 'string',
-              minLength: 0,
-            },
-            uniqueItems: true,
-          },
-        },
-        additionalProperties: false,
-      },
-    ],
-  },
-  defaultOptions: [
-    {
-      whitelist: [],
-    },
-  ],
   create(context) {
     const whitelist: string[] = context.options[0]?.whitelist ?? []
 
@@ -50,6 +22,7 @@ const rule = createRule({
       if (longhandCache.has(name)) {
         return longhandCache.get(name)!
       }
+
       const longhand = resolveLonghand(name, context)
       longhandCache.set(name, longhand)
       return longhand
@@ -62,20 +35,22 @@ const rule = createRule({
       if (shorthandsCache.has(name)) {
         return shorthandsCache.get(name)!
       }
+
       const shorthands = resolveShorthands(name, context)
       shorthandsCache.set(name, shorthands)
       return shorthands
     }
 
     // Caches for helper functions
-    const pandaPropCache = new WeakMap<TSESTree.JSXAttribute, boolean | undefined>()
-    const isCachedPandaProp = (node: TSESTree.JSXAttribute): boolean => {
-      if (pandaPropCache.has(node)) {
-        return pandaPropCache.get(node)!
+    const pandaPropertyCache = new WeakMap<TSESTree.JSXAttribute, boolean | undefined>()
+    const isCachedPandaProperty = (node: TSESTree.JSXAttribute): boolean => {
+      if (pandaPropertyCache.has(node)) {
+        return pandaPropertyCache.get(node)!
       }
-      const result = isPandaProp(node, context)
-      pandaPropCache.set(node, result)
-      return !!result
+
+      const result = isPandaProperty(node, context)
+      pandaPropertyCache.set(node, result)
+      return Boolean(result)
     }
 
     const pandaAttributeCache = new WeakMap<TSESTree.Property, boolean | undefined>()
@@ -83,9 +58,10 @@ const rule = createRule({
       if (pandaAttributeCache.has(node)) {
         return pandaAttributeCache.get(node)!
       }
+
       const result = isPandaAttribute(node, context)
       pandaAttributeCache.set(node, result)
-      return !!result
+      return Boolean(result)
     }
 
     const recipeVariantCache = new WeakMap<TSESTree.Property, boolean | undefined>()
@@ -93,18 +69,26 @@ const rule = createRule({
       if (recipeVariantCache.has(node)) {
         return recipeVariantCache.get(node)!
       }
+
       const result = isRecipeVariant(node, context)
       recipeVariantCache.set(node, result)
-      return !!result
+      return Boolean(result)
     }
 
     const sendReport = (node: TSESTree.Identifier | TSESTree.JSXIdentifier) => {
-      if (whitelist.includes(node.name)) return
+      if (whitelist.includes(node.name)) {
+        return
+      }
+
       const longhand = getLonghand(node.name)
-      if (longhand) return // If it's already shorthand, no need to report
+      if (longhand) {
+        return
+      } // If it's already shorthand, no need to report
 
       const shorthands = getShorthands(node.name)
-      if (!shorthands || shorthands.length === 0) return
+      if (!shorthands || shorthands.length === 0) {
+        return
+      }
 
       const shorthandList = shorthands.map((s) => `\`${s}\``).join(', ')
 
@@ -114,14 +98,14 @@ const rule = createRule({
       }
 
       context.report({
-        node,
-        messageId: 'shorthand',
         data,
+        messageId: 'shorthand',
+        node,
         suggest: [
           {
-            messageId: 'replace',
             data,
             fix: (fixer) => fixer.replaceText(node, shorthands[0]),
+            messageId: 'replace',
           },
         ],
       })
@@ -129,21 +113,68 @@ const rule = createRule({
 
     return {
       JSXAttribute(node: TSESTree.JSXAttribute) {
-        if (!isJSXIdentifier(node.name)) return
-        if (!isCachedPandaProp(node)) return
+        if (!isJSXIdentifier(node.name)) {
+          return
+        }
+
+        if (!isCachedPandaProperty(node)) {
+          return
+        }
 
         sendReport(node.name)
       },
 
       Property(node: TSESTree.Property) {
-        if (!isIdentifier(node.key)) return
-        if (!isCachedPandaAttribute(node)) return
-        if (isCachedRecipeVariant(node)) return
+        if (!isIdentifier(node.key)) {
+          return
+        }
+
+        if (!isCachedPandaAttribute(node)) {
+          return
+        }
+
+        if (isCachedRecipeVariant(node)) {
+          return
+        }
 
         sendReport(node.key)
       },
     }
   },
+  defaultOptions: [
+    {
+      whitelist: [],
+    },
+  ],
+  meta: {
+    docs: {
+      description:
+        'Discourage the use of longhand properties and promote the preference for shorthand properties in the codebase.',
+    },
+    hasSuggestions: true,
+    messages: {
+      replace: 'Replace `{{longhand}}` with `{{shorthand}}`.',
+      shorthand: 'Use shorthand property instead of `{{longhand}}`. Prefer `{{shorthand}}`.',
+    },
+    schema: [
+      {
+        additionalProperties: false,
+        properties: {
+          whitelist: {
+            items: {
+              minLength: 0,
+              type: 'string',
+            },
+            type: 'array',
+            uniqueItems: true,
+          },
+        },
+        type: 'object',
+      },
+    ],
+    type: 'suggestion',
+  },
+  name: RULE_NAME,
 })
 
 export default rule

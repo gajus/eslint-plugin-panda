@@ -1,5 +1,5 @@
-import { eslintTester } from '../test-utils'
 import rule, { RULE_NAME } from '../src/rules/file-not-included'
+import { eslintTester } from '../test-utils'
 import multiline from 'multiline-ts'
 
 const validCode = multiline`
@@ -17,17 +17,17 @@ import { Circle } from './panda/jsx';
 `
 
 eslintTester.run(RULE_NAME, rule, {
+  invalid: [
+    {
+      code: invalidCode,
+      errors: [{ messageId: 'include' }],
+      filename: 'Invalid.tsx',
+    },
+  ],
   valid: [
     {
       code: validCode,
       filename: 'App.tsx',
-    },
-  ],
-  invalid: [
-    {
-      code: invalidCode,
-      filename: 'Invalid.tsx',
-      errors: [{ messageId: 'include' }],
     },
   ],
 })

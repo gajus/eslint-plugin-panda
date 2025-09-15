@@ -1,38 +1,28 @@
+import { createRule } from '../utils'
 import {
   getInvalidTokens,
   getTaggedTemplateCaller,
   isPandaAttribute,
   isPandaIsh,
-  isPandaProp,
+  isPandaProp as isPandaProperty,
   isRecipeVariant,
   isStyledTaggedTemplate,
 } from '../utils/helpers'
-import { createRule } from '../utils'
-import { AST_NODE_TYPES, TSESTree } from '@typescript-eslint/utils'
-import { isNodeOfTypes } from '@typescript-eslint/utils/ast-utils'
 import { isIdentifier, isJSXExpressionContainer, isLiteral, isTemplateLiteral } from '../utils/nodes'
+import { AST_NODE_TYPES, type TSESTree } from '@typescript-eslint/utils'
+import { isNodeOfTypes } from '@typescript-eslint/utils/ast-utils'
 
 export const RULE_NAME = 'no-invalid-token-paths'
 
 const rule = createRule({
-  name: RULE_NAME,
-  meta: {
-    docs: {
-      description: 'Disallow the use of invalid token paths within token function syntax.',
-    },
-    messages: {
-      noInvalidTokenPaths: '`{{token}}` is an invalid token path.',
-    },
-    type: 'problem',
-    schema: [],
-  },
-  defaultOptions: [],
   create(context) {
     // Cache for invalid tokens to avoid redundant computations
     const invalidTokensCache = new Map<string, string[]>()
 
     const sendReport = (node: TSESTree.Node, value: string | undefined) => {
-      if (!value) return
+      if (!value) {
+        return
+      }
 
       let tokens: string[] | undefined = invalidTokensCache.get(value)
       if (!tokens) {
@@ -40,19 +30,23 @@ const rule = createRule({
         invalidTokensCache.set(value, tokens)
       }
 
-      if (tokens.length === 0) return
+      if (tokens.length === 0) {
+        return
+      }
 
-      tokens.forEach((token) => {
+      for (const token of tokens) {
         context.report({
-          node,
-          messageId: 'noInvalidTokenPaths',
           data: { token },
+          messageId: 'noInvalidTokenPaths',
+          node,
         })
-      })
+      }
     }
 
     const handleLiteralOrTemplate = (node: TSESTree.Node | undefined) => {
-      if (!node) return
+      if (!node) {
+        return
+      }
 
       if (isLiteral(node)) {
         const value = node.value?.toString()
@@ -65,7 +59,9 @@ const rule = createRule({
 
     return {
       JSXAttribute(node: TSESTree.JSXAttribute) {
-        if (!node.value || !isPandaProp(node, context)) return
+        if (!node.value || !isPandaProperty(node, context)) {
+          return
+        }
 
         if (isLiteral(node.value)) {
           handleLiteralOrTemplate(node.value)
@@ -89,15 +85,21 @@ const rule = createRule({
 
       TaggedTemplateExpression(node: TSESTree.TaggedTemplateExpression) {
         const caller = getTaggedTemplateCaller(node)
-        if (!caller) return
+        if (!caller) {
+          return
+        }
 
         // Check if this is a styled template literal
-        if (!isStyledTaggedTemplate(node, context)) return
+        if (!isStyledTaggedTemplate(node, context)) {
+          return
+        }
 
         const quasis = node.quasi.quasis
-        quasis.forEach((quasi) => {
+        for (const quasi of quasis) {
           const styles = quasi.value.raw
-          if (!styles) return
+          if (!styles) {
+            continue
+          }
 
           let tokens: string[] | undefined = invalidTokensCache.get(styles)
           if (!tokens) {
@@ -105,9 +107,11 @@ const rule = createRule({
             invalidTokensCache.set(styles, tokens)
           }
 
-          if (tokens.length === 0) return
+          if (tokens.length === 0) {
+            continue
+          }
 
-          tokens.forEach((token) => {
+          for (const token of tokens) {
             let index = styles.indexOf(token)
 
             while (index !== -1) {
@@ -115,22 +119,34 @@ const rule = createRule({
               const end = start + token.length
 
               context.report({
+                data: { token },
                 loc: {
-                  start: context.sourceCode.getLocFromIndex(start),
                   end: context.sourceCode.getLocFromIndex(end),
+                  start: context.sourceCode.getLocFromIndex(start),
                 },
                 messageId: 'noInvalidTokenPaths',
-                data: { token },
               })
 
               // Check for other occurences of the invalid token
               index = styles.indexOf(token, index + token.length)
             }
-          })
-        })
+          }
+        }
       },
     }
   },
+  defaultOptions: [],
+  meta: {
+    docs: {
+      description: 'Disallow the use of invalid token paths within token function syntax.',
+    },
+    messages: {
+      noInvalidTokenPaths: '`{{token}}` is an invalid token path.',
+    },
+    schema: [],
+    type: 'problem',
+  },
+  name: RULE_NAME,
 })
 
 export default rule

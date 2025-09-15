@@ -1,71 +1,8 @@
-import { eslintTester } from '../test-utils'
 import rule, { RULE_NAME } from '../src/rules/no-physical-properties'
-
+import { eslintTester } from '../test-utils'
 import multiline from 'multiline-ts'
 
 eslintTester.run(RULE_NAME, rule, {
-  valid: [
-    {
-      code: multiline`
-  import { css } from './panda/css';
-  
-  const styles = css({ insetInlineStart: '0' })`,
-    },
-
-    {
-      code: multiline`
-  import { css } from './panda/css';
-  
-  function App(){
-    return <div className={css({ marginInlineStart: '4' })} />;
-  }`,
-    },
-
-    {
-      code: multiline`
-  import { Circle } from './panda/jsx';
-  
-  function App(){
-    return <Circle _hover={{  borderBlockEnd: 'solid 1px' }} />;
-  }`,
-    },
-
-    // textAlign with non-physical values - regular object literal
-    {
-      code: multiline`
-  import { css } from './panda/css';
-  
-  const styles = css({ textAlign: 'start' })`,
-    },
-
-    {
-      code: multiline`
-  import { css } from './panda/css';
-  
-  function App(){
-    return <div className={css({ textAlign: 'end' })} />;
-  }`,
-    },
-
-    // textAlign with non-physical values - JSX expression container
-    {
-      code: multiline`
-  import { Box } from './panda/jsx';
-  
-  function App(){
-    return <Box textAlign={"start"} />;
-  }`,
-    },
-
-    {
-      code: multiline`
-  import { Box } from './panda/jsx';
-  
-  function App(){
-    return <Box textAlign={"end"} />;
-  }`,
-    },
-  ],
   invalid: [
     {
       code: multiline`
@@ -234,6 +171,68 @@ eslintTester.run(RULE_NAME, rule, {
           ],
         },
       ],
+    },
+  ],
+  valid: [
+    {
+      code: multiline`
+  import { css } from './panda/css';
+  
+  const styles = css({ insetInlineStart: '0' })`,
+    },
+
+    {
+      code: multiline`
+  import { css } from './panda/css';
+  
+  function App(){
+    return <div className={css({ marginInlineStart: '4' })} />;
+  }`,
+    },
+
+    {
+      code: multiline`
+  import { Circle } from './panda/jsx';
+  
+  function App(){
+    return <Circle _hover={{  borderBlockEnd: 'solid 1px' }} />;
+  }`,
+    },
+
+    // textAlign with non-physical values - regular object literal
+    {
+      code: multiline`
+  import { css } from './panda/css';
+  
+  const styles = css({ textAlign: 'start' })`,
+    },
+
+    {
+      code: multiline`
+  import { css } from './panda/css';
+  
+  function App(){
+    return <div className={css({ textAlign: 'end' })} />;
+  }`,
+    },
+
+    // textAlign with non-physical values - JSX expression container
+    {
+      code: multiline`
+  import { Box } from './panda/jsx';
+  
+  function App(){
+    return <Box textAlign={"start"} />;
+  }`,
+    },
+
+    {
+      code: multiline`
+  import { Box } from './panda/jsx';
+  
+  function App(){
+    return <Box textAlign={"end"} />;
+  }`,
     },
   ],
 })

@@ -1,6 +1,5 @@
-import type { TSESTree } from '@typescript-eslint/utils'
+import { AST_NODE_TYPES, type TSESTree } from '@typescript-eslint/utils'
 import { isNodeOfType } from '@typescript-eslint/utils/ast-utils'
-import { AST_NODE_TYPES } from '@typescript-eslint/utils'
 
 export type Node = TSESTree.Node
 

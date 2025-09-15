@@ -1,43 +1,18 @@
-import { isPandaAttribute, isPandaProp, isRecipeVariant, isValidProperty, resolveLonghand } from '../utils/helpers'
 import { createRule } from '../utils'
 import { compositeProperties } from '../utils/composite-properties'
+import {
+  isPandaAttribute,
+  isPandaProp as isPandaProperty,
+  isRecipeVariant,
+  isValidProperty,
+  resolveLonghand,
+} from '../utils/helpers'
 import { isIdentifier, isJSXIdentifier } from '../utils/nodes'
-import type { TSESTree } from '@typescript-eslint/utils'
+import { type TSESTree } from '@typescript-eslint/utils'
 
 export const RULE_NAME = 'prefer-composite-properties'
 
 const rule = createRule({
-  name: RULE_NAME,
-  meta: {
-    docs: {
-      description: 'Encourage the use of composite properties instead of atomic properties in the codebase.',
-    },
-    messages: {
-      composite: 'Use composite property instead of `{{atomic}}`. Prefer: `{{composite}}`.',
-    },
-    type: 'suggestion',
-    schema: [
-      {
-        type: 'object',
-        properties: {
-          whitelist: {
-            type: 'array',
-            items: {
-              type: 'string',
-              minLength: 0,
-            },
-            uniqueItems: true,
-          },
-        },
-        additionalProperties: false,
-      },
-    ],
-  },
-  defaultOptions: [
-    {
-      whitelist: [],
-    },
-  ],
   create(context) {
     const whitelist: string[] = context.options[0]?.whitelist ?? []
 
@@ -48,6 +23,7 @@ const rule = createRule({
       if (longhandCache.has(name)) {
         return longhandCache.get(name)!
       }
+
       const longhand = resolveLonghand(name, context) ?? name
       longhandCache.set(name, longhand)
       return longhand
@@ -75,14 +51,15 @@ const rule = createRule({
     }
 
     // Caches for helper functions
-    const pandaPropCache = new WeakMap<TSESTree.JSXAttribute, boolean | undefined>()
-    const isCachedPandaProp = (node: TSESTree.JSXAttribute): boolean => {
-      if (pandaPropCache.has(node)) {
-        return pandaPropCache.get(node)!
+    const pandaPropertyCache = new WeakMap<TSESTree.JSXAttribute, boolean | undefined>()
+    const isCachedPandaProperty = (node: TSESTree.JSXAttribute): boolean => {
+      if (pandaPropertyCache.has(node)) {
+        return pandaPropertyCache.get(node)!
       }
-      const result = isPandaProp(node, context)
-      pandaPropCache.set(node, result)
-      return !!result
+
+      const result = isPandaProperty(node, context)
+      pandaPropertyCache.set(node, result)
+      return Boolean(result)
     }
 
     const pandaAttributeCache = new WeakMap<TSESTree.Property, boolean | undefined>()
@@ -90,9 +67,10 @@ const rule = createRule({
       if (pandaAttributeCache.has(node)) {
         return pandaAttributeCache.get(node)!
       }
+
       const result = isPandaAttribute(node, context)
       pandaAttributeCache.set(node, result)
-      return !!result
+      return Boolean(result)
     }
 
     const recipeVariantCache = new WeakMap<TSESTree.Property, boolean | undefined>()
@@ -100,46 +78,98 @@ const rule = createRule({
       if (recipeVariantCache.has(node)) {
         return recipeVariantCache.get(node)!
       }
+
       const result = isRecipeVariant(node, context)
       recipeVariantCache.set(node, result)
-      return !!result
+      return Boolean(result)
     }
 
     const sendReport = (node: TSESTree.Identifier | TSESTree.JSXIdentifier, composite: string) => {
-      if (whitelist.includes(node.name)) return
+      if (whitelist.includes(node.name)) {
+        return
+      }
+
       context.report({
-        node,
-        messageId: 'composite',
         data: {
-          composite,
           atomic: node.name,
+          composite,
         },
+        messageId: 'composite',
+        node,
       })
     }
 
     return {
       JSXAttribute(node: TSESTree.JSXAttribute) {
-        if (!isJSXIdentifier(node.name)) return
-        if (!isCachedPandaProp(node)) return
+        if (!isJSXIdentifier(node.name)) {
+          return
+        }
+
+        if (!isCachedPandaProperty(node)) {
+          return
+        }
 
         const composite = resolveCompositeProperty(node.name.name)
-        if (!composite) return
+        if (!composite) {
+          return
+        }
 
         sendReport(node.name, composite)
       },
 
       Property(node: TSESTree.Property) {
-        if (!isIdentifier(node.key)) return
-        if (!isCachedPandaAttribute(node)) return
-        if (isCachedRecipeVariant(node)) return
+        if (!isIdentifier(node.key)) {
+          return
+        }
+
+        if (!isCachedPandaAttribute(node)) {
+          return
+        }
+
+        if (isCachedRecipeVariant(node)) {
+          return
+        }
 
         const composite = resolveCompositeProperty(node.key.name)
-        if (!composite) return
+        if (!composite) {
+          return
+        }
 
         sendReport(node.key, composite)
       },
     }
   },
+  defaultOptions: [
+    {
+      whitelist: [],
+    },
+  ],
+  meta: {
+    docs: {
+      description: 'Encourage the use of composite properties instead of atomic properties in the codebase.',
+    },
+    messages: {
+      composite: 'Use composite property instead of `{{atomic}}`. Prefer: `{{composite}}`.',
+    },
+    schema: [
+      {
+        additionalProperties: false,
+        properties: {
+          whitelist: {
+            items: {
+              minLength: 0,
+              type: 'string',
+            },
+            type: 'array',
+            uniqueItems: true,
+          },
+        },
+        type: 'object',
+      },
+    ],
+    type: 'suggestion',
+  },
+  name: RULE_NAME,
 })
 
 export default rule

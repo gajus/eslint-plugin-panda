@@ -1,6 +1,5 @@
-import { type TSESTree } from '@typescript-eslint/utils'
 import { createRule } from '../utils'
-import { isInPandaFunction, isPandaAttribute, isPandaProp, isRecipeVariant } from '../utils/helpers'
+import { isInPandaFunction, isPandaAttribute, isPandaProp as isPandaProperty, isRecipeVariant } from '../utils/helpers'
 import {
   isArrayExpression,
   isIdentifier,
@@ -9,11 +8,134 @@ import {
   isObjectExpression,
   isTemplateLiteral,
 } from '../utils/nodes'
+import { type TSESTree } from '@typescript-eslint/utils'
 
 export const RULE_NAME = 'no-dynamic-styling'
 
 const rule = createRule({
-  name: RULE_NAME,
+  create(context) {
+    // Helper function to determine if a node represents a static value
+    function isStaticValue(node: null | TSESTree.Node | undefined): boolean {
+      if (!node) {
+        return false
+      }
+
+      if (isLiteral(node)) {
+        return true
+      }
+
+      if (isTemplateLiteral(node) && node.expressions.length === 0) {
+        return true
+      }
+
+      if (isObjectExpression(node)) {
+        return true
+      } // Conditions are acceptable
+
+      return false
+    }
+
+    // Function to check array elements for dynamic values
+    function checkArrayElements(array: TSESTree.ArrayExpression) {
+      for (const element of array.elements) {
+        if (!element) {
+          continue
+        }
+
+        if (isStaticValue(element)) {
+          continue
+        }
+
+        context.report({
+          messageId: 'dynamic',
+          node: element,
+        })
+      }
+    }
+
+    return {
+      // JSX Attributes
+      JSXAttribute(node: TSESTree.JSXAttribute) {
+        if (!node.value) {
+          return
+        }
+
+        // Check if it's a Panda prop early to avoid unnecessary processing
+        const isPanda = isPandaProperty(node, context)
+        if (!isPanda) {
+          return
+        }
+
+        // Static literals are fine
+        if (isLiteral(node.value)) {
+          return
+        }
+
+        if (isJSXExpressionContainer(node.value)) {
+          const expr = node.value.expression
+
+          if (isStaticValue(expr)) {
+            return
+          }
+
+          if (isArrayExpression(expr)) {
+            checkArrayElements(expr)
+            return
+          }
+
+          // Report dynamic value usage
+          context.report({
+            messageId: 'dynamic',
+            node: node.value,
+          })
+        }
+      },
+
+      // Object Properties
+      Property(node: TSESTree.Property) {
+        if (!isIdentifier(node.key)) {
+          return
+        }
+
+        // Check if it's a Panda attribute early to avoid unnecessary processing
+        if (!isPandaAttribute(node, context)) {
+          return
+        }
+
+        if (isRecipeVariant(node, context)) {
+          return
+        }
+
+        if (isStaticValue(node.value)) {
+          return
+        }
+
+        if (isArrayExpression(node.value)) {
+          checkArrayElements(node.value)
+          return
+        }
+
+        // Report dynamic value usage
+        context.report({
+          messageId: 'dynamic',
+          node: node.value,
+        })
+      },
+
+      // Dynamic properties with computed keys
+      'Property[computed=true]': (node: TSESTree.Property) => {
+        if (!isInPandaFunction(node, context)) {
+          return
+        }
+
+        context.report({
+          messageId: isRecipeVariant(node, context) ? 'dynamicRecipeVariant' : 'dynamicProperty',
+          node: node.key,
+        })
+      },
+    }
+  },
+  defaultOptions: [],
   meta: {
     docs: {
       description:
@@ -24,96 +146,10 @@ const rule = createRule({
       dynamicProperty: 'Remove dynamic property. Prefer static style property.',
       dynamicRecipeVariant: 'Remove dynamic variant. Prefer static variant definition.',
     },
-    type: 'problem',
     schema: [],
+    type: 'problem',
   },
-  defaultOptions: [],
-  create(context) {
-    // Helper function to determine if a node represents a static value
-    function isStaticValue(node: TSESTree.Node | null | undefined): boolean {
-      if (!node) return false
-      if (isLiteral(node)) return true
-      if (isTemplateLiteral(node) && node.expressions.length === 0) return true
-      if (isObjectExpression(node)) return true // Conditions are acceptable
-      return false
-    }
-
-    // Function to check array elements for dynamic values
-    function checkArrayElements(array: TSESTree.ArrayExpression) {
-      array.elements.forEach((element) => {
-        if (!element) return
-        if (isStaticValue(element)) return
-
-        context.report({
-          node: element,
-          messageId: 'dynamic',
-        })
-      })
-    }
-
-    return {
-      // JSX Attributes
-      JSXAttribute(node: TSESTree.JSXAttribute) {
-        if (!node.value) return
-
-        // Check if it's a Panda prop early to avoid unnecessary processing
-        const isPanda = isPandaProp(node, context)
-        if (!isPanda) return
-
-        // Static literals are fine
-        if (isLiteral(node.value)) return
-
-        if (isJSXExpressionContainer(node.value)) {
-          const expr = node.value.expression
-
-          if (isStaticValue(expr)) return
-
-          if (isArrayExpression(expr)) {
-            checkArrayElements(expr)
-            return
-          }
-
-          // Report dynamic value usage
-          context.report({
-            node: node.value,
-            messageId: 'dynamic',
-          })
-        }
-      },
-
-      // Dynamic properties with computed keys
-      'Property[computed=true]': (node: TSESTree.Property) => {
-        if (!isInPandaFunction(node, context)) return
-
-        context.report({
-          node: node.key,
-          messageId: isRecipeVariant(node, context) ? 'dynamicRecipeVariant' : 'dynamicProperty',
-        })
-      },
-
-      // Object Properties
-      Property(node: TSESTree.Property) {
-        if (!isIdentifier(node.key)) return
-
-        // Check if it's a Panda attribute early to avoid unnecessary processing
-        if (!isPandaAttribute(node, context)) return
-        if (isRecipeVariant(node, context)) return
-
-        if (isStaticValue(node.value)) return
-
-        if (isArrayExpression(node.value)) {
-          checkArrayElements(node.value)
-          return
-        }
-
-        // Report dynamic value usage
-        context.report({
-          node: node.value,
-          messageId: 'dynamic',
-        })
-      },
-    }
-  },
+  name: RULE_NAME,
 })
 
 export default rule
