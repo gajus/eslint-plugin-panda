@@ -50,50 +50,53 @@ async function _getContext(configPath: string | undefined) {
   return context;
 }
 
-async function filterDeprecatedTokens(
+// Refactored to arrow function, removed async
+const filterDeprecatedTokens = (
   context: PandaContext,
   tokens: DeprecatedToken[],
-): Promise<DeprecatedToken[]> {
+): DeprecatedToken[] => {
   return tokens.filter((token) => {
     const value =
       typeof token === 'string' ? token : token.category + '.' + token.value;
     return context.utility.tokens.isDeprecated(value);
   });
-}
+};
 
-async function filterInvalidTokens(
+// Refactored to arrow function, removed async
+const filterInvalidTokens = (
   context: PandaContext,
   paths: string[],
-): Promise<string[]> {
+): string[] => {
   return paths.filter((path) => !context.utility.tokens.view.get(path));
-}
+};
 
-async function getPropertyCategory(context: PandaContext, _attribute: string) {
-  const longhand = await resolveLongHand(context, _attribute);
+// Refactored to arrow function, removed async
+const getPropertyCategory = (context: PandaContext, _attribute: string) => {
+  const longhand = resolveLongHand(context, _attribute);
   const attribute = longhand || _attribute;
   const attributeConfig = context.utility.config[attribute];
   return typeof attributeConfig?.values === 'string'
     ? attributeConfig.values
     : undefined;
-}
+};
 
-async function isColorAttribute(
+// Refactored to arrow function, removed async
+const isColorAttribute = (
   context: PandaContext,
   _attribute: string,
-): Promise<boolean> {
-  const category = await getPropertyCategory(context, _attribute);
+): boolean => {
+  const category = getPropertyCategory(context, _attribute);
   return category === 'colors';
-}
+};
 
-async function isColorToken(
-  context: PandaContext,
-  value: string,
-): Promise<boolean> {
+// Refactored to arrow function, removed async
+const isColorToken = (context: PandaContext, value: string): boolean => {
   return Boolean(
     context.utility.tokens.view.categoryMap.get('colors')?.get(value),
   );
-}
+};
 
+// Refactored to arrow function
 const arePathsEqual = (path1: string, path2: string) => {
   const normalizedPath1 = path.resolve(path1);
   const normalizedPath2 = path.resolve(path2);
@@ -271,18 +274,17 @@ export async function runAsync(
   }
 }
 
-async function isValidFile(
-  context: PandaContext,
-  fileName: string,
-): Promise<boolean> {
+// Refactored to arrow function, removed async
+const isValidFile = (context: PandaContext, fileName: string): boolean => {
   return context.getFiles().some((file) => arePathsEqual(file, fileName));
-}
+};
 
-async function isValidProperty(
+// Refactored to arrow function, removed async
+const isValidProperty = (
   context: PandaContext,
   name: string,
   patternName?: string,
-) {
+) => {
   if (context.isValidProperty(name)) {
     return true;
   }
@@ -299,19 +301,20 @@ async function isValidProperty(
   }
 
   return Object.keys(pattern).includes(name);
-}
+};
 
-async function matchFile(
+// Refactored to arrow function, removed async
+const matchFile = (
   context: PandaContext,
   name: string,
   imports: ImportResult[],
-) {
+) => {
   const file = context.imports.file(imports);
-
   return file.match(name);
-}
+};
 
-async function matchImports(context: PandaContext, result: MatchImportResult) {
+// Refactored to arrow function, removed async
+const matchImports = (context: PandaContext, result: MatchImportResult) => {
   return context.imports.match(result, (module_) => {
     const { tsOptions } = context.parserOptions;
     if (!tsOptions?.pathMappings) {
@@ -320,12 +323,13 @@ async function matchImports(context: PandaContext, result: MatchImportResult) {
 
     return resolveTsPathPattern(tsOptions.pathMappings, module_);
   });
-}
+};
 
-async function resolveLongHand(
+// Refactored to arrow function, removed async
+const resolveLongHand = (
   context: PandaContext,
   name: string,
-): Promise<string | undefined> {
+): string | undefined => {
   const reverseShorthandsMap = new Map();
 
   for (const [key, values] of context.utility.getPropShorthandsMap()) {
@@ -335,13 +339,14 @@ async function resolveLongHand(
   }
 
   return reverseShorthandsMap.get(name);
-}
+};
 
-async function resolveShorthands(
+// Refactored to arrow function, removed async
+const resolveShorthands = (
   context: PandaContext,
   name: string,
-): Promise<string[] | undefined> {
+): string[] | undefined => {
   return context.utility.getPropShorthandsMap().get(name);
-}
+};
 
 runAsWorker(run as any);
