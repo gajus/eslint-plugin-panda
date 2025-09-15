@@ -35,10 +35,11 @@ export const createGeneratorContext = (userConfig?: Config) => {
 }
 
 export const createContext = (userConfig?: Config) => {
-  // @ts-expect-error
   const resolvedConfig = mergeConfigs([
+    // @ts-expect-error
     userConfig,
     fixtureDefaults.config,
+    // @ts-expect-error
     sandboxConfig,
     { importMap: './panda' },
   ]) as UserConfig
