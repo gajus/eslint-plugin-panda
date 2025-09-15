@@ -32,7 +32,7 @@ jobs:
         with:
           fetch-depth: 0
       - uses: ./.github/actions/install
-      - nun: pnpm build
+      - run: pnpm build
       - id: changesets
         uses: changesets/action@v1
         with:
