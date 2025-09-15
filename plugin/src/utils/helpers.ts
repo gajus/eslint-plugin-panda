@@ -18,6 +18,7 @@ import {
 import {
   type DeprecatedToken,
   getPandaContext,
+  matchFile,
   matchImports,
   type run,
   runAsync,
@@ -140,7 +141,7 @@ const isPandaIsh = (name: string, context: RuleContext<any, any>) => {
     return false;
   }
 
-  return syncAction('matchFile', getSyncOptions(context), name, imports);
+  return matchFile(getPandaContext(getSyncOptions(context)), name, imports);
 };
 
 const findDeclaration = (name: string, context: RuleContext<any, any>) => {

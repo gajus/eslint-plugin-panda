@@ -143,12 +143,6 @@ export function run(
   patternName?: string,
 ): boolean;
 export function run(
-  action: 'matchFile',
-  options: Options,
-  name: string,
-  imports: ImportResult[],
-): boolean;
-export function run(
   action: 'getPropCategory',
   options: Options,
   property: string,
@@ -201,12 +195,6 @@ export function runAsync(
   patternName?: string,
 ): boolean;
 export function runAsync(
-  action: 'matchFile',
-  options: Options,
-  name: string,
-  imports: ImportResult[],
-): boolean;
-export function runAsync(
   action: 'getPropCategory',
   options: Options,
   property: string,
@@ -240,9 +228,6 @@ export function runAsync(action: string, options: Options, ...args: any): any {
     case 'isValidProperty':
       // @ts-expect-error cast
       return isValidProperty(context, ...args);
-    case 'matchFile':
-      // @ts-expect-error cast
-      return matchFile(context, ...args);
     case 'resolveLongHand':
       // @ts-expect-error cast
       return resolveLongHand(context, ...args);
@@ -279,7 +264,7 @@ const isValidProperty = (
   return Object.keys(pattern).includes(name);
 };
 
-const matchFile = (
+export const matchFile = (
   context: PandaContext,
   name: string,
   imports: ImportResult[],
