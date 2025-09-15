@@ -3,11 +3,7 @@ import { mergeConfigs } from '@pandacss/config';
 import { defineConfig } from '@pandacss/dev';
 import { PandaContext } from '@pandacss/node';
 import { parseJson, stringifyJson } from '@pandacss/shared';
-import {
-  type Config,
-  type LoadConfigResult,
-  type UserConfig,
-} from '@pandacss/types';
+import { type LoadConfigResult, type UserConfig } from '@pandacss/types';
 
 const sandboxConfig = defineConfig({
   exclude: [],
@@ -142,9 +138,7 @@ const fixtureDefaults = {
   serialized: stringifyJson(config),
 } as LoadConfigResult;
 
-// TODO why is this unused?
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-export const createContext = (userConfig?: Config) => {
+export const createContext = () => {
   const resolvedConfig = mergeConfigs([
     // @ts-expect-error - TODO explain why this is needed
     fixtureDefaults.config as unknown,
