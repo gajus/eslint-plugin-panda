@@ -94,7 +94,16 @@ const rule = createRule({
     const handleNodeValue = (node: TSESTree.Node, value: string) => {
       if (!hasImportantKeyword(value)) return
 
-      const { fixed, keyword } = removeImportantKeyword(value)
+      const arbitraryValue = getArbitraryValue(value)
+      const { fixed: fixedArbitrary, keyword } = removeImportantKeyword(arbitraryValue)
+
+      // If the value has escape hatch brackets, preserve them
+      let fixed = value
+      if (value.startsWith('[') && value.endsWith(']')) {
+        fixed = `[${fixedArbitrary}]`
+      } else {
+        fixed = fixedArbitrary
+      }
 
       context.report({
         node,

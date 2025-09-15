@@ -56,9 +56,12 @@ const rule = createRule({
       JSXAttribute(node: TSESTree.JSXAttribute) {
         if (!node.value) return
 
-        if (isLiteral(node.value)) return
         // Check if it's a Panda prop early to avoid unnecessary processing
-        if (!isPandaProp(node, context)) return
+        const isPanda = isPandaProp(node, context)
+        if (!isPanda) return
+
+        // Static literals are fine
+        if (isLiteral(node.value)) return
 
         if (isJSXExpressionContainer(node.value)) {
           const expr = node.value.expression
@@ -69,13 +72,13 @@ const rule = createRule({
             checkArrayElements(expr)
             return
           }
-        }
 
-        // Report dynamic value usage
-        context.report({
-          node: node.value,
-          messageId: 'dynamic',
-        })
+          // Report dynamic value usage
+          context.report({
+            node: node.value,
+            messageId: 'dynamic',
+          })
+        }
       },
 
       // Dynamic properties with computed keys

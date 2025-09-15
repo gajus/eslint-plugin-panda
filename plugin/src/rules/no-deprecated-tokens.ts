@@ -94,52 +94,6 @@ const rule = createRule({
 
         handleLiteralOrTemplate(prop, node.value)
       },
-
-      TaggedTemplateExpression(node: TSESTree.TaggedTemplateExpression) {
-        const caller = getTaggedTemplateCaller(node)
-        if (!caller || !isPandaIsh(caller, context)) return
-
-        const quasis = node.quasi.quasis
-        quasis.forEach((quasi) => {
-          const styles = quasi.value.raw
-          if (!styles) return
-
-          // Use the same pattern as sendReport function
-          let tokens: DeprecatedToken[] | undefined = deprecatedTokensCache.get(styles)
-          if (!tokens) {
-            // For template literals, we don't have a specific prop, so we use an empty string
-            tokens = getDeprecatedTokens('', styles, context)
-            deprecatedTokensCache.set(styles, tokens)
-          }
-
-          if (tokens.length === 0) return
-
-          tokens.forEach((token) => {
-            const tokenValue = typeof token === 'string' ? token : token.value
-            let index = styles.indexOf(tokenValue)
-
-            while (index !== -1) {
-              const start = quasi.range[0] + index + 1 // +1 for the backtick
-              const end = start + tokenValue.length
-
-              context.report({
-                loc: {
-                  start: context.sourceCode.getLocFromIndex(start),
-                  end: context.sourceCode.getLocFromIndex(end),
-                },
-                messageId: typeof token === 'string' ? 'noDeprecatedTokenPaths' : 'noDeprecatedTokens',
-                data: {
-                  token: tokenValue,
-                  category: typeof token === 'string' ? undefined : token.category,
-                },
-              })
-
-              // Check for other occurrences of the deprecated token
-              index = styles.indexOf(tokenValue, index + tokenValue.length)
-            }
-          })
-        })
-      },
     }
   },
 })

@@ -5,6 +5,7 @@ import {
   isPandaIsh,
   isPandaProp,
   isRecipeVariant,
+  isStyledTaggedTemplate,
 } from '../utils/helpers'
 import { createRule } from '../utils'
 import { AST_NODE_TYPES, TSESTree } from '@typescript-eslint/utils'
@@ -88,7 +89,10 @@ const rule = createRule({
 
       TaggedTemplateExpression(node: TSESTree.TaggedTemplateExpression) {
         const caller = getTaggedTemplateCaller(node)
-        if (!caller || !isPandaIsh(caller, context)) return
+        if (!caller) return
+
+        // Check if this is a styled template literal
+        if (!isStyledTaggedTemplate(node, context)) return
 
         const quasis = node.quasi.quasis
         quasis.forEach((quasi) => {

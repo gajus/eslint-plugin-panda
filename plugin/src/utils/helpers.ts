@@ -129,7 +129,13 @@ const isLocalStyledFactory = (node: TSESTree.JSXOpeningElement, context: RuleCon
   if (!decl) return
   if (!isCallExpression(decl.init)) return
   if (!isIdentifier(decl.init.callee)) return
-  if (!isPandaIsh(decl.init.callee.name, context)) return
+
+  // Check if the callee is 'styled' from panda imports
+  const calleeName = decl.init.callee.name
+  const rawImports = _getImports(context)
+  const isStyledImport = rawImports.some((imp) => imp.alias === calleeName && imp.mod.includes('panda'))
+
+  if (!isStyledImport && !isPandaIsh(calleeName, context)) return
 
   return true
 }
@@ -155,14 +161,55 @@ export const isPandaProp = (node: TSESTree.JSXAttribute, context: RuleContext<an
   // <styled.div /> && <Box />
   if (!isJSXMemberExpression(jsxAncestor.name) && !isJSXIdentifier(jsxAncestor.name)) return
 
-  const name = isJSXMemberExpression(jsxAncestor.name) ? (jsxAncestor.name.object as any).name : jsxAncestor.name.name
+  let isPandaComponent = false
+  let componentName: string | undefined
+
+  if (isJSXMemberExpression(jsxAncestor.name)) {
+    // For <styled.div>, check if 'styled' is a Panda import
+    const objectName = (jsxAncestor.name.object as any).name
+    componentName = objectName
+    // Check if 'styled' is imported from panda - check both filtered and raw imports
+    const imports = getImports(context)
+    const rawImports = _getImports(context)
+    isPandaComponent =
+      imports.some((imp) => imp.alias === objectName) ||
+      rawImports.some((imp) => imp.alias === objectName && imp.mod.includes('panda')) ||
+      isPandaIsh(objectName, context)
+
+    // For styled.div, all props are valid styled props
+    if (isPandaComponent) {
+      return true
+    }
+  } else if (isJSXIdentifier(jsxAncestor.name)) {
+    // For <Circle> or <PandaComp>
+    componentName = jsxAncestor.name.name
+
+    // Check if it's a local styled factory (e.g., const PandaComp = styled(div))
+    const isLocalStyled = isLocalStyledFactory(jsxAncestor, context)
+
+    // For local styled components, we need to check if the prop is a valid Panda prop
+    if (isLocalStyled) {
+      const prop = node.name.name
+      // Special props like 'css' and props starting with '_' are Panda props
+      if (prop === 'css' || (typeof prop === 'string' && prop.startsWith('_'))) {
+        return true
+      }
+      // Other props need to be valid style properties
+      if (typeof prop !== 'string' || !isValidProperty(prop, context)) {
+        return false
+      }
+      return true
+    }
+
+    // For imported Panda components like Circle
+    isPandaComponent = isPandaIsh(componentName, context)
+  }
+
+  if (!isPandaComponent) return
+
   const prop = node.name.name
-
-  // Ensure component is a panda component
-  if (!isPandaIsh(name, context) && !isLocalStyledFactory(jsxAncestor, context)) return
-
   // Ensure prop is a styled prop
-  if (typeof prop !== 'string' || !isValidProperty(prop, context, name)) return
+  if (typeof prop !== 'string' || !isValidProperty(prop, context, componentName)) return
 
   return true
 }
@@ -208,8 +255,27 @@ export const isInJSXProp = (node: TSESTree.Property, context: RuleContext<any, a
   const jsxAttrAncestor = getAncestor(isJSXAttribute, node)
 
   if (!jsxExprAncestor || !jsxAttrAncestor) return
-  if (!isPandaProp(jsxAttrAncestor, context)) return
-  if (typeof jsxAttrAncestor.name === 'string') return
+
+  // Get the JSX element to check if it's a Panda component
+  const jsxElement = getAncestor(isJSXOpeningElement, jsxAttrAncestor)
+  if (!jsxElement) return
+
+  // Check if it's a Panda component (styled.div, Circle, etc.)
+  let isPandaComponent = false
+  if (isJSXMemberExpression(jsxElement.name)) {
+    // For <styled.div>, check if 'styled' is a Panda import
+    const objectName = (jsxElement.name.object as any).name
+    isPandaComponent = isPandaIsh(objectName, context)
+  } else if (isJSXIdentifier(jsxElement.name)) {
+    // For <Circle> or <PandaComp>
+    const componentName = jsxElement.name.name
+    isPandaComponent = isPandaIsh(componentName, context) || !!isLocalStyledFactory(jsxElement, context)
+  }
+
+  if (!isPandaComponent) return
+
+  // Check if the attribute name is a valid styled prop
+  if (!isJSXIdentifier(jsxAttrAncestor.name)) return
   if (!isValidStyledProp(jsxAttrAncestor.name, context)) return
 
   return true
@@ -328,6 +394,17 @@ export const getTaggedTemplateCaller = (node: TSESTree.TaggedTemplateExpression)
   }
 }
 
+export const isStyledTaggedTemplate = (node: TSESTree.TaggedTemplateExpression, context: RuleContext<any, any>) => {
+  const caller = getTaggedTemplateCaller(node)
+  if (!caller) return false
+
+  // Check if 'styled' is imported from panda
+  const rawImports = _getImports(context)
+  const isStyledImport = rawImports.some((imp) => imp.alias === caller && imp.mod.includes('panda'))
+
+  return isStyledImport || isPandaIsh(caller, context)
+}
+
 export function isRecipeVariant(node: TSESTree.Property, context: RuleContext<any, any>) {
   const caller = isInPandaFunction(node, context)
   if (!caller) return
@@ -357,4 +434,28 @@ export function isRecipeVariant(node: TSESTree.Property, context: RuleContext<an
   const extraLength = styleObjectParent === 'base' ? 0 : 4
 
   if (length < requiredLength + extraLength) return true
+}
+
+export const isPandaComponent = (node: TSESTree.JSXOpeningElement, context: RuleContext<any, any>) => {
+  // <styled.div /> && <Box />
+  if (!isJSXMemberExpression(node.name) && !isJSXIdentifier(node.name)) return false
+
+  if (isJSXMemberExpression(node.name)) {
+    // For <styled.div>, check if 'styled' is a Panda import
+    const objectName = (node.name.object as any).name
+    // Check if 'styled' is imported from panda - check both filtered and raw imports
+    const imports = getImports(context)
+    const rawImports = _getImports(context)
+    return (
+      imports.some((imp) => imp.alias === objectName) ||
+      rawImports.some((imp) => imp.alias === objectName && imp.mod.includes('panda')) ||
+      isPandaIsh(objectName, context)
+    )
+  } else if (isJSXIdentifier(node.name)) {
+    // For <Circle> or <PandaComp>
+    const componentName = node.name.name
+    return isPandaIsh(componentName, context) || !!isLocalStyledFactory(node, context)
+  }
+
+  return false
 }

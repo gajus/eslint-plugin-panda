@@ -55,19 +55,16 @@ const invalids = [
   },
 ]
 
-// Note: We're only testing detection, not the actual fixes
-// The rules provide suggestions but we're not validating them here
 eslintTester.run(RULE_NAME, rule as any, {
   valid: valids.map(({ code }) => ({
     code: imports + code,
   })),
+  // @ts-expect-error - we're only testing detection, not the actual fixes
   invalid: invalids.map(({ code }) => ({
     code: imports + code,
-    errors: 1 as any, // Just check that an error is reported
+    errors: [{ messageId: 'debug', suggestions: 1 }],
   })),
 })
-
-//? For testing all sorts of expressions
 
 const valids2 = [
   'const styles = css({ bg: "red" })',
@@ -132,15 +129,14 @@ const invalids3 = [
   },
 ]
 
-// Note: We're only testing detection, not the actual fixes
-// The rules provide suggestions but we're not validating them here
 eslintTester.run(RULE_NAME3, rule3 as any, {
   valid: valids3.map((code) => ({
     code: imports + code,
   })),
+  // @ts-expect-error - we're only testing detection, not the actual fixes
   invalid: invalids3.map(({ code }) => ({
     code: imports + code,
-    errors: 1 as any, // Just check that an error is reported
+    errors: [{ messageId: 'escapeHatch', suggestions: 1 }],
   })),
 })
 
@@ -166,15 +162,14 @@ const invalids4 = [
   { code: '<Circle bg={tk("colors.red.300")} />' },
 ]
 
-// Note: We're only testing detection, not the actual fixes
-// The rules provide suggestions but we're not validating them here
 eslintTester.run(RULE_NAME4, rule4 as any, {
   valid: valids4.map((code) => ({
     code: imports4 + code,
   })),
+  // @ts-expect-error - we're only testing detection, not the actual fixes
   invalid: invalids4.map(({ code }) => ({
     code: imports4 + code,
-    errors: 1 as any, // Just check that an error is reported
+    errors: [{ messageId: 'noUnsafeTokenFnUsage', suggestions: 1 }],
   })),
 })
 
