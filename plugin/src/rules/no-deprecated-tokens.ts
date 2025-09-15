@@ -1,5 +1,6 @@
 import { createRule } from '../utils';
 import {
+  type DeprecatedToken,
   getDeprecatedTokens,
   isPandaAttribute,
   isPandaProp as isPandaProperty,
@@ -11,7 +12,6 @@ import {
   isLiteral,
   isTemplateLiteral,
 } from '../utils/nodes';
-import { type DeprecatedToken } from '../utils/worker';
 import { AST_NODE_TYPES, type TSESTree } from '@typescript-eslint/utils';
 import { isNodeOfTypes } from '@typescript-eslint/utils/ast-utils';
 
