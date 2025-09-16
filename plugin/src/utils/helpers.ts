@@ -119,13 +119,21 @@ const isValidStyledProperty = <T extends Node>(
   return isJSXIdentifier(node) && isValidProperty(node.name, context);
 };
 
+const matchFile = (
+  name: string,
+  imports: ImportResult[],
+  context: RuleContext<any, any>,
+) => {
+  return syncAction('matchFile', getSyncOptions(context), name, imports);
+};
+
 const isPandaIsh = (name: string, context: RuleContext<any, any>) => {
   const imports = getImports(context);
   if (imports.length === 0) {
     return false;
   }
 
-  return syncAction('matchFile', getSyncOptions(context), name, imports);
+  return matchFile(name, imports, context);
 };
 
 const findDeclaration = (name: string, context: RuleContext<any, any>) => {

@@ -47,6 +47,7 @@ async function _getContext(configPath: string | undefined) {
   const cwd = path.dirname(configPath);
 
   const context = await loadConfigAndCreateContext({ configPath, cwd });
+
   return context;
 }
 

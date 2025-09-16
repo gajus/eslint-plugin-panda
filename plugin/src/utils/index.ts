@@ -22,9 +22,22 @@ const distDir = fileURLToPath(
 const _syncAction = createSyncFn(join(distDir, 'utils/worker.mjs'));
 
 // Define syncAction with proper typing and error handling
+const cache = new Map<string, any>();
+
 export const syncAction = ((...args: Parameters<typeof run>) => {
+  // Generate cache key from arguments
+  const cacheKey = JSON.stringify(args);
+
+  // Return cached result if exists
+  if (cache.has(cacheKey)) {
+    return cache.get(cacheKey);
+  }
+
   try {
-    return _syncAction(...args);
+    const result = _syncAction(...args);
+    // Store result in cache
+    cache.set(cacheKey, result);
+    return result;
   } catch (error) {
     console.error('syncAction error:', error);
     return undefined;
