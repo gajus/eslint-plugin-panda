@@ -159,3 +159,28 @@ This repository started as a fork of [@pandacss/eslint-plugin](https://github.co
 Since then, it has been updated to:
 
 - Added thorough linting and testing.
+- Optimized performance.
+
+Here is an example of a performance profile before and after the optimizations.
+
+Before:
+
+```markdown
+Rule                                      | Time (ms) | Relative
+:-----------------------------------------|----------:|--------:
+@pandacss/no-deprecated-tokens            | 13645.357 |    16.9%
+@pandacss/no-invalid-token-paths          | 11341.290 |    14.0%
+@pandacss/no-dynamic-styling              | 10975.720 |    13.6%
+@pandacss/no-property-renaming            |  5253.137 |     6.5%
+```
+
+After:
+
+```markdown
+Rule                                      | Time (ms) | Relative
+:-----------------------------------------|----------:|--------:
+panda/no-dynamic-styling                  |  4597.765 |     9.0%
+panda/no-deprecated-tokens                |  3655.652 |     7.2%
+panda/no-invalid-token-paths              |  2161.846 |     4.2%
+panda/no-property-renaming                |  1465.211 |     2.9%
+```
