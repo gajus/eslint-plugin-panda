@@ -184,3 +184,4 @@ panda/no-deprecated-tokens                |  3655.652 |     7.2%
 panda/no-invalid-token-paths              |  2161.846 |     4.2%
 panda/no-property-renaming                |  1465.211 |     2.9%
 ```
+
