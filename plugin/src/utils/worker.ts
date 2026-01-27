@@ -152,6 +152,11 @@ export function run(
   result: MatchImportResult,
 ): boolean;
 export function run(
+  action: 'filterImports',
+  options: Options,
+  imports: MatchImportResult[],
+): MatchImportResult[];
+export function run(
   action: 'getPropCategory',
   options: Options,
   property: string,
@@ -219,6 +224,11 @@ export function runAsync(
   result: MatchImportResult,
 ): Promise<boolean>;
 export function runAsync(
+  action: 'filterImports',
+  options: Options,
+  imports: MatchImportResult[],
+): Promise<MatchImportResult[]>;
+export function runAsync(
   action: 'getPropCategory',
   options: Options,
   property: string,
@@ -243,6 +253,9 @@ export async function runAsync(
     case 'filterDeprecatedTokens':
       // @ts-expect-error cast
       return filterDeprecatedTokens(context, ...args);
+    case 'filterImports':
+      // @ts-expect-error cast
+      return filterImports(context, ...args);
     case 'filterInvalidTokens':
       // @ts-expect-error cast
       return filterInvalidTokens(context, ...args);
@@ -346,22 +359,49 @@ const matchImports = (context: Generator, result: MatchImportResult) => {
   });
 };
 
-// Refactored to arrow function, removed async
+// Batch filter imports to reduce worker thread crossings
+const filterImports = (
+  context: Generator,
+  imports: MatchImportResult[],
+): MatchImportResult[] => {
+  return imports.filter((imp) =>
+    context.imports.match(imp, (module_) => {
+      const { tsOptions } = context.parserOptions;
+      if (!tsOptions?.pathMappings) {
+        return;
+      }
+
+      return resolveTsPathPattern(tsOptions.pathMappings, module_);
+    }),
+  );
+};
+
+// Cache reverse shorthand map per context to avoid O(N) rebuild on every call
+const reverseShorthandsMapCache = new WeakMap<Generator, Map<string, string>>();
+
+const getReverseShorthandsMap = (context: Generator): Map<string, string> => {
+  let reverseMap = reverseShorthandsMapCache.get(context);
+  if (!reverseMap) {
+    reverseMap = new Map();
+    const shorthands = context.utility.getPropShorthandsMap();
+    for (const [key, values] of shorthands) {
+      for (const value of values) {
+        reverseMap.set(value, key);
+      }
+    }
+
+    reverseShorthandsMapCache.set(context, reverseMap);
+  }
+
+  return reverseMap;
+};
+
+// Refactored to use cached reverse shorthand map
 const resolveLongHand = (
   context: Generator,
   name: string,
 ): string | undefined => {
-  const reverseShorthandsMap = new Map();
-
-  const shorthands = context.utility.getPropShorthandsMap();
-
-  for (const [key, values] of shorthands) {
-    for (const value of values) {
-      reverseShorthandsMap.set(value, key);
-    }
-  }
-
-  return reverseShorthandsMap.get(name);
+  return getReverseShorthandsMap(context).get(name);
 };
 
 // Refactored to arrow function, removed async

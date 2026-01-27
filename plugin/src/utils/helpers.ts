@@ -16,7 +16,7 @@ import {
   type Node,
 } from './nodes';
 import { type DeprecatedToken } from './worker';
-import { analyze } from '@typescript-eslint/scope-manager';
+import { analyze, type ScopeManager } from '@typescript-eslint/scope-manager';
 import { type TSESTree } from '@typescript-eslint/utils';
 import { type RuleContext } from '@typescript-eslint/utils/ts-eslint';
 
@@ -84,7 +84,14 @@ export const isPandaConfigFunction = (
   );
 };
 
+// Caching raw imports per context to avoid redundant AST traversal
+const rawImportsCache = new WeakMap<RuleContext<any, any>, ImportResult[]>();
+
 const _getImports = (context: RuleContext<any, any>) => {
+  if (rawImportsCache.has(context)) {
+    return rawImportsCache.get(context)!;
+  }
+
   const specifiers = getImportSpecifiers(context);
 
   const imports: ImportResult[] = specifiers.map(({ mod, specifier }) => ({
@@ -93,10 +100,11 @@ const _getImports = (context: RuleContext<any, any>) => {
     name: (specifier.imported as any).name,
   }));
 
+  rawImportsCache.set(context, imports);
   return imports;
 };
 
-// Caching imports per context to avoid redundant computations
+// Caching filtered imports per context to avoid redundant computations
 const importsCache = new WeakMap<RuleContext<any, any>, ImportResult[]>();
 
 const getImports = (context: RuleContext<any, any>) => {
@@ -105,8 +113,11 @@ const getImports = (context: RuleContext<any, any>) => {
   }
 
   const imports = _getImports(context);
-  const filteredImports = imports.filter((imp) =>
-    syncAction('matchImports', getSyncOptions(context), imp),
+  // Batch filter all imports in a single sync call to reduce worker thread crossings
+  const filteredImports = syncAction(
+    'filterImports',
+    getSyncOptions(context),
+    imports,
   );
   importsCache.set(context, filteredImports);
   return filteredImports;
@@ -143,6 +154,9 @@ const isPandaIsh = (name: string, context: RuleContext<any, any>) => {
   return matchFile(name, imports, context);
 };
 
+// Caching scope analysis per AST to avoid expensive re-computation
+const scopeCache = new WeakMap<TSESTree.Program, ScopeManager>();
+
 const findDeclaration = (name: string, context: RuleContext<any, any>) => {
   try {
     const source = context.sourceCode;
@@ -154,9 +168,14 @@ const findDeclaration = (name: string, context: RuleContext<any, any>) => {
       return undefined;
     }
 
-    const scope = analyze(source.ast, {
-      sourceType: 'module',
-    });
+    let scope = scopeCache.get(source.ast);
+    if (!scope) {
+      scope = analyze(source.ast, {
+        sourceType: 'module',
+      });
+      scopeCache.set(source.ast, scope);
+    }
+
     const decl = scope.variables
       .find((v) => v.name === name)
       ?.defs.find((d) => isIdentifier(d.name) && d.name.name === name)?.node;
