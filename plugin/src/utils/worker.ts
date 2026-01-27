@@ -1,8 +1,9 @@
 import { type ImportResult } from '.';
-import { createContext } from '../../tests/fixtures/create-context';
-import { findConfig } from '@pandacss/config';
+import { createGeneratorContext } from '../../tests/fixtures/create-context';
+import { findConfig, loadConfig } from '@pandacss/config';
 import { resolveTsPathPattern } from '@pandacss/config/ts-path';
-import { loadConfigAndCreateContext, type PandaContext } from '@pandacss/node';
+import { Generator } from '@pandacss/generator';
+import micromatch from 'micromatch';
 import path from 'path';
 import { runAsWorker } from 'synckit';
 
@@ -11,7 +12,7 @@ type Options = {
   currentFile: string;
 };
 
-const contextCache: { [configPath: string]: Promise<PandaContext> } = {};
+const contextCache: { [configPath: string]: Promise<Generator> } = {};
 
 export type DeprecatedToken =
   | string
@@ -22,8 +23,12 @@ export type DeprecatedToken =
 
 export async function getContext(options: Options) {
   if (process.env.NODE_ENV === 'test') {
-    const context = createContext() as unknown as PandaContext;
-    context.getFiles = () => ['App.tsx'];
+    const context = createGeneratorContext({
+      exclude: ['**/Invalid.tsx', '**/panda.config.ts'],
+      importMap: './panda',
+      include: ['**/*'],
+      jsxFactory: 'styled',
+    });
     return context;
   } else {
     const configPath = findConfig({
@@ -35,7 +40,7 @@ export async function getContext(options: Options) {
       contextCache[configPath] = _getContext(configPath);
     }
 
-    return await contextCache[configPath];
+    return contextCache[configPath];
   }
 }
 
@@ -46,14 +51,15 @@ async function _getContext(configPath: string | undefined) {
 
   const cwd = path.dirname(configPath);
 
-  const context = await loadConfigAndCreateContext({ configPath, cwd });
+  const conf = await loadConfig({ cwd, file: configPath });
+  const context = new Generator(conf);
 
   return context;
 }
 
 // Refactored to arrow function, removed async
 const filterDeprecatedTokens = (
-  context: PandaContext,
+  context: Generator,
   tokens: DeprecatedToken[],
 ): DeprecatedToken[] => {
   return tokens.filter((token) => {
@@ -64,15 +70,12 @@ const filterDeprecatedTokens = (
 };
 
 // Refactored to arrow function, removed async
-const filterInvalidTokens = (
-  context: PandaContext,
-  paths: string[],
-): string[] => {
+const filterInvalidTokens = (context: Generator, paths: string[]): string[] => {
   return paths.filter((path) => !context.utility.tokens.view.get(path));
 };
 
 // Refactored to arrow function, removed async
-const getPropertyCategory = (context: PandaContext, _attribute: string) => {
+const getPropertyCategory = (context: Generator, _attribute: string) => {
   const longhand = resolveLongHand(context, _attribute);
   const attribute = longhand || _attribute;
   const attributeConfig = context.utility.config[attribute];
@@ -82,27 +85,16 @@ const getPropertyCategory = (context: PandaContext, _attribute: string) => {
 };
 
 // Refactored to arrow function, removed async
-const isColorAttribute = (
-  context: PandaContext,
-  _attribute: string,
-): boolean => {
+const isColorAttribute = (context: Generator, _attribute: string): boolean => {
   const category = getPropertyCategory(context, _attribute);
   return category === 'colors';
 };
 
 // Refactored to arrow function, removed async
-const isColorToken = (context: PandaContext, value: string): boolean => {
+const isColorToken = (context: Generator, value: string): boolean => {
   return Boolean(
     context.utility.tokens.view.categoryMap.get('colors')?.get(value),
   );
-};
-
-// Refactored to arrow function
-const arePathsEqual = (path1: string, path2: string) => {
-  const normalizedPath1 = path.resolve(path1);
-  const normalizedPath2 = path.resolve(path2);
-
-  return normalizedPath1 === normalizedPath2;
 };
 
 type MatchImportResult = {
@@ -169,6 +161,10 @@ export function run(
   options: Options,
   tokens: DeprecatedToken[],
 ): DeprecatedToken[];
+export function run(
+  action: 'getJsxFactory',
+  options: Options,
+): string | undefined;
 export function run(action: string, options: Options, ...args: any[]): any {
   // @ts-expect-error cast
   return runAsync(action, options, ...args);
@@ -232,6 +228,10 @@ export function runAsync(
   options: Options,
   tokens: DeprecatedToken[],
 ): Promise<DeprecatedToken[]>;
+export function runAsync(
+  action: 'getJsxFactory',
+  options: Options,
+): Promise<string | undefined>;
 export async function runAsync(
   action: string,
   options: Options,
@@ -246,6 +246,8 @@ export async function runAsync(
     case 'filterInvalidTokens':
       // @ts-expect-error cast
       return filterInvalidTokens(context, ...args);
+    case 'getJsxFactory':
+      return getJsxFactory(context);
     case 'getPropCategory':
       // @ts-expect-error cast
       return getPropertyCategory(context, ...args);
@@ -275,14 +277,24 @@ export async function runAsync(
   }
 }
 
-// Refactored to arrow function, removed async
-const isValidFile = (context: PandaContext, fileName: string): boolean => {
-  return context.getFiles().some((file) => arePathsEqual(file, fileName));
+// Refactored to use micromatch instead of getFiles() for O(1) performance
+const isValidFile = (context: Generator, fileName: string): boolean => {
+  const { exclude, include } = context.config;
+  const cwd = context.config.cwd || process.cwd();
+
+  const relativePath = path.isAbsolute(fileName)
+    ? path.relative(cwd, fileName)
+    : fileName;
+
+  return micromatch.isMatch(relativePath, include, {
+    dot: true,
+    ignore: exclude,
+  });
 };
 
 // Refactored to arrow function, removed async
 const isValidProperty = (
-  context: PandaContext,
+  context: Generator,
   name: string,
   patternName?: string,
 ) => {
@@ -291,14 +303,22 @@ const isValidProperty = (
   }
 
   if (!patternName) {
-    return;
+    return false;
+  }
+
+  // If the pattern name is the jsxFactory (e.g., 'styled'), we should accept
+  // any property that is valid according to the global property check
+  // Since styled components are generic wrappers, we don't need pattern-specific checks
+  if (patternName === context.config.jsxFactory) {
+    // Already checked globally above, so return false if we got here
+    return false;
   }
 
   const pattern = context.patterns.details.find(
     (p) => p.baseName === patternName || p.jsx.includes(patternName),
   )?.config.properties;
   if (!pattern) {
-    return;
+    return false;
   }
 
   return Object.keys(pattern).includes(name);
@@ -306,7 +326,7 @@ const isValidProperty = (
 
 // Refactored to arrow function, removed async
 const matchFile = (
-  context: PandaContext,
+  context: Generator,
   name: string,
   imports: ImportResult[],
 ) => {
@@ -315,7 +335,7 @@ const matchFile = (
 };
 
 // Refactored to arrow function, removed async
-const matchImports = (context: PandaContext, result: MatchImportResult) => {
+const matchImports = (context: Generator, result: MatchImportResult) => {
   return context.imports.match(result, (module_) => {
     const { tsOptions } = context.parserOptions;
     if (!tsOptions?.pathMappings) {
@@ -328,12 +348,14 @@ const matchImports = (context: PandaContext, result: MatchImportResult) => {
 
 // Refactored to arrow function, removed async
 const resolveLongHand = (
-  context: PandaContext,
+  context: Generator,
   name: string,
 ): string | undefined => {
   const reverseShorthandsMap = new Map();
 
-  for (const [key, values] of context.utility.getPropShorthandsMap()) {
+  const shorthands = context.utility.getPropShorthandsMap();
+
+  for (const [key, values] of shorthands) {
     for (const value of values) {
       reverseShorthandsMap.set(value, key);
     }
@@ -344,10 +366,14 @@ const resolveLongHand = (
 
 // Refactored to arrow function, removed async
 const resolveShorthands = (
-  context: PandaContext,
+  context: Generator,
   name: string,
 ): string[] | undefined => {
   return context.utility.getPropShorthandsMap().get(name);
+};
+
+const getJsxFactory = (context: Generator): string | undefined => {
+  return context.config.jsxFactory;
 };
 
 runAsWorker(run as any);

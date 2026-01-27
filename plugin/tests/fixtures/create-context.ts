@@ -1,7 +1,7 @@
 import { fixturePreset } from './config';
 import { mergeConfigs } from '@pandacss/config';
 import { defineConfig } from '@pandacss/dev';
-import { PandaContext } from '@pandacss/node';
+import { Generator } from '@pandacss/generator';
 import { parseJson, stringifyJson } from '@pandacss/shared';
 import { type LoadConfigResult, type UserConfig } from '@pandacss/types';
 
@@ -138,22 +138,21 @@ const fixtureDefaults = {
   serialized: stringifyJson(config),
 } as LoadConfigResult;
 
-export const createContext = () => {
+export const createGeneratorContext = (
+  userConfig?: Record<string, unknown>,
+) => {
   const resolvedConfig = mergeConfigs([
     // @ts-expect-error - TODO explain why this is needed
     fixtureDefaults.config as unknown,
     // @ts-expect-error - TODO explain why this is needed
     sandboxConfig as unknown,
     { importMap: './panda' },
+    ...(userConfig ? [userConfig] : []),
   ]) as unknown as UserConfig;
 
-  return new PandaContext({
+  return new Generator({
     ...fixtureDefaults,
     // @ts-expect-error - TODO explain why this is needed
     config: resolvedConfig,
-    tsconfig: {
-      // @ts-expect-error - TODO explain why this is needed
-      useInMemoryFileSystem: true,
-    },
   });
 };
