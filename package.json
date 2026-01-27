@@ -1,6 +1,5 @@
 {
   "dependencies": {
-    "@changesets/cli": "^2.27.1",
     "typescript": "^5.3.3"
   },
   "description": "ESLint plugin for Panda CSS",
@@ -16,6 +15,7 @@
     "husky": "^9.0.6",
     "knip": "^5.63.1",
     "lint-staged": "^15.2.0",
+    "semantic-release": "^24.2.0",
     "vitest": "^1.2.1"
   },
   "files": [
@@ -33,7 +33,7 @@
     "lint:knip": "knip",
     "lint:tsc": "pnpm -r --parallel lint:tsc",
     "prepare": "husky",
-    "release": "changeset publish",
+    "release": "semantic-release",
     "test:vitest": "vitest run"
   },
   "version": "0.0.0"
