@@ -1,4 +1,4 @@
-## ESLint Plugin for Panda CSS
+## Fast ESLint Plugin for Panda CSS
 
 ### Installation
 
