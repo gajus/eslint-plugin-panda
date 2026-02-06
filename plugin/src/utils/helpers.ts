@@ -107,7 +107,7 @@ const _getImports = (context: RuleContext<any, any>) => {
 // Caching filtered imports per context to avoid redundant computations
 const importsCache = new WeakMap<RuleContext<any, any>, ImportResult[]>();
 
-const getImports = (context: RuleContext<any, any>) => {
+const getImports = (context: RuleContext<any, any>): ImportResult[] => {
   if (importsCache.has(context)) {
     return importsCache.get(context)!;
   }
@@ -119,8 +119,11 @@ const getImports = (context: RuleContext<any, any>) => {
     getSyncOptions(context),
     imports,
   );
-  importsCache.set(context, filteredImports);
-  return filteredImports;
+  // syncAction returns undefined when the worker fails (e.g. config loading error).
+  // Fall back to an empty array to prevent downstream crashes.
+  const result = filteredImports ?? [];
+  importsCache.set(context, result);
+  return result;
 };
 
 const isValidStyledProperty = <T extends Node>(
