@@ -1,4 +1,5 @@
 import { type ImportResult, syncAction } from '.';
+import { getFileCache } from './cache';
 import {
   isCallExpression,
   isIdentifier,
@@ -16,7 +17,7 @@ import {
   type Node,
 } from './nodes';
 import { type DeprecatedToken } from './worker';
-import { analyze, type ScopeManager } from '@typescript-eslint/scope-manager';
+import { analyze } from '@typescript-eslint/scope-manager';
 import { type TSESTree } from '@typescript-eslint/utils';
 import { type RuleContext } from '@typescript-eslint/utils/ts-eslint';
 
@@ -84,12 +85,12 @@ export const isPandaConfigFunction = (
   );
 };
 
-// Caching raw imports per context to avoid redundant AST traversal
-const rawImportsCache = new WeakMap<RuleContext<any, any>, ImportResult[]>();
-
+// Caching raw imports for the current file to avoid redundant AST traversal
 const _getImports = (context: RuleContext<any, any>) => {
-  if (rawImportsCache.has(context)) {
-    return rawImportsCache.get(context)!;
+  const cache = getFileCache(context.filename);
+
+  if (cache.rawImports) {
+    return cache.rawImports;
   }
 
   const specifiers = getImportSpecifiers(context);
@@ -100,16 +101,16 @@ const _getImports = (context: RuleContext<any, any>) => {
     name: (specifier.imported as any).name,
   }));
 
-  rawImportsCache.set(context, imports);
+  cache.rawImports = imports;
   return imports;
 };
 
-// Caching filtered imports per context to avoid redundant computations
-const importsCache = new WeakMap<RuleContext<any, any>, ImportResult[]>();
-
+// Caching filtered imports for the current file to avoid redundant computations
 const getImports = (context: RuleContext<any, any>): ImportResult[] => {
-  if (importsCache.has(context)) {
-    return importsCache.get(context)!;
+  const cache = getFileCache(context.filename);
+
+  if (cache.imports) {
+    return cache.imports;
   }
 
   const imports = _getImports(context);
@@ -122,7 +123,7 @@ const getImports = (context: RuleContext<any, any>): ImportResult[] => {
   // syncAction returns undefined when the worker fails (e.g. config loading error).
   // Fall back to an empty array to prevent downstream crashes.
   const result = filteredImports ?? [];
-  importsCache.set(context, result);
+  cache.imports = result;
   return result;
 };
 
@@ -157,9 +158,7 @@ const isPandaIsh = (name: string, context: RuleContext<any, any>) => {
   return matchFile(name, imports, context);
 };
 
-// Caching scope analysis per AST to avoid expensive re-computation
-const scopeCache = new WeakMap<TSESTree.Program, ScopeManager>();
-
+// Caching scope analysis for the current file to avoid expensive re-computation
 const findDeclaration = (name: string, context: RuleContext<any, any>) => {
   try {
     const source = context.sourceCode;
@@ -171,12 +170,14 @@ const findDeclaration = (name: string, context: RuleContext<any, any>) => {
       return undefined;
     }
 
-    let scope = scopeCache.get(source.ast);
+    const cache = getFileCache(context.filename);
+
+    let scope = cache.scopeAnalysis;
     if (!scope) {
       scope = analyze(source.ast, {
         sourceType: 'module',
       });
-      scopeCache.set(source.ast, scope);
+      cache.scopeAnalysis = scope;
     }
 
     const decl = scope.variables
